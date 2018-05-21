@@ -1,0 +1,17 @@
+{
+  "name": "paws",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc",
+    "deploy": "gcloud beta functions deploy --trigger-http paws"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/google-cloud__storage": "^1.1.7",
+    "typescript": "^2.8.3"
+  }
+}
