@@ -13,7 +13,7 @@ async function pawsMain(req: any) {
 
   // Check to see if request is a json file
   if (req.get('content-type') !== 'application/json') {
-    return {statusCode: 400, body: 'Not JSON'}
+    return {statusCode: 400, body: 'Not JSON\n'}
   }
   // Get user attribute 
   const currentUser : string = req.body.user;
@@ -25,27 +25,34 @@ async function pawsMain(req: any) {
 
   // if current user is not allowed
   if (!usersArray.includes(currentUser)) { 
-    return {statusCode: 401, body: 'Unauthorized'};
+    return {statusCode: 401, body: 'Unauthorized\n'};
   }
 
   try {
     // specifiying the prefix of the directory to list files
     const prefixAndDelimiter = {
-      prefix: '/' + currentUser,
-      delimiter: '/'
-    }; // e.g. if currentUser is samlee, it ends up : /samlee/
-    
-    const [filesList] = await bucket.getFiles(prefixAndDelimiter);
+      delimiter: '/',
+      prefix: currentUser + '/'
+    }; // delimiter makes it so that we get only the direct child of prefix
+
+    const [files] = await bucket.getFiles(prefixAndDelimiter);
+    // get files for folder
     let bodyString: string = currentUser + "'s files:\n";
-    filesList.forEach(fileName => {
-      bodyString += fileName + "\n";
-    });
+
+    for (let i = 0; i < files.length; i++) { // loop through all files
+      bodyString += 'Name: ' + files[i].name + '\n';
+      bodyString += 'Contents:\n'
+      const [fileContents] = await files[i].download();
+      // download file
+      bodyString += fileContents.toString() + '\n';
+      // put file content in body text.
+    }
 
     return {statusCode: 200, body: bodyString};
 
   } catch (e) {
 
-    return {statusCode: 500, body: 'User does not have stored folder.'}
+    return {statusCode: 500, body: e}
   }
 
 }
