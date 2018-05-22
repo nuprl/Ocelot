@@ -5,10 +5,13 @@
   "license": "MIT",
   "scripts": {
     "build": "./node_modules/.bin/tsc",
-    "deploy": "gcloud beta functions deploy --trigger-http pawsGetFile"
+    "deploy": "gcloud beta functions deploy --trigger-http paws"
   },
   "dependencies": {
     "@google-cloud/storage": "^1.6.0",
+    "@types/body-parser": "^1.17.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
     "google-auth-library": "^1.5.0"
   },
   "devDependencies": {

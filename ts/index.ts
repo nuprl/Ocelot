@@ -2,6 +2,8 @@
 import * as storage from '@google-cloud/storage';
 import {OAuth2Client} from 'google-auth-library';
 import {Request} from 'express';
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
 
 const sto = storage(); //why not new?
 const bucket = sto.bucket('paws-student-files');
@@ -59,14 +61,19 @@ async function getUserFiles(req: Request) {
 }
 
 
+export const paws = express();
+paws.use(bodyParser.json());
 
-export function pawsGetFile(req: any, res: any) {
+paws.post('/getfile', (req, resp) => {
   getUserFiles(req).then(responseObj => {
-    res.status(responseObj.statusCode).send(responseObj.body);
+    resp.status(responseObj.statusCode).send(responseObj.body);
+  }).catch(reason => {
+    resp.status(500).send(reason.toString());
   });
-}
+});
 
-export function pawsLoginAuthenticate(req: any, res: any) {
+
+paws.get('/login', (req, resp) => {
   //filler
-  res.status(200).end();
-}
+  resp.status(200).end();
+});
