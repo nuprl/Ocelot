@@ -1,11 +1,12 @@
 
 import * as storage from '@google-cloud/storage';
+import {OAuth2Client} from 'google-auth-library';
+import {Request} from 'express';
 
-const sto = storage();
+const sto = storage(); //why not new?
 const bucket = sto.bucket('paws-student-files');
 
-async function pawsMain(req: any) {
-
+async function getUserFiles(req: Request) {
   // Check to see if request is a get request
   if (req.method !== 'POST') {
     return {statusCode: 200, body: 'Testopesto'};
@@ -13,7 +14,7 @@ async function pawsMain(req: any) {
 
   // Check to see if request is a json file
   if (req.get('content-type') !== 'application/json') {
-    return {statusCode: 400, body: 'Not JSON\n'}
+    return {statusCode: 400, body: JSON.stringify({"message": "Not JSON"})}
   }
   // Get user attribute 
   const currentUser : string = req.body.user;
@@ -25,7 +26,7 @@ async function pawsMain(req: any) {
 
   // if current user is not allowed
   if (!usersArray.includes(currentUser)) { 
-    return {statusCode: 401, body: 'Unauthorized\n'};
+    return {statusCode: 401, body: JSON.stringify({"message": "Unauthorized"})};
   }
 
   try {
@@ -37,18 +38,18 @@ async function pawsMain(req: any) {
 
     const [files] = await bucket.getFiles(prefixAndDelimiter);
     // get files for folder
-    let bodyString: string = currentUser + "'s files:\n";
+    let userFiles: {user: string, files: {name: string, content: string}[]};
+    userFiles = {user: currentUser, files: []};
 
     for (let i = 0; i < files.length; i++) { // loop through all files
-      bodyString += 'Name: ' + files[i].name + '\n';
-      bodyString += 'Contents:\n'
       const [fileContents] = await files[i].download();
-      // download file
-      bodyString += fileContents.toString() + '\n';
-      // put file content in body text.
+      userFiles.files.push({
+        name: files[i].name,
+        content: fileContents.toString()
+      });
     }
 
-    return {statusCode: 200, body: bodyString};
+    return {statusCode: 200, body: JSON.stringify(userFiles)};
 
   } catch (e) {
 
@@ -57,8 +58,15 @@ async function pawsMain(req: any) {
 
 }
 
-export function paws(req: any, res: any) {
-  pawsMain(req).then(pawsResponse => {
-    res.status(pawsResponse.statusCode).send(pawsResponse.body);
+
+
+export function pawsGetFile(req: any, res: any) {
+  getUserFiles(req).then(responseObj => {
+    res.status(responseObj.statusCode).send(responseObj.body);
   });
+}
+
+export function pawsLoginAuthenticate(req: any, res: any) {
+  //filler
+  res.status(200).end();
 }
