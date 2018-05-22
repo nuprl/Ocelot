@@ -304,7 +304,7 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-google-auth-library@^1.3.1:
+google-auth-library@^1.3.1, google-auth-library@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-1.5.0.tgz#d9068f8bad9017224a4c41abcdcb6cf6a704e83b"
   dependencies:

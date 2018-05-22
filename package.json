@@ -8,7 +8,8 @@
     "deploy": "gcloud beta functions deploy --trigger-http paws"
   },
   "dependencies": {
-    "@google-cloud/storage": "^1.6.0"
+    "@google-cloud/storage": "^1.6.0",
+    "google-auth-library": "^1.5.0"
   },
   "devDependencies": {
     "@types/google-cloud__storage": "^1.1.7",
