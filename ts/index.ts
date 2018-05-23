@@ -21,7 +21,7 @@ const bucket = sto.bucket('paws-student-files');
  * @returns {statusCode: number, body: {}} statusCode and contents in body
  */
 async function getUserFiles(req: Request) {
-  
+
   // Get user attribute 
   const currentUser: string = req.body.user;
 
@@ -127,19 +127,19 @@ paws.use(cors()); // shouldn't this have options for which domain to allow?
 
 paws.use(bodyParser.json()); // parse all incoming json data
 
-paws.get('/', (req, res) => {
-  res.status(200).send("Hello World");
+paws.get('/', (req, res) => { // simple get request
+  res.status(200).send("Hello World"); 
 });
 
-paws.post('/getfile', (req, res) => {
-  getUserFiles(req).then(responseObj => {
+paws.post('/getfile', (req, res) => { // post request to route /getfile
+  getUserFiles(req).then(responseObj => { // give req to getUserFiles and process it accordingly
     res.status(responseObj.statusCode).json(responseObj.body);
   }).catch(reason => { // for debugging
     res.status(500).send(reason.toString());
   });
 });
 
-paws.post('/login', (req, res) => {
+paws.post('/login', (req, res) => { // post request to login to verify token
   verify(req).then(responseObj => {
     res.status(responseObj.statusCode).json(responseObj.body);
   }).catch(reason => {
