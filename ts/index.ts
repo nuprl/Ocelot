@@ -80,7 +80,8 @@ const client = new OAuth2Client(CLIENT_ID);
  * @returns {statusCode: number, body: {}} statusCode and contents in body
  */
 async function verify(req: Request) {
-  const ticket = await client.verifyIdToken({
+
+  const ticket = await client.verifyIdToken({ // verify and get ticket
     idToken: req.body.token,
     audience: CLIENT_ID
   });
@@ -89,13 +90,13 @@ async function verify(req: Request) {
     return { statusCode: 400, body: { message: "verifying ends up null hm" } };
   }
 
-  const payload = ticket.getPayload();
+  const payload = ticket.getPayload(); // get payload from ticket
 
   if (payload == null) {
     return { statusCode: 400, body: { message: "payload ends up null hm" } };
   }
 
-  const userEmail = payload['email'];
+  const userEmail = payload['email']; // get user email
 
   if (userEmail == undefined) {
     return { statusCode: 400, body: { message: "No email" } };
@@ -106,7 +107,7 @@ async function verify(req: Request) {
   const [buffer] = await file.download();
   const usersArray: string[] = JSON.parse(buffer.toString());
 
-  if (!usersArray.includes(userEmail)) {
+  if (!usersArray.includes(userEmail)) { // check if logged in user is allowed
     return { statusCode: 401, body: { "message": "Unauthorized" } };
   }
 
