@@ -13,29 +13,54 @@
 
 <body>
 
-    <div id="my-signin2" data-onsuccess="onSignIn"></div>
+    <div id="my-signin2"></div>
     <script>
-        function onSuccess(googleUser) {
+        async function onSuccess(googleUser) {
+
             console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
 
             var id_token = googleUser.getAuthResponse().id_token;
 
-            var xhr = new XMLHttpRequest();
-            xhr.responseType = 'json'; // not supported by IE11
-            xhr.open('POST', 'http://localhost:8000/login');
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onload = function () {
-                const jsonResponse = xhr.response;
-                if (xhr.status !== 200) {
+            let url = 'https://us-central1-umass-compsci220.cloudfunctions.net/paws/login';
+
+            if (window.location.host.substring(0, 9) === 'localhost') {
+                url = 'http://localhost:8000/login';
+            }
+
+            const data = { token: id_token };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+
+
+                const jsonResponse = await response.json();
+
+                console.log('Getting response...'); // probably loading screen here to tell user to wait
+
+                if (jsonResponse.message === 'Unauthorized') {
                     signOut();
-                    console.log("Signed out")
+                    return;
                 }
-            };
-            xhr.send(JSON.stringify({ token: id_token }));
+
+                console.log("You're logged in!");
+
+            } catch (error) {
+                console.error('Error', error);
+                signOut();
+            }
         }
+
         function onFailure(error) {
             console.log(error);
         }
+
         function renderButton() {
             gapi.signin2.render('my-signin2', {
                 'scope': 'profile email',
@@ -58,18 +83,6 @@
             auth2.signOut().then(function () {
                 console.log('User signed out.');
             });
-        }
-
-        function onSignIn(googleUser) {
-
-
-
-
-            var profile = googleUser.getBasicProfile();
-            console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-            console.log('Name: ' + profile.getName());
-            console.log('Image URL: ' + profile.getImageUrl());
-            console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
         }
     </script>
 
