@@ -21,15 +21,7 @@ const bucket = sto.bucket('paws-student-files');
  * @returns {statusCode: number, body: {}} statusCode and contents in body
  */
 async function getUserFiles(req: Request) {
-  // Check to see if request is a get request
-  if (req.method !== 'POST') {
-    return { statusCode: 200, body: 'TEST' };
-  }
-
-  // Check to see if request is a json file
-  if (req.get('content-type') !== 'application/json') {
-    return { statusCode: 400, body: { "message": "Not JSON" } }
-  }
+  
   // Get user attribute 
   const currentUser: string = req.body.user;
 
