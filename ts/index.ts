@@ -5,7 +5,7 @@ import { Request } from 'express'; // For response and request object autocomple
 import * as express from 'express'; // for routing different links
 import * as bodyParser from 'body-parser'; // for parsing JSON data
 import * as path from 'path'; // for manipulating paths
-import * as cors from 'cors';
+import * as cors from 'cors'; // allows sending http requests to different domains
 
 import * as morgan from 'morgan'; // for logging in all http traffic on console.
 
@@ -120,7 +120,7 @@ async function verify(req: Request) {
 export const paws = express();
 paws.use(morgan('combined')); // logging all http traffic
 
-paws.use(cors()); // shouldn't this have options for which domain to allow?
+paws.use(cors()); // shouldn't this have options for which domain to allow? (will be dealt later)
 // allows cross-origin resource sharing, i.e stops Same Origin Policy from 
 // happening across different ports, we need to this to send post requests
 // (Same Origin Policy is on by default to prevent cross site resource forgery)
