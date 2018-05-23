@@ -31,6 +31,9 @@
             const data = { token: id_token }; // data to be sent
 
             try {
+
+                console.log('Getting response...'); // probably loading screen here to tell user to wait
+
                 const response = await fetch(url, { // send json data to specified URL
                     method: 'POST',
                     body: JSON.stringify(data),
@@ -41,8 +44,7 @@
 
                 const jsonResponse = await response.json(); // get json response
 
-                console.log('Getting response...'); // probably loading screen here to tell user to wait
-
+                
                 if (jsonResponse.message === 'Unauthorized') { // if messaged back as unauthorized
                     signOut(); // sign user out
                     return;

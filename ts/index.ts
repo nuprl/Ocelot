@@ -57,10 +57,14 @@ async function getUserFiles(req: Request) {
 
     for (let i = 0; i < files.length; i++) { // loop through all files
       const [fileContents] = await files[i].download();
-      userFiles.files.push({
-        name: path.basename(files[i].name), // get the filename instead of whole path
-        content: fileContents.toString()
-      });
+      const fileName: string = files[i].name;
+
+      if (fileName.substr(fileName.length - 1, 1) !== '/') { // if it's not directory directory
+        userFiles.files.push({
+          name: path.basename(files[i].name), // get the filename instead of whole path
+          content: fileContents.toString()
+        });
+      }
     }
 
     return { statusCode: 200, body: userFiles };
