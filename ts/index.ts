@@ -1,7 +1,7 @@
 
 import * as storage from '@google-cloud/storage'; // Google cloud storage
-import {OAuth2Client} from 'google-auth-library'; // for authenticating google login
-import {Request} from 'express'; // For response and request object autocomplete
+import { OAuth2Client } from 'google-auth-library'; // for authenticating google login
+import { Request } from 'express'; // For response and request object autocomplete
 import * as express from 'express'; // for routing different links
 import * as bodyParser from 'body-parser'; // for parsing JSON data
 import * as path from 'path'; // for manipulating paths
@@ -12,27 +12,35 @@ import * as morgan from 'morgan'; // for logging in all http traffic on console.
 const sto = storage();
 const bucket = sto.bucket('paws-student-files');
 
+
+/**
+ * Given the username in req, get files of user accordingly
+ * Otherwise, return unauthorized message if user is not authorized.
+ * 
+ * @param {Request} req 
+ * @returns {statusCode: number, body: {}} statusCode and contents in body
+ */
 async function getUserFiles(req: Request) {
   // Check to see if request is a get request
   if (req.method !== 'POST') {
-    return {statusCode: 200, body: 'TEST'};
+    return { statusCode: 200, body: 'TEST' };
   }
 
   // Check to see if request is a json file
   if (req.get('content-type') !== 'application/json') {
-    return {statusCode: 400, body: {"message": "Not JSON"}}
+    return { statusCode: 400, body: { "message": "Not JSON" } }
   }
   // Get user attribute 
-  const currentUser : string = req.body.user;
+  const currentUser: string = req.body.user;
 
   // Get allowed users list, a list of emails
   const [file] = await bucket.file('allowedUsersList.json').get();
-  const [buffer] =  await file.download();
+  const [buffer] = await file.download();
   const usersArray: string[] = JSON.parse(buffer.toString());
 
   // if current user is not allowed
-  if (!usersArray.includes(currentUser)) { 
-    return {statusCode: 401, body: {"message": "Unauthorized"}};
+  if (!usersArray.includes(currentUser)) {
+    return { statusCode: 401, body: { "message": "Unauthorized" } };
   }
 
   try {
@@ -44,8 +52,8 @@ async function getUserFiles(req: Request) {
 
     const [files] = await bucket.getFiles(prefixAndDelimiter);
     // get files for folder
-    let userFiles: {user: string, files: {name: string, content: string}[]};
-    userFiles = {user: currentUser, files: []};
+    let userFiles: { user: string, files: { name: string, content: string }[] };
+    userFiles = { user: currentUser, files: [] };
 
     for (let i = 0; i < files.length; i++) { // loop through all files
       const [fileContents] = await files[i].download();
@@ -55,11 +63,11 @@ async function getUserFiles(req: Request) {
       });
     }
 
-    return {statusCode: 200, body: userFiles};
+    return { statusCode: 200, body: userFiles };
 
   } catch (e) {
 
-    return {statusCode: 500, body: {message: e}};
+    return { statusCode: 500, body: { message: e } };
   }
 
 }
@@ -68,6 +76,13 @@ async function getUserFiles(req: Request) {
 const CLIENT_ID = "883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
+/**
+ * Verifies the given token in request
+ * and check if user is allowed to be sign in.
+ * 
+ * @param {Request} req 
+ * @returns {statusCode: number, body: {}} statusCode and contents in body
+ */
 async function verify(req: Request) {
   const ticket = await client.verifyIdToken({
     idToken: req.body.token,
@@ -75,31 +90,31 @@ async function verify(req: Request) {
   });
 
   if (ticket == null) {
-    return {statusCode: 400, body: {message: "verifying ends up null hm"}};
+    return { statusCode: 400, body: { message: "verifying ends up null hm" } };
   }
 
   const payload = ticket.getPayload();
 
   if (payload == null) {
-    return {statusCode: 400, body: {message: "payload ends up null hm"}};
+    return { statusCode: 400, body: { message: "payload ends up null hm" } };
   }
 
   const userEmail = payload['email'];
-  
+
   if (userEmail == undefined) {
-    return {statusCode: 400, body: {message: "No email"}};
+    return { statusCode: 400, body: { message: "No email" } };
   }
 
   // Get allowed users list, not sure how to fix this duplicated code
   const [file] = await bucket.file('allowedUsersList.json').get();
-  const [buffer] =  await file.download();
+  const [buffer] = await file.download();
   const usersArray: string[] = JSON.parse(buffer.toString());
 
-  if (!usersArray.includes(userEmail)) { 
-    return {statusCode: 401, body: {"message": "Unauthorized"}};
+  if (!usersArray.includes(userEmail)) {
+    return { statusCode: 401, body: { "message": "Unauthorized" } };
   }
 
-  return {statusCode: 200, body: {"message": "Success"}}
+  return { statusCode: 200, body: { "message": "Success" } }
 
 }
 

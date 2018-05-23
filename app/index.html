@@ -19,18 +19,19 @@
 
             console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
 
-            var id_token = googleUser.getAuthResponse().id_token;
+            var id_token = googleUser.getAuthResponse().id_token; // get id token
 
             let url = 'https://us-central1-umass-compsci220.cloudfunctions.net/paws/login';
+            // domain to send post requests to
 
-            if (window.location.host.substring(0, 9) === 'localhost') {
-                url = 'http://localhost:8000/login';
+            if (window.location.host.substring(0, 9) === 'localhost') { // if hosted on localhost
+                url = 'http://localhost:8000/login'; 
             }
 
-            const data = { token: id_token };
+            const data = { token: id_token }; // data to be sent
 
             try {
-                const response = await fetch(url, {
+                const response = await fetch(url, { // send json data to specified URL
                     method: 'POST',
                     body: JSON.stringify(data),
                     headers: {
@@ -38,18 +39,16 @@
                     }
                 });
 
-
-
-                const jsonResponse = await response.json();
+                const jsonResponse = await response.json(); // get json response
 
                 console.log('Getting response...'); // probably loading screen here to tell user to wait
 
-                if (jsonResponse.message === 'Unauthorized') {
-                    signOut();
+                if (jsonResponse.message === 'Unauthorized') { // if messaged back as unauthorized
+                    signOut(); // sign user out
                     return;
                 }
 
-                console.log("You're logged in!");
+                console.log("You're logged in!"); // if not, they are logged in 
 
             } catch (error) {
                 console.error('Error', error);
