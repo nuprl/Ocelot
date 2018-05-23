@@ -109,7 +109,10 @@ async function verify(req: Request) {
 export const paws = express();
 paws.use(morgan('combined')); // logging all http traffic
 
-paws.use(cors());
+paws.use(cors()); // shouldn't be on one single route?
+// allows cross-origin resource sharing, i.e stops Same Origin Policy from 
+// happening across different ports, we need to this to send post requests
+// (Same Origin Policy is on by default to prevent cross site resource forgery)
 
 paws.use(bodyParser.json()); // parse all incoming json data
 
