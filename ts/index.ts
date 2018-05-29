@@ -123,7 +123,7 @@ paws.use(morgan('combined')); // logging all http traffic
 
 paws.use(cors()); // shouldn't this have options for which domain to allow? (will be dealt later)
 // allows cross-origin resource sharing, i.e stops Same Origin Policy from 
-// happening across different ports, we need to this to send post requests
+// happening across different ports, we need to do this to send post requests
 // (Same Origin Policy is on by default to prevent cross site resource forgery)
 
 paws.use(bodyParser.json()); // parse all incoming json data
