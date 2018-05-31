@@ -34,12 +34,12 @@ async function getUserFiles(req: Request) {
 
   // Get allowed users list from Datastore, a list of emails
   const kind = 'CS220AllowedUsers';
-  const name = 'allowedUsers';
-  const query = datastore
+  const name = 'allowedUsers'; // name of entity
+  const query = datastore 
     .createQuery(kind)
     .filter('__key__', '=', datastore.key([kind, name]));
 
-  const [result] = await datastore.runQuery(query);
+  const [result] = await datastore.runQuery(query); //query datastore
   const userObj = result[0] as any;
 
   const usersArray: string[] = userObj.users
