@@ -36,8 +36,8 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
         this.setState({ auth: checked });
     };
 
-    changeToLoading = () => {
-        this.setState({ loading: true });
+    toggleLoading = () => {
+        this.setState({ loading: !this.state.loading });
     };
 
     onSuccessResponse = async (googleUser: GoogleLoginResponse) => {
@@ -68,12 +68,15 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
             const jsonResponse = await response.json(); // get json response
 
             if (jsonResponse.message === 'Unauthorized') { // if messaged back as unauthorized
-                googleUser.disconnect(); // sign user out
+                googleUser.disconnect(); // sign user out (revoke given permissions)
+                this.toggleLoading();
+                // tslint:disable-next-line:no-console
+                console.log('No can do dude');
                 return;
             }
             // tslint:disable-next-line:no-console
-            console.log('You\'re logged in!'); // if not, they are logged in 
-            this.setState({auth: true});
+            console.log('You\'re logged in!'); // if not, they are logged in
+            this.setState({ auth: true });
 
         } catch (error) {
             // tslint:disable-next-line:no-console
@@ -85,15 +88,15 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
     onFailureResponse = (response: { error: string }) => {
         // tslint:disable-next-line:no-console
         console.log(response.error);
-        this.setState({loading: false});
+        this.toggleLoading();
     }
 
     renderButton = (renderProps?: { onClick: () => void }) => {
         if (renderProps !== undefined) {
             return (
-                <Button color="inherit" onClick={() => { renderProps.onClick(); this.changeToLoading(); }}>
-                    {this.state.loading ? 
-                        <CircularProgress size={14}  color="inherit"/> :
+                <Button color="inherit" onClick={() => { renderProps.onClick(); this.toggleLoading(); }}>
+                    {this.state.loading ?
+                        <CircularProgress size={14} color="inherit" /> :
                         <Typography color="inherit">Login</Typography>
                     }
                 </Button>
@@ -116,16 +119,18 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
                             CS 220 Paws
                         </Typography>
                         {auth ? (
-                            <Button color="inherit">Login</Button>
+                            <Typography color="inherit">
+                                You're logged in BOI!
+                             </Typography>
                         ) : (
                                 <GoogleLogin
                                     clientId="883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com"
                                     onSuccess={(response) => {
                                         this.onSuccessResponse(response as GoogleLoginResponse)
-                                        .catch(reason => {
-                                            // tslint:disable-next-line:no-console
-                                            console.error(reason);
-                                        });
+                                            .catch(reason => {
+                                                // tslint:disable-next-line:no-console
+                                                console.error(reason);
+                                            });
                                     }}
                                     onFailure={this.onFailureResponse}
                                     prompt="select_account" // always prompts user to select a specific account

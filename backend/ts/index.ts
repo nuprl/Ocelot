@@ -25,36 +25,33 @@ const datastore = new Datastore({});
 async function getUserFiles(req: Request) {
 
   // Get user attribute 
-  const currentUser: string = req.body.user;
+  const userEmail: string = req.body.user;
 
   // Get allowed users list from Datastore, a list of emails
-  const kind = 'CS220AllowedUsers';
-  const name = 'allowedUsers'; // name of entity
-  const query = datastore 
+  const kind = "CS220AllowedAccounts";
+  const name = userEmail; // name of entity
+  const query = datastore
     .createQuery(kind)
     .filter('__key__', '=', datastore.key([kind, name]));
 
-  const [result] = await datastore.runQuery(query); //query datastore
-  const userObj = result[0] as any;
-
-  const usersArray: string[] = userObj.users
+  const [queryResultArray] = await datastore.runQuery(query); //query datastore
 
   // if current user is not allowed
-  if (!usersArray.includes(currentUser)) {
-    return { statusCode: 401, body: { "message": "Unauthorized" } };
+  if (queryResultArray.length !== 1) {
+    return { statusCode: 200, body: { "message": "Unauthorized" } };
   }
 
   try {
     // specifiying the prefix of the directory to list files
     const prefixAndDelimiter = {
       delimiter: '/',
-      prefix: currentUser.split('@')[0] + '/'
+      prefix: userEmail.split('@')[0] + '/'
     }; // delimiter makes it so that we get only the direct child of prefix
 
     const [files] = await bucket.getFiles(prefixAndDelimiter);
     // get files for folder
     let userFiles: { user: string, files: { name: string, content: string }[] };
-    userFiles = { user: currentUser, files: [] };
+    userFiles = { user: userEmail, files: [] };
 
     for (let i = 0; i < files.length; i++) { // loop through all files
       const [fileContents] = await files[i].download();
@@ -111,13 +108,18 @@ async function verify(req: Request) {
     return { statusCode: 400, body: { message: "No email" } };
   }
 
-  // Get allowed users list, not sure how to fix this duplicated code
-  const [file] = await bucket.file('allowedUsersList.json').get();
-  const [buffer] = await file.download();
-  const usersArray: string[] = JSON.parse(buffer.toString());
+  // Get allowed users list from Datastore, a list of emails, duplicated code unfortunately
+  const kind = "CS220AllowedAccounts";
+  const name = userEmail; // name of entity
+  const query = datastore
+    .createQuery(kind)
+    .filter('__key__', '=', datastore.key([kind, name]));
 
-  if (!usersArray.includes(userEmail)) { // check if logged in user is allowed
-    return { statusCode: 401, body: { "message": "Unauthorized" } };
+  const [queryResultArray] = await datastore.runQuery(query); //query datastore
+
+  // if current user is not allowed (if query array does not contain the user entity)
+  if (queryResultArray.length !== 1) {
+    return { statusCode: 200, body: { "message": "Unauthorized" } };
   }
 
   return { statusCode: 200, body: { "message": "Success" } }
@@ -125,23 +127,30 @@ async function verify(req: Request) {
 }
 
 
-
+// for testing stuff
 async function testDatastore() {
 
-  // const taskKey = datastore.key([kind, name]);
+  const kind = "CS220AllowedAccounts";
+  const users = ["chunghinlee", "arjunguha", "rachitnigam", "sambaxter"];
+  const emailDomain = "umass.edu"
+  for (let i = 0; i < users.length; i++) {
+    const userKey = datastore.key([kind, users[i] + '@' + emailDomain]);
+    const userEntity = {
+      key: userKey,
+      data: {
+        email: users[i] + "@" + emailDomain
+      }
+    };
 
-  // const task = {
-  //   key: taskKey,
-  //   data: {
-  //     users: [
-  //       "chunghinlee@umass.edu",
-  //       "arjunguha@umass.edu",
-  //       "rachitnigam@umass.edu",
-  //       "sambaxter@umass.edu"
-  //     ]
-  //   }
-  // }
+    try {
+      await datastore.save(userEntity); 
+      console.log(`Saved ${userEntity.key.name}: ${userEntity.data.email}`);
+    } catch (err) {
+      console.error('ERROR:', err);
+    }
+  }
 
+  
 
 
 }
