@@ -14,25 +14,25 @@ const storage = Storage();
 const bucket = storage.bucket('paws-student-files');
 
 const datastore = new Datastore({});
+const datastoreKind = "CS220AllowedAccounts";
 
 /**
- * Given the username in req, get files of user accordingly
+ * Given the userEmail in req, get files of user accordingly
  * Otherwise, return unauthorized message if user is not authorized.
  * 
- * @param {Request} req with a user attribute from JSON POST request
+ * @param {Request} req with a userEmail attribute from JSON POST request
  * @returns statusCode and contents in body
  */
 async function getUserFiles(req: Request) {
 
   // Get user attribute 
-  const userEmail: string = req.body.user;
+  const userEmail: string = req.body.userEmail;
 
   // Get allowed users list from Datastore, a list of emails
-  const kind = "CS220AllowedAccounts";
   const name = userEmail; // name of entity
   const query = datastore
-    .createQuery(kind)
-    .filter('__key__', '=', datastore.key([kind, name]));
+    .createQuery(datastoreKind)
+    .filter('__key__', '=', datastore.key([datastoreKind, name]));
 
   const [queryResultArray] = await datastore.runQuery(query); //query datastore
 
@@ -109,11 +109,10 @@ async function verify(req: Request) {
   }
 
   // Get allowed users list from Datastore, a list of emails, duplicated code unfortunately
-  const kind = "CS220AllowedAccounts";
   const name = userEmail; // name of entity
   const query = datastore
-    .createQuery(kind)
-    .filter('__key__', '=', datastore.key([kind, name]));
+    .createQuery(datastoreKind)
+    .filter('__key__', '=', datastore.key([datastoreKind, name]));
 
   const [queryResultArray] = await datastore.runQuery(query); //query datastore
 
