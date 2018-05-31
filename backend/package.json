@@ -10,11 +10,13 @@
   "dependencies": {
     "@google-cloud/datastore": "^1.4.0",
     "@google-cloud/storage": "^1.6.0",
+    "@types/uid-safe": "^2.1.1",
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "google-auth-library": "^1.5.0",
-    "morgan": "^1.9.0"
+    "morgan": "^1.9.0",
+    "uid-safe": "^2.1.5"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",

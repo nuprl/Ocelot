@@ -74,8 +74,10 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
                 console.log('No can do dude');
                 return;
             }
+
+            localStorage.setItem('session', jsonResponse.session);
             // tslint:disable-next-line:no-console
-            console.log('You\'re logged in!'); // if not, they are logged in
+            console.log(`You're logged in!`); // if not, they are logged in
             this.setState({ auth: true });
 
         } catch (error) {

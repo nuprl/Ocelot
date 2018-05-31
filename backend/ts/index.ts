@@ -7,7 +7,7 @@ import * as express from 'express'; // for routing different links
 import * as bodyParser from 'body-parser'; // for parsing JSON data
 import * as path from 'path'; // for manipulating paths
 import * as cors from 'cors'; // allows sending http requests to different domains
-
+import * as uid from 'uid-safe';
 import * as morgan from 'morgan'; // for logging in all http traffic on console.
 
 const storage = Storage();
@@ -15,6 +15,32 @@ const bucket = storage.bucket('paws-student-files');
 
 const datastore = new Datastore({});
 const datastoreKind = "CS220AllowedAccounts";
+
+async function checkValidSession(req: Request): Promise<string> {
+  const session = req.body.session;
+  const account = req.body.account;
+  const key = datastore.key([datastoreKind, account, 'session', session]);
+  const query = datastore.createQuery('session').filter('__key__', key);
+  const [results] = await datastore.runQuery(query);
+  if (results.length !== 1) {
+    throw new Error(`session (${session}) for account (${account}) not found`);
+  }
+  return account;
+}
+
+async function getAccountInfo(id: string): Promise<object | undefined> {
+  const query = datastore
+    .createQuery(datastoreKind)
+    .filter('__key__', '=', datastore.key([datastoreKind, id]));
+
+  const [results] = await datastore.runQuery(query);
+  if (results.length === 1) {
+    return results[0];
+  }
+  else {
+    return undefined;
+  }
+}
 
 /**
  * Given the userEmail in req, get files of user accordingly
@@ -26,20 +52,7 @@ const datastoreKind = "CS220AllowedAccounts";
 async function getUserFiles(req: Request) {
 
   // Get user attribute 
-  const userEmail: string = req.body.userEmail;
-
-  // Get allowed users list from Datastore, a list of emails
-  const name = userEmail; // name of entity
-  const query = datastore
-    .createQuery(datastoreKind)
-    .filter('__key__', '=', datastore.key([datastoreKind, name]));
-
-  const [queryResultArray] = await datastore.runQuery(query); //query datastore
-
-  // if current user is not allowed
-  if (queryResultArray.length !== 1) {
-    return { statusCode: 200, body: { "message": "Unauthorized" } };
-  }
+  const userEmail: string = await checkValidSession(req);
 
   try {
     // specifiying the prefix of the directory to list files
@@ -74,7 +87,6 @@ async function getUserFiles(req: Request) {
 
 }
 
-
 const CLIENT_ID = "883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com"
 const client = new OAuth2Client(CLIENT_ID);
 
@@ -85,7 +97,7 @@ const client = new OAuth2Client(CLIENT_ID);
  * @param {Request} req 
  * @returns statusCode and contents in body
  */
-async function verify(req: Request) {
+async function login(req: Request) {
 
   const ticket = await client.verifyIdToken({ // verify and get ticket
     idToken: req.body.token,
@@ -97,32 +109,28 @@ async function verify(req: Request) {
   }
 
   const payload = ticket.getPayload(); // get payload from ticket
-
   if (payload == null) {
     return { statusCode: 400, body: { message: "payload ends up null hm" } };
   }
 
   const userEmail = payload['email']; // get user email
-
   if (userEmail == undefined) {
     return { statusCode: 400, body: { message: "No email" } };
   }
 
-  // Get allowed users list from Datastore, a list of emails, duplicated code unfortunately
-  const name = userEmail; // name of entity
-  const query = datastore
-    .createQuery(datastoreKind)
-    .filter('__key__', '=', datastore.key([datastoreKind, name]));
-
-  const [queryResultArray] = await datastore.runQuery(query); //query datastore
-
-  // if current user is not allowed (if query array does not contain the user entity)
-  if (queryResultArray.length !== 1) {
+  const account = await getAccountInfo(userEmail);
+  if (account === undefined) {
     return { statusCode: 200, body: { "message": "Unauthorized" } };
   }
 
-  return { statusCode: 200, body: { "message": "Success" } }
+  const session = uid.sync(18);
 
+  await datastore.insert({
+    key: datastore.key([datastoreKind, userEmail, 'session', session]),
+    data: { time: Date.now() }
+  });
+
+  return { statusCode: 200, body: { "message": "Success", "session": session } }
 }
 
 
@@ -183,7 +191,7 @@ paws.post('/getfile', (req, res) => { // post request to route /getfile
 });
 
 paws.post('/login', (req, res) => { // post request to login to verify token
-  verify(req).then(responseObj => {
+  login(req).then(responseObj => {
     res.status(responseObj.statusCode).json(responseObj.body);
   }).catch(reason => {
     res.status(500).send(reason.toString());
