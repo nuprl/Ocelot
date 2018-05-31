@@ -1,6 +1,6 @@
 import * as React from 'react';
 import withStyles, { WithStyles, StyleRulesCallback } from '@material-ui/core/styles/withStyles';
-import withRoot from '../withRoot';
+import customTheme from '../customTheme';
 import MenuAppbar from '../components/MenuAppbar';
 
 const styles: StyleRulesCallback<'root'> = theme => ({
@@ -14,10 +14,9 @@ class Index extends React.Component<WithStyles<'root'>> {
     return (
       <div className={this.props.classes.root}>
         <MenuAppbar />
-        
       </div>
     );
   }
 }
 
-export default withRoot(withStyles(styles)(Index));
+export default customTheme(withStyles(styles)(Index));
