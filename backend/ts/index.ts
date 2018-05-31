@@ -169,8 +169,6 @@ async function testDatastore() {
 export const paws = express();
 paws.use(morgan('combined')); // logging all http traffic
 
-// TODO(arjun): think about secure cookies, cookie double-submit, or wahtever
-// the latest technology is.
 paws.use(cors()); // shouldn't this have options for which domain to allow? (will be dealt later)
 // allows cross-origin resource sharing, i.e stops Same Origin Policy from 
 // happening across different ports, we need to do this to send post requests
