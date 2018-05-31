@@ -4,7 +4,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import { GoogleLogin, GoogleLoginResponse } from 'react-google-login';
+import { GoogleLogin, GoogleLogout, GoogleLoginResponse } from 'react-google-login';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles: StyleRulesCallback = theme => ({
@@ -77,10 +77,12 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
             // tslint:disable-next-line:no-console
             console.log('You\'re logged in!'); // if not, they are logged in
             this.setState({ auth: true });
+            this.toggleLoading();
 
         } catch (error) {
             // tslint:disable-next-line:no-console
             console.error('Error', error);
+            this.toggleLoading();
             googleUser.disconnect();
         }
     }
@@ -90,6 +92,12 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
         console.log(response.error);
         this.toggleLoading();
     }
+
+    logout = () => {
+        // tslint:disable-next-line:no-console
+        console.log('You\'re logged out!');
+        this.setState({auth: false});
+    };
 
     renderButton = (renderProps?: { onClick: () => void }) => {
         if (renderProps !== undefined) {
@@ -119,9 +127,15 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
                             CS 220 Paws
                         </Typography>
                         {auth ? (
-                            <Typography color="inherit">
-                                You're logged in BOI!
+                            <div>
+                                <GoogleLogout // this button needs fixing
+                                    onLogoutSuccess={this.logout}
+                                    buttonText="Logout"
+                                />
+                                <Typography color="inherit">
+                                    You're logged in BOI!
                              </Typography>
+                            </div>
                         ) : (
                                 <GoogleLogin
                                     clientId="883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com"
