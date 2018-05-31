@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "./node_modules/.bin/tsc",
+    "build": "tsc",
     "deploy": "gcloud beta functions deploy --trigger-http paws"
   },
   "dependencies": {

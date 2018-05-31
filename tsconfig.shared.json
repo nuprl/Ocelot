@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+      "pretty": true,
+      "strict": true,
+      "noImplicitReturns": true,
+      "inlineSourceMap": true,
+      "noUnusedLocals": true
+  }
+}

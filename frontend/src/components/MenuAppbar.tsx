@@ -120,7 +120,13 @@ class MenuAppbar extends React.Component<WithStyles<string>, State> {
                         ) : (
                                 <GoogleLogin
                                     clientId="883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com"
-                                    onSuccess={this.onSuccessResponse}
+                                    onSuccess={(response) => {
+                                        this.onSuccessResponse(response as GoogleLoginResponse)
+                                        .catch(reason => {
+                                            // tslint:disable-next-line:no-console
+                                            console.error(reason);
+                                        });
+                                    }}
                                     onFailure={this.onFailureResponse}
                                     prompt="select_account" // always prompts user to select a specific account
                                     render={this.renderButton}

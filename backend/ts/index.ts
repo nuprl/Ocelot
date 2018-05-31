@@ -9,16 +9,11 @@ import * as path from 'path'; // for manipulating paths
 import * as cors from 'cors'; // allows sending http requests to different domains
 
 import * as morgan from 'morgan'; // for logging in all http traffic on console.
-import { PassThrough } from 'stream';
 
 const storage = Storage();
 const bucket = storage.bucket('paws-student-files');
 
-const projectId = 'umass-compsci220'
-const datastore = new Datastore({
-  projectId: projectId // should I include the project id? or should I remove it?
-});
-
+const datastore = new Datastore({});
 
 /**
  * Given the username in req, get files of user accordingly
@@ -158,6 +153,8 @@ async function testDatastore() {
 export const paws = express();
 paws.use(morgan('combined')); // logging all http traffic
 
+// TODO(arjun): think about secure cookies, cookie double-submit, or wahtever
+// the latest technology is.
 paws.use(cors()); // shouldn't this have options for which domain to allow? (will be dealt later)
 // allows cross-origin resource sharing, i.e stops Same Origin Policy from 
 // happening across different ports, we need to do this to send post requests
