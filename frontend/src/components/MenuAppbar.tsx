@@ -7,7 +7,7 @@ import LoginButton from './LoginButton';
 
 const styles: StyleRulesCallback = theme => ({
     root: {
-        flexGrow: 1,
+        flexGrow: 0,
     },
     flex: {
         flex: 1,
@@ -21,7 +21,7 @@ function MenuAppbar(props: WithStyles<'root'|'flex'>) {
         <div className={classes.root}>
             <AppBar position="static">
                 <Toolbar>
-                    <Typography variant="title" color="inherit" className={classes.flex}>
+                    <Typography variant="title" color="inherit" className={classes.flex} noWrap>
                         CS 220 Paws
                     </Typography>
                     <LoginButton />

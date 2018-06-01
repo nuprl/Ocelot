@@ -16,30 +16,50 @@ const bucket = storage.bucket('paws-student-files');
 const datastore = new Datastore({});
 const datastoreKind = "CS220AllowedAccounts";
 
-async function checkValidSession(req: Request): Promise<string> {
-  const session = req.body.session;
-  const account = req.body.account;
-  const key = datastore.key([datastoreKind, account, 'session', session]);
-  const query = datastore.createQuery('session').filter('__key__', key);
-  const [results] = await datastore.runQuery(query);
-  if (results.length !== 1) {
-    throw new Error(`session (${session}) for account (${account}) not found`);
+const sessionDuration = 3; //hours
+
+function isWithinSessionTime(sessionTime: number) {
+  const sessionDurationMili : number = sessionDuration * 3600000;
+  if (Math.abs(sessionTime - Date.now()) > sessionDurationMili) {
+    return false;
   }
-  return account;
+  return true;
 }
 
-async function getAccountInfo(id: string): Promise<object | undefined> {
+async function checkValidSession(userEmail: string, sessionId: string): Promise<boolean> {
+  const key = datastore.key([datastoreKind, userEmail, 'session', sessionId]); 
+  // kind: session, name is a sessionId
+  const query = datastore.createQuery('session').filter('__key__', '=', key);
+  const [results] = await datastore.runQuery(query);
+  if (results.length === 1 && isWithinSessionTime((results[0] as any).time)) {
+    await updateSessionId(userEmail, sessionId);
+    return true;
+  }
+  return false;
+}
+
+async function checkValidUser(userEmail: string) : Promise<boolean> {
   const query = datastore
     .createQuery(datastoreKind)
-    .filter('__key__', '=', datastore.key([datastoreKind, id]));
+    .filter('__key__', '=', datastore.key([datastoreKind, userEmail]));
 
   const [results] = await datastore.runQuery(query);
   if (results.length === 1) {
-    return results[0];
+    return true;
   }
-  else {
-    return undefined;
+  return false;
+}
+
+async function updateSessionId(userEmail: string, sessionId: string): Promise<void> {
+  const sessionEntityKey = datastore.key([datastoreKind, userEmail, 'session', sessionId]);
+  const session = {
+    key: sessionEntityKey,
+    data: {
+      time: Date.now()
+    }
   }
+  await datastore.upsert(session);
+  
 }
 
 /**
@@ -50,9 +70,16 @@ async function getAccountInfo(id: string): Promise<object | undefined> {
  * @returns statusCode and contents in body
  */
 async function getUserFiles(req: Request) {
-
+  // Get sessionId from JSON
+  const sessionId = req.body.sessionId;
   // Get user attribute 
-  const userEmail: string = await checkValidSession(req);
+  const userEmail = req.body.userEmail;
+  // check against database for sessionId
+  const isValidSession : boolean = await checkValidSession(userEmail, sessionId);
+
+  if (!isValidSession) {
+    return {statusCode: 200, body: {message: "Invalid Session"}}
+  }
 
   try {
     // specifiying the prefix of the directory to list files
@@ -99,6 +126,8 @@ const client = new OAuth2Client(CLIENT_ID);
  */
 async function login(req: Request) {
 
+  // check if user has active session, if so, just return session
+
   const ticket = await client.verifyIdToken({ // verify and get ticket
     idToken: req.body.token,
     audience: CLIENT_ID
@@ -118,21 +147,28 @@ async function login(req: Request) {
     return { statusCode: 400, body: { message: "No email" } };
   }
 
-  const account = await getAccountInfo(userEmail);
-  if (account === undefined) {
+  const isValidUser : boolean = await checkValidUser(userEmail);
+  if (!isValidUser) {
     return { statusCode: 200, body: { "message": "Unauthorized" } };
   }
+  // at this point the user is CS220 student/teacher of some sort.
 
-  const session = uid.sync(18);
+  let sessionId : string | null = req.body.sessionId // explicit null is passed into sessionId if it's not there
+  if (sessionId === null) {
+    sessionId = uid.sync(18); 
+  }
 
-  await datastore.insert({
-    key: datastore.key([datastoreKind, userEmail, 'session', session]),
-    data: { time: Date.now() }
+  const sessionEntityKey = datastore.key([datastoreKind, userEmail, 'session', sessionId])
+
+  await datastore.upsert({
+    key: sessionEntityKey,
+    data: { 
+      time: Date.now() 
+    }
   });
 
-  return { statusCode: 200, body: { "message": "Success", "session": session } }
+  return { statusCode: 200, body: { "message": "Success", "sessionId": sessionId } }
 }
-
 
 // for testing stuff
 async function testDatastore() {
