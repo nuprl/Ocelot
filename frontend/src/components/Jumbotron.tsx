@@ -1,26 +1,13 @@
 import * as React from 'react';
-import withStyles, { WithStyles, StyleRulesCallback } from '@material-ui/core/styles/withStyles';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
-
-const styles: StyleRulesCallback = theme => ({
-    jumboContainer: {
-        display: 'flex',
-        overflow: 'hidden',
-        height: 'calc(100vh - 64px)',
-    },
-    col: {
-        flex: 1,
-        height: '100%',
-        width: '50%',
-    }
-});
+import './../styles/Jumbotron.css';
 
 type State = {
     code: string
 };
 
-class Jumbotron extends React.Component<WithStyles<string>, State> {
+class Jumbotron extends React.Component<{}, State> {
 
     state = {
         code: '// type your code...',
@@ -54,8 +41,6 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
     }
 
     render() {
-
-        const { classes } = this.props;
         // const { code } = this.state;
         const options: monacoEditor.editor.IEditorConstructionOptions = {
             selectOnLineNumbers: true,
@@ -63,8 +48,8 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
         };
 
         return (
-            <div className={classes.jumboContainer}>
-                <div className={classes.col}>
+            <div className="jumboContainer">
+                <div className="col">
                     <MonacoEditor // using this causes errors during development
                     // but the production works fine so it's okay.
                         language="javascript"
@@ -75,7 +60,7 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
                         editorDidMount={this.editorDidMount}
                     />
                 </div>
-                <div className={classes.col}>
+                <div className="col">
                     <canvas />
                 </div>
             </div>
@@ -83,4 +68,4 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
     }
 }
 
-export default withStyles(styles)(Jumbotron);
+export default Jumbotron;

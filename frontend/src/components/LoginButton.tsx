@@ -35,7 +35,6 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
 
     onSuccessResponse = async (googleUser: GoogleLoginResponse) => {
         this.setState({ loading: true });
-        // tslint:disable-next-line:no-console
         this.setState({ email: googleUser.getBasicProfile().getEmail() });
         let id_token = googleUser.getAuthResponse().id_token; // get id token
         let url = 'https://us-central1-umass-compsci220.cloudfunctions.net/paws/login';
@@ -74,8 +73,6 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
             this.setState({ auth: true });
 
         } catch (error) {
-            // tslint:disable-next-line:no-console
-            console.error('Error', error);
             this.setState({ loading: false });
             this.setState({ error: true });
             googleUser.disconnect();
@@ -91,15 +88,10 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
     };
 
     onFailureResponse = (response: { error: string }) => {
-        // tslint:disable-next-line:no-console
-        console.log(response.error);
-        // tslint:disable-next-line:no-console
         this.setState({ loading: false });
     };
 
     logout = () => {
-        // tslint:disable-next-line:no-console
-        console.log('You\'re logged out!');
         this.setState({ auth: false });
     };
 
@@ -107,13 +99,12 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
         if (renderProps !== undefined) {
             return (
                 <Button
-                    variant="outlined"
                     color="inherit"
                     onClick={() => { renderProps.onClick(); this.setState({ loading: true }); }}
                 >
                     {this.state.loading ?
                         <CircularProgress size={14} color="inherit" /> :
-                        <Typography color="inherit">Login</Typography>
+                        <Typography color="inherit" variant="button">Sign in</Typography>
                     }
                 </Button>
             );
@@ -131,7 +122,7 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
                     onClick={renderProps.onClick}
                     className={this.props.classes.logoutButton}
                 >
-                    Logout
+                    <Typography color="inherit" variant="button">Sign out</Typography>
                 </Button>
             );
         }
@@ -146,10 +137,10 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
         if (reason === 'clickaway') {
             return;
         }
-        this.setState({error: false});
+        this.setState({ error: false });
     }
     handleCloseClickSnackbar = (event: React.MouseEvent<HTMLElement>): void => {
-        this.setState({error: false});
+        this.setState({ error: false });
     }
 
     render() {
@@ -193,7 +184,7 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
                         />
                     </div>
                 </Fade>
-                <ErrorSnackbar 
+                <ErrorSnackbar
                     open={error}
                     handleClose={this.handleCloseSnackbar}
                     handleClick={this.handleCloseClickSnackbar}

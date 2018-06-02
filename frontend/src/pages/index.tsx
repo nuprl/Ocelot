@@ -10,13 +10,19 @@ const styles: StyleRulesCallback = theme => ({
     minHeight: '100vh',
     margin: '0',
     padding: '0',
+    backgroundColor: theme.palette.primary.main,
   }
 });
 
 class Index extends React.Component<WithStyles<string>> {
 
+  componentDidMount() {
+    setTimeout(() => this.setState({ loading: false }), 1000 + Math.random() * 800);
+  }
+
   render() {
     const { classes } = this.props;
+
     return (
       <div className={classes.root}>
         <MenuAppbar />
