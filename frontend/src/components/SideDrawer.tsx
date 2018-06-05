@@ -6,7 +6,7 @@ import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/st
 import { MailFolderListItems, otherMailFolderListItems } from './tileData';
 import '../styles/SideDrawer.css';
 
-const drawerWidth = 240;
+export const drawerWidth = 240;
 
 const styles: StyleRulesCallback = theme => ({
     drawerPaper: {
@@ -25,11 +25,13 @@ type SideDrawerProps = {
 class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
 
     render() {
-        const { classes } = this.props;
+        const { classes, loggedIn } = this.props;
 
         return (
             <Drawer
-                variant="permanent"
+                variant="persistent"
+                open={loggedIn}
+                anchor="left"
                 classes={{
                     paper: classes.drawerPaper,
                 }}

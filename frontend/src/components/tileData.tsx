@@ -20,26 +20,60 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 function mailFolderListItems(props: WithStyles<string>) {
-  const mailFolderList = ['Inbox', 'Starred', 'Send mail', 'Drafts'];
-  const mailFolderIcons = [<InboxIcon key={1} className={props.classes.listItemRoot} />,
-  <StarIcon key={2} />, <SendIcon key={3} />, <DraftsIcon key={4} />];
   return (
     <div>
-      {[0, 1, 2, 3].map(value => (
-        <ListItem button>
+      <ListItem button>
           <ListItemIcon>
-            {mailFolderIcons[value]}
+          <InboxIcon className={props.classes.listItemRoot} />
           </ListItemIcon>
           <ListItemText
             disableTypography
             primary={
               <Typography variant="subheading" style={{ color: '#ffffff' }}>
-                {mailFolderList[value]}
+                Inbox
               </Typography>}
             classes={{ root: props.classes.listItemRoot }} 
           />
         </ListItem>
-      ))}
+        <ListItem button>
+          <ListItemIcon>
+          <StarIcon />
+          </ListItemIcon>
+          <ListItemText
+            disableTypography
+            primary={
+              <Typography variant="subheading" style={{ color: '#ffffff' }}>
+                Starred
+              </Typography>}
+            classes={{ root: props.classes.listItemRoot }} 
+          />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon>
+          <SendIcon />
+          </ListItemIcon>
+          <ListItemText
+            disableTypography
+            primary={
+              <Typography variant="subheading" style={{ color: '#ffffff' }}>
+                Send mail
+              </Typography>}
+            classes={{ root: props.classes.listItemRoot }} 
+          />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon>
+          <DraftsIcon />
+          </ListItemIcon>
+          <ListItemText
+            disableTypography
+            primary={
+              <Typography variant="subheading" style={{ color: '#ffffff' }}>
+                Drafts
+              </Typography>}
+            classes={{ root: props.classes.listItemRoot }} 
+          />
+        </ListItem>
     </div>
   );
 }

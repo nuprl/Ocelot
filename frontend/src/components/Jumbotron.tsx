@@ -100,12 +100,14 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
         };
 
         const { classes } = this.props;
+        const { runner } = this.state;
 
         return (
             <div className="jumboContainer">
                 <div className={classes.toolbar} />
                 <div className="col">
                     <Button
+                        style={{display: runner === undefined ? 'inline-block' : 'none'}}
                         color="secondary"
                         className={classes.button}
                         onClick={() => this.onRunClick()}
@@ -114,6 +116,7 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
                     </Button>
                     <MuiThemeProvider theme={tempTheme}>
                         <Button
+                            style={{display: runner === undefined ? 'none' : 'inline-block'}}
                             color="primary"
                             className={classes.button}
                             onClick={() => this.onStopClick()}
