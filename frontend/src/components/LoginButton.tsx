@@ -25,7 +25,12 @@ type State = {
     errorMessage: string
 };
 
-class LoginButton extends React.Component<WithStyles<string>, State> {
+type LoginButtonProps = {
+    onLogin: () => void, // notifies the index (the top parent element that we're logged in)
+    onLogout: () => void, // notifies the index (the top parent element that we're logged in)
+};
+
+class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps, State> {
 
     state = {
         auth: false, // for showing user email, login/logout button
@@ -78,6 +83,7 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
 
             this.setState({ loading: false });
             this.setState({ auth: true });
+            this.props.onLogin();
 
         } catch (error) {
             this.setState({
@@ -103,6 +109,7 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
 
     logout = () => {
         this.setState({ auth: false });
+        this.props.onLogout();
     };
 
     renderLoginButton = (renderProps?: { onClick: () => void }) => {

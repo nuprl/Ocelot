@@ -7,12 +7,6 @@ import SideDrawer from '../components/SideDrawer';
 
 const styles: StyleRulesCallback = theme => ({
   root: {
-    // minWidth: '350px',
-    // minHeight: '100vh',
-    // zIndex: 1,
-    // margin: '0',
-    // padding: '0',
-    // backgroundColor: theme.palette.primary.main,
     flexGrow: 1,
     height: '100vh',
     zIndex: 1,
@@ -29,19 +23,32 @@ const styles: StyleRulesCallback = theme => ({
   toolbar: theme.mixins.toolbar,
 });
 
-class Index extends React.Component<WithStyles<string>> {
+type State = {
+  loggedIn: boolean;
+};
 
-  componentDidMount() {
-    setTimeout(() => this.setState({ loading: false }), 1000 + Math.random() * 800);
+class Index extends React.Component<WithStyles<string>, State> {
+
+  state = {
+    loggedIn: false,
+  };
+
+  onLogin = () => {
+    this.setState({loggedIn: true});
+  }
+
+  onLogout = () => {
+    this.setState({loggedIn: false});
   }
 
   render() {
     const { classes } = this.props;
+    const { loggedIn } = this.state;
 
     return (
       <div className={classes.root}>
-        <MenuAppbar />
-        <SideDrawer />
+        <MenuAppbar onLogin={this.onLogin} onLogout={this.onLogout}/>
+        <SideDrawer loggedIn={loggedIn}/>
         <main className={classes.content}>
           <div className={classes.toolbar} />
           <Jumbotron />

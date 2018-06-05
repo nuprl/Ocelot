@@ -20,10 +20,15 @@ const styles: StyleRulesCallback = theme => ({
     }
 });
 
-class MenuAppbar extends React.Component<WithStyles<string>> {
+type MenuAppbarProps = {
+    onLogin: () => void;
+    onLogout: () => void;
+};
+
+class MenuAppbar extends React.Component<WithStyles<string> & MenuAppbarProps> {
 
     render() {
-        const { classes } = this.props;
+        const { classes, onLogin, onLogout } = this.props;
 
         return (
             <AppBar position="absolute" className={classes.appBar}>
@@ -38,7 +43,7 @@ class MenuAppbar extends React.Component<WithStyles<string>> {
                             </Typography>
                     </Fade>
 
-                    <LoginButton />
+                    <LoginButton onLogin={onLogin} onLogout={onLogout} />
                 </Toolbar>
             </AppBar>
         );

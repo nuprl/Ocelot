@@ -1,14 +1,21 @@
 import * as React from 'react';
-import { WithStyles, withStyles, StyleRulesCallback } from '@material-ui/core/styles';
+import { WithStyles, withStyles, StyleRulesCallback, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import Button from '@material-ui/core/Button';
+import red from '@material-ui/core/colors/red';
 import './../styles/Jumbotron.css';
 
 const styles: StyleRulesCallback = theme => ({
     toolbar: theme.mixins.toolbar,
-    button : {
-        margin: theme.spacing.unit + 1,
+    button: {
+        margin: theme.spacing.unit,
+    }
+});
+
+const tempTheme = createMuiTheme({
+    palette: {
+        primary: red,
     }
 });
 
@@ -63,11 +70,13 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
                 <div className={classes.toolbar} />
                 <div className="col">
                     <Button color="secondary" className={classes.button}>
-                        Primary
+                        Run
                     </Button>
-                    <Button color="primary" className={classes.button}>
-                        Primary
-                    </Button>
+                    <MuiThemeProvider theme={tempTheme}>
+                        <Button color="primary" className={classes.button}>
+                            Stop
+                        </Button>
+                    </MuiThemeProvider>
                     <MonacoEditor // using this causes errors during development
                         // but the production works fine so it's okay.
                         language="javascript"
