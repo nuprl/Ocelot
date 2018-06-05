@@ -27,7 +27,7 @@ type SideDrawerProps = {
 class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
 
     getUserFiles = () => {
-        
+        return 1;
     };
 
     render() {

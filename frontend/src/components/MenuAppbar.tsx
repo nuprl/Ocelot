@@ -19,13 +19,14 @@ const styles: StyleRulesCallback = theme => {
             zIndex: theme.zIndex.drawer + 1,
         },
         playIcon: {
-            // transform: 'rotate(90deg) !important',
             margin: theme.spacing.unit,
-            fill: '#fff',
-            // zIndex: theme.zIndex.appBar + 1000,
             height: theme.typography.display1.fontSize,
             width: theme.typography.display1.fontSize,
-        }
+        },
+        title: {
+            fontFamily: 'Fira Mono, Roboto, Arial, sans-serif',
+            fontWeight: 400,
+        },
     };
 };
 
@@ -44,9 +45,17 @@ class MenuAppbar extends React.Component<WithStyles<string> & MenuAppbarProps> {
                 <Toolbar>
                     <PlayStopIcon className={classes.playIcon} color={appBarConstrastText} />
                     <Fade in={true} timeout={700} >
-                        <Typography variant="subheading" color="inherit" className={classes.flex} noWrap>
+                        <Typography
+                            variant="subheading"
+                            color="inherit"
+                            classes={{
+                                subheading: classes.title,
+                            }}
+                            className={classes.flex}
+                            noWrap
+                        >
                             PAWS
-                            </Typography>
+                        </Typography>
                     </Fade>
 
                     <LoginButton onLogin={onLogin} onLogout={onLogout} />

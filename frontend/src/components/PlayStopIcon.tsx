@@ -18,13 +18,13 @@ export default (props: { color: string, className: string }) => (
                     stroke-dasharray: 32 34;
                     stroke-dashoffset: 33;
                     animation:SlSmTBKE_draw 1300ms ease-in-out 0ms forwards;
-                    animation-delay: 0.3s;
+                    animation-delay: 0.1s;
                 }
                 .SlSmTBKE_1{
                     stroke-dasharray: 38 40;
                     stroke-dashoffset:39;
                     animation:SlSmTBKE_draw 1300ms ease-in-out 0ms forwards;
-                    animation-delay: 0.3s;
+                    animation-delay: 0.1s;
                 }
                 @keyframes SlSmTBKE_draw{
                     100% {
