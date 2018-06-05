@@ -1,0 +1,9 @@
+{
+    "extends": "../tsconfig.shared.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "outDir": "./dist",
+        "lib": ["es2016"],
+        "target": "es5",
+    }
+}
