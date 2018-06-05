@@ -21,8 +21,8 @@
     "typescript": "^2.8.3"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "start": "cp node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts start",
+    "build": "cp node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },

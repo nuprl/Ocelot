@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
+    "serve": "node dist/testServer",
     "deploy": "gcloud beta functions deploy --trigger-http paws"
   },
   "dependencies": {
