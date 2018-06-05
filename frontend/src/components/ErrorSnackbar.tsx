@@ -8,7 +8,7 @@ const styles: StyleRulesCallback = theme => ({
     close: {
         width: theme.spacing.unit * 4,
         height: theme.spacing.unit * 4,
-    },
+    }
 });
 
 type ErrorSnackbarProps = {
@@ -25,7 +25,7 @@ function ErrorSnackbar(props: WithStyles<'close'> & ErrorSnackbarProps) {
                 horizontal: 'center',
             }}
             open={props.open}
-            autoHideDuration={6000}
+            autoHideDuration={5000}
             onClose={props.handleClose}
             ContentProps={{
                 'aria-describedby': 'message-id',

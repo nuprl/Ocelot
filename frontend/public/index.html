@@ -4,6 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="user-scalable=0, initial-scale=1, minimum-scale=1, width=device-width, height=device-height">
+  <!-- <meta http-equiv="cache-control" content="no-cache">
+  <meta http-equiv="expires" content="0">
+  <meta http-equiv="pragma" content="no-cache"> -->
   <!-- PWA primary color -->
   <meta name="theme-color" content="#000000">
   <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
@@ -18,21 +21,7 @@
     -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.13.1/min/vs/loader.js"></script>
-  <script>
-    require.config({
-      paths: {
-        'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.13.1/min/vs'
-      }
-    });
-    window.MonacoEnvironment = {
-      getWorkerUrl: function (workerId, label) {
-        return '/monaco-editor-worker-loader-proxy.js';
-      }
-    };
-    require(["vs/editor/editor.main"], function () { })
-  </script>
+
   <title>CS 220 Paws</title>
 </head>
 
@@ -41,6 +30,22 @@
     You need to enable JavaScript to run this app.
   </noscript>
   <div id="app"></div>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.13.1/min/vs/loader.js"></script>
+  <script type="text/javascript">
+    require.config({
+      paths: {
+        'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.13.1/min/vs'
+      }
+    });
+    window.MonacoEnvironment = {
+      getWorkerUrl: function (workerId, label) {
+        return 'monaco-editor-worker-loader-proxy.js';
+      }
+    };
+    require(["vs/editor/editor.main"], function () { })
+  </script>
 </body>
 
 </html>

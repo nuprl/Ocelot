@@ -1,13 +1,22 @@
 import * as React from 'react';
+import { WithStyles, withStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
+import Button from '@material-ui/core/Button';
 import './../styles/Jumbotron.css';
+
+const styles: StyleRulesCallback = theme => ({
+    toolbar: theme.mixins.toolbar,
+    button : {
+        margin: theme.spacing.unit + 1,
+    }
+});
 
 type State = {
     code: string
 };
 
-class Jumbotron extends React.Component<{}, State> {
+class Jumbotron extends React.Component<WithStyles<string>, State> {
 
     state = {
         code: '// type your code...',
@@ -47,11 +56,20 @@ class Jumbotron extends React.Component<{}, State> {
             mouseWheelZoom: true
         };
 
+        const { classes } = this.props;
+
         return (
             <div className="jumboContainer">
+                <div className={classes.toolbar} />
                 <div className="col">
+                    <Button color="secondary" className={classes.button}>
+                        Primary
+                    </Button>
+                    <Button color="primary" className={classes.button}>
+                        Primary
+                    </Button>
                     <MonacoEditor // using this causes errors during development
-                    // but the production works fine so it's okay.
+                        // but the production works fine so it's okay.
                         language="javascript"
                         theme="vs-dark"
                         // value={code}
@@ -63,9 +81,10 @@ class Jumbotron extends React.Component<{}, State> {
                 <div className="col">
                     <canvas />
                 </div>
+                {/* <Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography> */}
             </div>
         );
     }
 }
 
-export default Jumbotron;
+export default withStyles(styles)(Jumbotron);

@@ -1,18 +1,12 @@
 
 .jumboContainer {
+    flex-grow: 1;
     display: flex;
-    overflow: hidden;
-    height: calc(100vh - 56px);
+    height: 100%;
+    min-width: 0;
 }
 
 .col {
     flex: 1;
     height: 100%;
-    width: 50%;
-}
-
-@media screen and (min-width: 600px) {
-    .jumboContainer {
-        height: calc(100vh - 64px);
-    }
 }

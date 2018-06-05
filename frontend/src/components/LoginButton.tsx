@@ -20,17 +20,19 @@ const styles: StyleRulesCallback = theme => ({
 type State = {
     auth: boolean,
     loading: boolean,
-    email: string
-    error: boolean
+    email: string,
+    error: boolean,
+    errorMessage: string
 };
 
 class LoginButton extends React.Component<WithStyles<string>, State> {
 
     state = {
-        auth: false,
-        loading: false,
-        error: false,
-        email: ''
+        auth: false, // for showing user email, login/logout button
+        loading: false, // for loading in button
+        error: false, // for showing snackbar for error (e.g. server is down)
+        email: '', // storing email
+        errorMessage: '', // error message of snackbar
     };
 
     onSuccessResponse = async (googleUser: GoogleLoginResponse) => {
@@ -63,7 +65,12 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
             const jsonResponse = await response.json(); // get json response
             if (jsonResponse.message === 'Unauthorized') { // if messaged back as unauthorized
                 googleUser.disconnect(); // sign user out (revoke given permissions)
-                this.setState({ loading: false });
+                this.setState({
+                    loading: false,
+                    errorMessage: 'Only students and professors of CS 220 are allowed to log in',
+                    error: true,
+                });
+                return;
             }
 
             // important: the key here is 'sessionId'
@@ -73,8 +80,11 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
             this.setState({ auth: true });
 
         } catch (error) {
-            this.setState({ loading: false });
-            this.setState({ error: true });
+            this.setState({
+                loading: false,
+                errorMessage: 'The authentication server seems to be down. Try again in a bit.',
+                error: true
+            });
             googleUser.disconnect();
         }
     };
@@ -144,24 +154,30 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
     }
 
     render() {
-        const { auth, email, error } = this.state;
+        const { auth, email, error, errorMessage } = this.state;
         const { classes } = this.props;
 
         return (
             <div>
-                <Hidden xsDown>
-                    <div
-                        className={classes.emailText}
-                        style={{ display: (auth ? 'inline-block' : 'none') }}
-                    >
-                        <Fade in={auth} {...(auth ? { timeout: 500 } : {})}>
 
+                <ErrorSnackbar
+                    open={error}
+                    handleClose={this.handleCloseSnackbar}
+                    handleClick={this.handleCloseClickSnackbar}
+                    message={errorMessage}
+                />
+                <Hidden xsDown>
+
+                    <Fade in={auth} {...(auth ? { timeout: 500 } : {})}>
+                        <div
+                            className={classes.emailText}
+                            style={{ display: (auth ? 'inline-block' : 'none') }}
+                        >
                             <Typography variant="subheading" color="inherit">
                                 {email}
                             </Typography>
-
-                        </Fade>
-                    </div>
+                        </div>
+                    </Fade>
                 </Hidden>
                 <Fade in={auth}>
                     <div style={{ display: (auth ? 'inline-block' : 'none') }}>
@@ -184,12 +200,6 @@ class LoginButton extends React.Component<WithStyles<string>, State> {
                         />
                     </div>
                 </Fade>
-                <ErrorSnackbar
-                    open={error}
-                    handleClose={this.handleCloseSnackbar}
-                    handleClick={this.handleCloseClickSnackbar}
-                    message="The authentication server seems to be down. Try again in a bit."
-                />
             </div >
         );
     }

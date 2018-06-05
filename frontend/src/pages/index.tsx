@@ -3,15 +3,30 @@ import withStyles, { WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import customTheme from '../customTheme';
 import MenuAppbar from '../components/MenuAppbar';
 import Jumbotron from '../components/Jumbotron';
+import SideDrawer from '../components/SideDrawer';
 
 const styles: StyleRulesCallback = theme => ({
   root: {
-    minWidth: '350px',
-    minHeight: '100vh',
-    margin: '0',
-    padding: '0',
+    // minWidth: '350px',
+    // minHeight: '100vh',
+    // zIndex: 1,
+    // margin: '0',
+    // padding: '0',
+    // backgroundColor: theme.palette.primary.main,
+    flexGrow: 1,
+    height: '100vh',
+    zIndex: 1,
+    overflow: 'hidden',
+    position: 'relative',
+    display: 'flex',
+  },
+
+  content: {
+    flexGrow: 1,
+    minWidth: 0, // So the Typography noWrap works
     backgroundColor: theme.palette.primary.main,
-  }
+  },
+  toolbar: theme.mixins.toolbar,
 });
 
 class Index extends React.Component<WithStyles<string>> {
@@ -26,7 +41,11 @@ class Index extends React.Component<WithStyles<string>> {
     return (
       <div className={classes.root}>
         <MenuAppbar />
-        <Jumbotron />
+        <SideDrawer />
+        <main className={classes.content}>
+          <div className={classes.toolbar} />
+          <Jumbotron />
+        </main>
       </div>
     );
   }
