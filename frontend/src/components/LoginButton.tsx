@@ -54,7 +54,7 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
         let data: { token: string, sessionId: string | null } = { token: id_token, sessionId: null }; // data to be sent
 
         const possibleSessionId = localStorage.getItem('sessionId');
-        if (possibleSessionId !== null) {
+        if (possibleSessionId !== null && possibleSessionId !== undefined) {
             data.sessionId = possibleSessionId;
         }
 
@@ -80,6 +80,7 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
 
             // important: the key here is 'sessionId'
             localStorage.setItem('sessionId', jsonResponse.sessionId);
+            localStorage.setItem('userEmail', this.state.email);
 
             this.setState({ loading: false });
             this.setState({ auth: true });

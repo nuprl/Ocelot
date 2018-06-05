@@ -3,7 +3,9 @@ import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
-import { MailFolderListItems, otherMailFolderListItems } from './tileData';
+import FilesFolderList from './FilesFolderList';
+import { otherMailFolderListItems } from './tileData';
+
 import '../styles/SideDrawer.css';
 
 export const drawerWidth = 240;
@@ -24,8 +26,17 @@ type SideDrawerProps = {
 
 class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
 
+    getUserFiles = () => {
+        
+    };
+
     render() {
         const { classes, loggedIn } = this.props;
+        let fileFolderComponent = <FilesFolderList />;
+
+        if (loggedIn) {
+            // make some request for files
+        }
 
         return (
             <Drawer
@@ -38,10 +49,10 @@ class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
             >
                 <div className={classes.toolbar} />
                 <List dense>
-                    <MailFolderListItems />
+                    {fileFolderComponent}
                 </List>
                 <Divider />
-                <List>{otherMailFolderListItems}</List>
+                <List dense>{otherMailFolderListItems}</List>
             </Drawer>
         );
     }

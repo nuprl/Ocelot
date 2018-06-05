@@ -45,11 +45,11 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
         this.editor = editor;
     }
 
-    onChange(code: string) {
+    onChange = (code: string) => {
         this.setState({ code: code });
     }
 
-    onRunClick() {
+    onRunClick = () => {
         const runner = stopify.stopifyLocally(
             this.state.code,
             {
@@ -59,15 +59,15 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
                 estimator: 'countdown',
                 yieldInterval: 1
             });
+        this.setState({ runner: runner });
         runner.run((result: any) => {
             // tslint:disable-next-line:no-console
             console.log(result);
             this.setState({ runner: undefined });
         });
-        this.setState({ runner: runner });
     }
 
-    onStopClick() {
+    onStopClick = () => {
         const runner = this.state.runner;
         if (typeof runner === 'undefined') {
             throw new Error(`no runner found (stop should be disabled)`);
@@ -96,7 +96,8 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
         // const { code } = this.state;
         const options: monacoEditor.editor.IEditorConstructionOptions = {
             selectOnLineNumbers: true,
-            mouseWheelZoom: true
+            mouseWheelZoom: true,
+            fontSize: 18,
         };
 
         const { classes } = this.props;
@@ -107,30 +108,29 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
                 <div className={classes.toolbar} />
                 <div className="col">
                     <Button
-                        style={{display: runner === undefined ? 'inline-block' : 'none'}}
+                        style={{ display: runner === undefined ? 'inline-block' : 'none' }}
                         color="secondary"
                         className={classes.button}
-                        onClick={() => this.onRunClick()}
+                        onClick={this.onRunClick}
                     >
                         Run
                     </Button>
                     <MuiThemeProvider theme={tempTheme}>
                         <Button
-                            style={{display: runner === undefined ? 'none' : 'inline-block'}}
+                            style={{ display: runner === undefined ? 'none' : 'inline-block' }}
                             color="primary"
                             className={classes.button}
-                            onClick={() => this.onStopClick()}
+                            onClick={this.onStopClick}
                         >
                             Stop
                         </Button>
                     </MuiThemeProvider>
-                    <MonacoEditor // using this causes errors during development
-                        // but the production works fine so it's okay.
+                    <MonacoEditor // refreshing breaks it (something to do with cache and webworkers)
                         language="javascript"
                         theme="vs-dark"
                         // value={code}
                         options={options}
-                        onChange={(code) => this.onChange(code)}
+                        onChange={this.onChange}
                         editorDidMount={this.editorDidMount}
                     />
                 </div>

@@ -14,12 +14,12 @@ const storage = Storage();
 const bucket = storage.bucket('paws-student-files');
 
 const datastore = new Datastore({});
-const datastoreKind = "CS220AllowedAccounts";
+const datastoreKind = 'CS220AllowedAccounts';
 
-const sessionDuration = 3; //hours
+const sessionDuration = 3; // hours
 
 function isWithinSessionTime(sessionTime: number) {
-  const sessionDurationMili : number = sessionDuration * 3600000;
+  const sessionDurationMili: number = sessionDuration * 3600000;
   if (Math.abs(sessionTime - Date.now()) > sessionDurationMili) {
     return false;
   }
@@ -27,7 +27,7 @@ function isWithinSessionTime(sessionTime: number) {
 }
 
 async function checkValidSession(userEmail: string, sessionId: string): Promise<boolean> {
-  const key = datastore.key([datastoreKind, userEmail, 'session', sessionId]); 
+  const key = datastore.key([datastoreKind, userEmail, 'session', sessionId]);
   // kind: session, name is a sessionId
   const query = datastore.createQuery('session').filter('__key__', '=', key);
   const [results] = await datastore.runQuery(query);
@@ -38,7 +38,7 @@ async function checkValidSession(userEmail: string, sessionId: string): Promise<
   return false;
 }
 
-async function checkValidUser(userEmail: string) : Promise<boolean> {
+async function checkValidUser(userEmail: string): Promise<boolean> {
   const query = datastore
     .createQuery(datastoreKind)
     .filter('__key__', '=', datastore.key([datastoreKind, userEmail]));
@@ -59,7 +59,7 @@ async function updateSessionId(userEmail: string, sessionId: string): Promise<vo
     }
   }
   await datastore.upsert(session);
-  
+
 }
 
 /**
@@ -75,10 +75,17 @@ async function getUserFiles(req: Request) {
   // Get user attribute 
   const userEmail = req.body.userEmail;
   // check against database for sessionId
-  const isValidSession : boolean = await checkValidSession(userEmail, sessionId);
+  const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
 
   if (!isValidSession) {
-    return {statusCode: 200, body: {message: "Invalid Session"}}
+    return {
+      statusCode: 200,
+      body:
+        {
+          status: 'failure',
+          message: 'Invalid session'
+        }
+    };
   }
 
   try {
@@ -105,16 +112,24 @@ async function getUserFiles(req: Request) {
       }
     }
 
-    return { statusCode: 200, body: userFiles };
+    return {
+      statusCode: 200,
+      body: {
+        status: 'success',
+        data: {
+          userFiles: userFiles
+        }
+      }
+    };
 
   } catch (e) {
 
-    return { statusCode: 500, body: { message: e } };
+    return { statusCode: 500, body: { status: 'failure', message: e } };
   }
 
 }
 
-const CLIENT_ID = "883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com"
+const CLIENT_ID = '883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com'
 const client = new OAuth2Client(CLIENT_ID);
 
 /**
@@ -134,66 +149,74 @@ async function login(req: Request) {
   });
 
   if (ticket == null) {
-    return { statusCode: 400, body: { message: "verifying ends up null hm" } };
+    return { statusCode: 400, body: { status: 'error', message: 'verifying ends up null hm' } };
   }
 
   const payload = ticket.getPayload(); // get payload from ticket
   if (payload == null) {
-    return { statusCode: 400, body: { message: "payload ends up null hm" } };
+    return { statusCode: 400, body: { status: 'error', message: 'payload ends up null hm' } };
   }
 
   const userEmail = payload['email']; // get user email
   if (userEmail == undefined) {
-    return { statusCode: 400, body: { message: "No email" } };
+    return { statusCode: 400, body: { status: 'error', message: 'No email' } };
   }
 
-  const isValidUser : boolean = await checkValidUser(userEmail);
+  const isValidUser: boolean = await checkValidUser(userEmail);
   if (!isValidUser) {
-    return { statusCode: 200, body: { "message": "Unauthorized" } };
+    return { statusCode: 200, body: { status: 'failure', 'message': 'Unauthorized' } };
   }
   // at this point the user is CS220 student/teacher of some sort.
 
-  let sessionId : string | null = req.body.sessionId // explicit null is passed into sessionId if it's not there
+  let sessionId: string | null = req.body.sessionId // explicit null is passed into sessionId if it's not there
   if (sessionId === null) {
-    sessionId = uid.sync(18); 
+    sessionId = uid.sync(18);
   }
 
   const sessionEntityKey = datastore.key([datastoreKind, userEmail, 'session', sessionId])
 
   await datastore.upsert({
     key: sessionEntityKey,
-    data: { 
-      time: Date.now() 
+    data: {
+      time: Date.now()
     }
   });
 
-  return { statusCode: 200, body: { "message": "Success", "sessionId": sessionId } }
+  return {
+    statusCode: 200,
+    body: {
+      status: 'success',
+      data: {
+        sessionId: sessionId,
+      }
+    }
+  };
 }
 
 // for testing stuff
 async function testDatastore() {
 
-  const kind = "CS220AllowedAccounts";
-  const users = ["chunghinlee", "arjunguha", "rachitnigam", "sambaxter"];
-  const emailDomain = "umass.edu"
+  const kind = 'CS220AllowedAccounts';
+  const users = ['chunghinlee', 'arjunguha', 'rachitnigam', 'sambaxter'];
+  const emailDomain = 'umass.edu'
   for (let i = 0; i < users.length; i++) {
     const userKey = datastore.key([kind, users[i] + '@' + emailDomain]);
     const userEntity = {
       key: userKey,
       data: {
-        email: users[i] + "@" + emailDomain
+        email: users[i] + '@' + emailDomain
       }
     };
 
     try {
-      await datastore.save(userEntity); 
+      await datastore.save(userEntity);
       console.log(`Saved ${userEntity.key.name}: ${userEntity.data.email}`);
     } catch (err) {
       console.error('ERROR:', err);
     }
   }
 
-  
+
 
 
 }
@@ -213,7 +236,7 @@ paws.use(cors()); // shouldn't this have options for which domain to allow? (wil
 paws.use(bodyParser.json()); // parse all incoming json data
 
 paws.get('/', (req, res) => { // simple get request
-  res.status(200).send("Hello World");
+  res.status(200).send('Hello World');
 });
 
 paws.post('/getfile', (req, res) => { // post request to route /getfile
@@ -235,7 +258,7 @@ paws.post('/login', (req, res) => { // post request to login to verify token
 // testing datastore
 paws.get('/testo', (req, res) => {
   testDatastore().then(() => {
-    res.status(200).send("Hello World!!");
+    res.status(200).send('Hello World!!');
   }).catch(reason => {
     res.status(500).send(reason.toString);
   });
