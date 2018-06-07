@@ -6,13 +6,13 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
 import FolderIcon from '@material-ui/icons/Folder';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import UserFiles from './UserFiles';
 import '../styles/FilesFolderList.css';
 
 const styles: StyleRulesCallback = theme => ({
@@ -127,7 +127,7 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
 
     render() {
         const { classes } = this.props;
-        const { open, files, selectedFileIndex } = this.state;
+        const { open, files, selectedFileIndex, filesLoading } = this.state;
 
         return (
             <div>
@@ -137,7 +137,13 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                         onClick={this.handleClick}
                     >
                         <ListItemIcon>
-                            <FolderIcon className={classes.listItemColor} />
+                            {filesLoading
+                                ? <CircularProgress
+                                    className={`${classes.progress} ${classes.listItemColor}`}
+                                    size={24}
+                                    thickness={5}
+                                />
+                                : <FolderIcon className={classes.listItemColor} />}
                         </ListItemIcon>
                         <ListItemText
                             disableTypography
@@ -162,63 +168,11 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                 </div>
                 <Collapse in={open} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding dense>
-
-                        {
-                            files.map((fileObj: { name: string, content: string }, index: number) => (
-                                <div
-                                    className="fileItem"
-                                    key={`${name}${index + 1}`}
-                                >
-                                    <ListItem
-                                        button
-                                        className={`${classes.nested} ${selectedFileIndex === index
-                                            ? classes.listItemSelectedColor
-                                            : classes.listItemColor}`}
-                                        onClick={this.makeHandleClickFile(index)}
-                                        key={`${name}${index + 2}`}
-                                    >
-                                        <ListItemIcon key={`${name}${index + 3}`}>
-                                            <InsertDriveFileIcon
-                                                className={selectedFileIndex === index
-                                                    ? classes.listItemSelectedColor
-                                                    : classes.listItemColor}
-                                                key={`${name}${index + 4}`}
-                                            />
-                                        </ListItemIcon>
-                                        <ListItemText
-                                            inset
-                                            disableTypography
-                                            primary={
-                                                <Typography
-                                                    variant="body1"
-                                                    className={selectedFileIndex === index
-                                                        ? classes.listItemSelectedColor
-                                                        : classes.listItemColor}
-                                                >
-                                                    {fileObj.name}
-                                                </Typography>}
-                                            classes={{ root: classes.listItemColor }}
-                                            key={`${name}${index + 5}`}
-                                        />
-                                        <ListItemSecondaryAction
-                                            key={`${name}${index + 6}`}
-                                            className={`${classes.listItemColor} fadeIcon`}
-                                        >
-                                            <Tooltip id="tooltip-icon" title="Delete" key={`${name}${index + 7}`}>
-                                                <IconButton
-                                                    aria-label="delete"
-                                                    color="inherit"
-                                                    className={``}
-                                                    key={`${name}${index + 8}`}
-                                                >
-                                                    <DeleteIcon color="inherit" key={`${name}${index + 9}`} />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                </div>
-                            ))}
-
+                        <UserFiles
+                            files={files}
+                            selectedFileIndex={selectedFileIndex}
+                            makeHandleClickFile={this.makeHandleClickFile}
+                        />
                     </List>
                 </Collapse>
             </div>

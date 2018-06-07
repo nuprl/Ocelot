@@ -12,7 +12,6 @@
     "react-dom": "^16.4.0",
     "react-google-login": "^3.2.1",
     "react-monaco-editor": "^0.17.2",
-    "react-panelgroup": "^1.0.5",
     "react-resize-detector": "^2.3.0",
     "react-scripts-ts": "^2.16.0"
   },
@@ -20,7 +19,7 @@
     "@types/inline-style-prefixer": "^3.0.1",
     "@types/jest": "^23.0.0",
     "@types/material-ui": "^0.20.8",
-    "@types/node": "^10.3.1",
+    "@types/node": "^8.10.19",
     "@types/react-resize-detector": "^2.2.0",
     "stopify": "^0.5.0",
     "typescript": "^2.9.1"
@@ -28,6 +27,7 @@
   "scripts": {
     "start": "cp node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts start",
     "build": "cp node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts build",
+    "deploy": "gsutil -h Cache-Control:private -m rsync -d -r build gs://paws",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },

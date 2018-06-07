@@ -1,0 +1,4 @@
+/* Took a bit to figure this one out lol */
+#tabs > div > div > div {
+    overflow-y: hidden;
+}

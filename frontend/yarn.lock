@@ -6238,10 +6238,6 @@ react-monaco-editor@^0.17.2:
     monaco-editor "^0.13.1"
     prop-types "^15.6.1"
 
-react-panelgroup@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/react-panelgroup/-/react-panelgroup-1.0.5.tgz#ff698e35908c70665d811d637be006e3c929b0b5"
-
 react-popper@^0.10.0:
   version "0.10.4"
   resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-0.10.4.tgz#af2a415ea22291edd504678d7afda8a6ee3295aa"

@@ -4,7 +4,8 @@ import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
-import PanelGroup from 'react-panelgroup';
+import PanelGroup from './../modifiedNodeModules/PanelGroup';
+import ConsoleTabs from './ConsoleTabs';
 // import ReactResizeDetector from 'react-resize-detector';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
@@ -20,7 +21,7 @@ const styles: StyleRulesCallback = theme => ({
         height: '100%',
         minWidth: '0',
     },
-    col: {
+    panel: {
         flex: 1,
         width: '100%',
         height: '100%',
@@ -41,17 +42,23 @@ type Props = {
 type State = {
     code: string,
     runner: any,
-    editorWidth: number;
+    editorWidth: number,
+    consoleHeight: number,
 };
 
 class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
 
     constructor(props: WithStyles<string> & Props) {
         super(props);
+        const container = document.getElementsByClassName(props.classes.jumboContainer)[0];
+        // tslint:disable-next-line:no-console
+        console.log(container);
+
         this.state = {
             code: '// type your code...',
             runner: undefined,
-            editorWidth: 300,
+            editorWidth: 500,
+            consoleHeight: 110,
         };
     }
 
@@ -102,17 +109,23 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         if (this.editor !== null) {
             this.editor.layout();
         }
-        // tslint:disable-next-line:no-console
-        // console.log(panelWidths);
-        // if (panelWidths) {
-        //     this.setState({editorWidth: panelWidths[0].size});
-        // }
+    }
+
+    saveDimensions = () => {
+        const editor = document.getElementById('editorio');
+        const webConsole = document.getElementById('webconsole');
+        if (editor !== null) {
+            this.setState({ editorWidth: editor.clientWidth });
+        }
+        if (webConsole !== null) {
+            this.setState({ consoleHeight: webConsole.clientHeight});
+        }
 
     }
 
-    componentDidMount() {
-        window.addEventListener('resize', this.handleResize);
-    }
+    // componentDidMount() {
+    //     window.addEventListener('resize', this.handleResize);
+    // }
 
     componentDidUpdate(prevProps: WithStyles<string> & Props) {
         // involved right after updating, has more parameters if needed
@@ -132,43 +145,60 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         };
 
         const { classes, } = this.props;
-        const { runner, } = this.state;
+        const { runner, editorWidth, consoleHeight } = this.state;
 
         return (
-            <div className={classes.jumboContainer}>
+            <div className={classes.jumboContainer} onMouseUp={this.saveDimensions}>
                 <div className={classes.toolbar} />
-                <PanelGroup panelWidths={[{minSize: 200}]} onUpdate={this.handleResize}>
-                    <div className={classes.col}>
-                        {/* <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} /> */}
-                        <Button
-                            style={{ display: runner === undefined ? 'inline-block' : 'none' }}
-                            color="secondary"
-                            className={classes.button}
-                            onClick={this.onRunClick}
-                        >
-                            Run
-                        </Button>
-                        <MuiThemeProvider theme={tempTheme}>
+                <PanelGroup
+                    direction="column"
+                    panelWidths={[{}, { resize: 'dynamic', size: consoleHeight, minSize: 110 }]}
+                    borderColor="#201e1e"
+                    spacing={4}
+                    onUpdate={this.handleResize}
+                >
+                    <PanelGroup
+                        direction="row"
+                        panelWidths={[{ minSize: 200, resize: 'dynamic', size: editorWidth }]}
+                        borderColor="#aaa"
+                        spacing={4}
+                        onUpdate={this.handleResize}
+                    >
+                        <div className={classes.panel} id="editorio">
+                            {/* <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} /> */}
                             <Button
-                                style={{ display: runner === undefined ? 'none' : 'inline-block' }}
-                                color="primary"
+                                style={{ display: runner === undefined ? 'inline-block' : 'none' }}
+                                color="secondary"
                                 className={classes.button}
-                                onClick={this.onStopClick}
+                                onClick={this.onRunClick}
                             >
-                                Stop
+                                Run
                             </Button>
-                        </MuiThemeProvider>
-                        <MonacoEditor // refreshing breaks it (something to do with cache and webworkers)
-                            language="javascript"
-                            theme="vs-dark"
-                            value={code}
-                            options={options}
-                            onChange={this.onChange}
-                            editorDidMount={this.editorDidMount}
-                        />
-                    </div>
-                    <div className={classes.col}>
-                        <canvas />
+                            <MuiThemeProvider theme={tempTheme}>
+                                <Button
+                                    style={{ display: runner === undefined ? 'none' : 'inline-block' }}
+                                    color="primary"
+                                    className={classes.button}
+                                    onClick={this.onStopClick}
+                                >
+                                    Stop
+                                </Button>
+                            </MuiThemeProvider>
+                            <MonacoEditor // refreshing breaks it (something to do with cache and webworkers)
+                                language="javascript"
+                                theme="vs-dark"
+                                value={code}
+                                options={options}
+                                onChange={this.onChange}
+                                editorDidMount={this.editorDidMount}
+                            />
+                        </div>
+                        <div className={classes.panel} style={{backgroundColor: '#aaa'}}>
+                            <canvas />
+                        </div>
+                    </PanelGroup>
+                    <div id="webconsole" className={classes.panel}>
+                        <ConsoleTabs />
                     </div>
                 </PanelGroup>
             </div>
