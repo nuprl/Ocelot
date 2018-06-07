@@ -4,7 +4,8 @@ import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
-// import PanelGroup from 'react-panelgroup';
+import PanelGroup from 'react-panelgroup';
+import ReactResizeDetector from 'react-resize-detector';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 
@@ -20,7 +21,7 @@ const styles: StyleRulesCallback = theme => ({
         minWidth: '0',
     },
     col: {
-        // flex: 1,
+        flex: 1,
         width: '100%',
         height: '100%',
     }
@@ -129,7 +130,9 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         return (
             <div className={classes.jumboContainer}>
                 <div className={classes.toolbar} />
+                <PanelGroup panelWidths={[{minSize: 200}]}>
                     <div className={classes.col}>
+                        <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
                         <Button
                             style={{ display: runner === undefined ? 'inline-block' : 'none' }}
                             color="secondary"
@@ -160,7 +163,7 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
                     <div className={classes.col}>
                         <canvas />
                     </div>
-                {/* <Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography> */}
+                </PanelGroup>
             </div>
         );
     }

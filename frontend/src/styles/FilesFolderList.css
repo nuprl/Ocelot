@@ -1,9 +1,13 @@
-.fileButton:hover  .delelelelel {
-    opacity: 0.8;
+.fileItem:hover  .fadeIcon {
+    opacity: 0.7;
     transition: opacity 0.2s ease-out;
 }
 
-.fileButton  .delelelelel {
+.fileItem  .fadeIcon {
     opacity: 0;
     transition: opacity 0.1s ease-in;
+}
+
+.fadeIcon:hover {
+    opacity: 1;
 }

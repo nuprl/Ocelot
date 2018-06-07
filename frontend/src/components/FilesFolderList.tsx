@@ -13,7 +13,6 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
-import Fade from '@material-ui/core/Fade';
 import '../styles/FilesFolderList.css';
 
 const styles: StyleRulesCallback = theme => ({
@@ -43,7 +42,6 @@ type State = {
     filesLoading: boolean,
     files: { name: string, content: string }[],
     selectedFileIndex: number,
-    hoveringFilesButton: boolean,
 };
 
 class FilesFolderList extends React.Component<WithStyles<string> & Props, State> {
@@ -54,7 +52,6 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
             filesLoading: true,
             files: [],
             selectedFileIndex: -1,
-            hoveringFilesButton: false,
         };
     }
 
@@ -134,25 +131,23 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
 
         return (
             <div>
-                <ListItem
-                    button
-                    onClick={this.handleClick}
-                    onMouseEnter={() => this.setState({ hoveringFilesButton: true })}
-                    onMouseLeave={() => this.setState({ hoveringFilesButton: false })}
-                >
-                    <ListItemIcon>
-                        <FolderIcon className={classes.listItemColor} />
-                    </ListItemIcon>
-                    <ListItemText
-                        disableTypography
-                        primary={
-                            <Typography variant="subheading" className={classes.listItemColor}>
-                                Files
-                            </Typography>}
-                        classes={{ root: classes.listItemColor }}
-                    />
-                    <Fade in={this.state.hoveringFilesButton}>
-                        <ListItemSecondaryAction>
+                <div className="fileItem">
+                    <ListItem
+                        button
+                        onClick={this.handleClick}
+                    >
+                        <ListItemIcon>
+                            <FolderIcon className={classes.listItemColor} />
+                        </ListItemIcon>
+                        <ListItemText
+                            disableTypography
+                            primary={
+                                <Typography variant="subheading" className={classes.listItemColor}>
+                                    Files
+                                </Typography>}
+                            classes={{ root: classes.listItemColor }}
+                        />
+                        <ListItemSecondaryAction className="fadeIcon">
                             <Tooltip id="tooltip-icon" title="New File">
                                 <IconButton
                                     aria-label="create"
@@ -163,15 +158,15 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                                 </IconButton>
                             </Tooltip>
                         </ListItemSecondaryAction>
-                    </Fade>
-                </ListItem>
+                    </ListItem>
+                </div>
                 <Collapse in={open} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding dense>
 
                         {
                             files.map((fileObj: { name: string, content: string }, index: number) => (
                                 <div
-                                    className="fileButton"
+                                    className="fileItem"
                                     key={`${name}${index + 1}`}
                                 >
                                     <ListItem
@@ -207,16 +202,16 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                                         />
                                         <ListItemSecondaryAction
                                             key={`${name}${index + 6}`}
-                                            className={`${classes.listItemColor} delelelelel`}
+                                            className={`${classes.listItemColor} fadeIcon`}
                                         >
                                             <Tooltip id="tooltip-icon" title="Delete" key={`${name}${index + 7}`}>
                                                 <IconButton
                                                     aria-label="delete"
                                                     color="inherit"
                                                     className={``}
-                                                    key={`name${index + 6}`}
+                                                    key={`${name}${index + 8}`}
                                                 >
-                                                    <DeleteIcon color="inherit" key={`${name}${index + 8}`} />
+                                                    <DeleteIcon color="inherit" key={`${name}${index + 9}`} />
                                                 </IconButton>
                                             </Tooltip>
                                         </ListItemSecondaryAction>
