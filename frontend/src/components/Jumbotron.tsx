@@ -5,7 +5,7 @@ import * as monacoEditor from 'monaco-editor';
 import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
 import PanelGroup from 'react-panelgroup';
-import ReactResizeDetector from 'react-resize-detector';
+// import ReactResizeDetector from 'react-resize-detector';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 
@@ -41,6 +41,7 @@ type Props = {
 type State = {
     code: string,
     runner: any,
+    editorWidth: number;
 };
 
 class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
@@ -50,6 +51,7 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         this.state = {
             code: '// type your code...',
             runner: undefined,
+            editorWidth: 300,
         };
     }
 
@@ -96,10 +98,15 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         });
     }
 
-    handleResize = () => {
+    handleResize = (panelWidths: any) => {
         if (this.editor !== null) {
             this.editor.layout();
         }
+        // tslint:disable-next-line:no-console
+        // console.log(panelWidths);
+        // if (panelWidths) {
+        //     this.setState({editorWidth: panelWidths[0].size});
+        // }
 
     }
 
@@ -125,14 +132,14 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         };
 
         const { classes, } = this.props;
-        const { runner } = this.state;
+        const { runner, } = this.state;
 
         return (
             <div className={classes.jumboContainer}>
                 <div className={classes.toolbar} />
-                <PanelGroup panelWidths={[{minSize: 200}]}>
+                <PanelGroup panelWidths={[{minSize: 200}]} onUpdate={this.handleResize}>
                     <div className={classes.col}>
-                        <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
+                        {/* <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} /> */}
                         <Button
                             style={{ display: runner === undefined ? 'inline-block' : 'none' }}
                             color="secondary"
