@@ -97,15 +97,15 @@ async function getUserFiles(req: Request) {
 
     const [files] = await bucket.getFiles(prefixAndDelimiter);
     // get files for folder
-    let userFiles: { user: string, files: { name: string, content: string }[] };
-    userFiles = { user: userEmail, files: [] };
+    let userFiles: { name: string, content: string }[];
+    userFiles = [];
 
     for (let i = 0; i < files.length; i++) { // loop through all files
       const [fileContents] = await files[i].download();
       const fileName: string = files[i].name;
 
       if (fileName.substr(fileName.length - 1, 1) !== '/') { // if it's not directory directory
-        userFiles.files.push({
+        userFiles.push({
           name: path.basename(files[i].name), // get the filename instead of whole path
           content: fileContents.toString()
         });
@@ -124,7 +124,7 @@ async function getUserFiles(req: Request) {
 
   } catch (e) {
 
-    return { statusCode: 500, body: { status: 'failure', message: e } };
+    return { statusCode: 500, body: { status: 'error', message: e } };
   }
 
 }
@@ -169,7 +169,7 @@ async function login(req: Request) {
   // at this point the user is CS220 student/teacher of some sort.
 
   let sessionId: string | null = req.body.sessionId // explicit null is passed into sessionId if it's not there
-  if (sessionId === null) {
+  if (sessionId === null || sessionId === undefined) {
     sessionId = uid.sync(18);
   }
 

@@ -5,6 +5,7 @@ import MenuAppbar from '../components/MenuAppbar';
 import Jumbotron from '../components/Jumbotron';
 import SideDrawer from '../components/SideDrawer';
 import { drawerWidth } from '../components/SideDrawer';
+import ErrorSnackbar from '../components/ErrorSnackbar';
 
 const styles: StyleRulesCallback = theme => ({
   root: {
@@ -39,6 +40,10 @@ const styles: StyleRulesCallback = theme => ({
 
 type State = {
   loggedIn: boolean;
+  error: boolean,
+  errorMessage: string,
+  files: {name: string, content: string}[],
+  selectedFileIndex: number,
 };
 
 class Index extends React.Component<WithStyles<string>, State> {
@@ -47,6 +52,10 @@ class Index extends React.Component<WithStyles<string>, State> {
     super(props);
     this.state = {
       loggedIn: false,
+      error: false,
+      errorMessage: '',
+      files: [],
+      selectedFileIndex: -1, // implying no file is selected.
     };
   }
 
@@ -58,19 +67,57 @@ class Index extends React.Component<WithStyles<string>, State> {
     this.setState({ loggedIn: false });
   }
 
+  handleCloseSnackbar = (event: React.SyntheticEvent<any>, reason: string): void => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({ error: false });
+  }
+  handleCloseClickSnackbar = (event: React.MouseEvent<HTMLElement>): void => {
+    this.setState({ error: false });
+  }
+
+  createSnackbarError = (message: string) => {
+    this.setState({ error: true });
+    this.setState({ errorMessage: message });
+  }
+
+  onUpdateFiles = (newFiles: {name: string, content: string}[]) => {
+    this.setState({files: newFiles});
+  }
+
+  onSelectFile = (fileIndex: number): void => {
+    this.setState({selectedFileIndex: fileIndex});
+  }
+
   render() {
     const { classes } = this.props;
-    const { loggedIn } = this.state;
+    const { loggedIn, error, errorMessage, files, selectedFileIndex } = this.state;
 
     return (
       <div className={classes.root}>
-        <MenuAppbar onLogin={this.onLogin} onLogout={this.onLogout} />
-        <SideDrawer loggedIn={loggedIn} />
+        <ErrorSnackbar
+          open={error}
+          handleClose={this.handleCloseSnackbar}
+          handleClick={this.handleCloseClickSnackbar}
+          message={errorMessage}
+        />
+        <MenuAppbar
+          onLogin={this.onLogin}
+          onLogout={this.onLogout}
+          createSnackbarError={this.createSnackbarError}
+        />
+        <SideDrawer
+          loggedIn={loggedIn}
+          createSnackbarError={this.createSnackbarError}
+          onUpdateFiles={this.onUpdateFiles}
+          onSelectFile={this.onSelectFile}
+        />
         <main
           className={`${classes.content} ${loggedIn ? classes.contentShift : ''}`}
         >
           <div className={classes.toolbar} />
-          <Jumbotron />
+          <Jumbotron files={files} selectedFileIndex={selectedFileIndex}/>
         </main>
       </div>
     );

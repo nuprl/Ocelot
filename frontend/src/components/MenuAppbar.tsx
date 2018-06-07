@@ -5,7 +5,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import LoginButton from './LoginButton';
 import Fade from '@material-ui/core/Fade';
-import PlayStopIcon from './PlayStopIcon';
+import { PlayStopIcon } from './PlayStopIcon';
 
 let appBarConstrastText: string = '#fff';
 
@@ -31,14 +31,15 @@ const styles: StyleRulesCallback = theme => {
 };
 
 type MenuAppbarProps = {
-    onLogin: () => void;
-    onLogout: () => void;
+    onLogin: () => void,
+    onLogout: () => void,
+    createSnackbarError: (message: string) => void,
 };
 
 class MenuAppbar extends React.Component<WithStyles<string> & MenuAppbarProps> {
 
     render() {
-        const { classes, onLogin, onLogout } = this.props;
+        const { classes, onLogin, onLogout, createSnackbarError } = this.props;
 
         return (
             <AppBar position="absolute" className={classes.appBar}>
@@ -58,7 +59,7 @@ class MenuAppbar extends React.Component<WithStyles<string> & MenuAppbarProps> {
                         </Typography>
                     </Fade>
 
-                    <LoginButton onLogin={onLogin} onLogout={onLogout} />
+                    <LoginButton onLogin={onLogin} onLogout={onLogout} createSnackbarError={createSnackbarError}/>
                 </Toolbar>
             </AppBar>
         );

@@ -4,9 +4,11 @@ import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
 import FilesFolderList from './FilesFolderList';
-import { otherMailFolderListItems } from './tileData';
-
-import '../styles/SideDrawer.css';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
+import ListItemText from '@material-ui/core/ListItemText';
+import Typography from '@material-ui/core/Typography';
 
 export const drawerWidth = 240;
 
@@ -14,29 +16,26 @@ const styles: StyleRulesCallback = theme => ({
     drawerPaper: {
         position: 'relative',
         width: drawerWidth,
-        backgroundColor: theme.palette.primary.main,
-        font: theme.palette.primary.contrastText,
+        backgroundColor: theme.palette.primary.main
     },
-    toolbar: theme.mixins.toolbar
+    toolbar: theme.mixins.toolbar,
+    listItemColor: {
+        color: theme.palette.primary.contrastText,
+        opacity: 0.85,
+    }
 });
 
 type SideDrawerProps = {
     loggedIn: boolean,
+    createSnackbarError: (message: string) => void,
+    onUpdateFiles: (file: { name: string, content: string }[]) => void,
+    onSelectFile: (fileIndex: number) => void,
 };
 
 class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
 
-    getUserFiles = () => {
-        return 1;
-    };
-
     render() {
-        const { classes, loggedIn } = this.props;
-        let fileFolderComponent = <FilesFolderList />;
-
-        if (loggedIn) {
-            // make some request for files
-        }
+        const { loggedIn, classes } = this.props;
 
         return (
             <Drawer
@@ -49,10 +48,29 @@ class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
             >
                 <div className={classes.toolbar} />
                 <List dense>
-                    {fileFolderComponent}
+                    {loggedIn &&
+                        <FilesFolderList
+                            createSnackbarError={this.props.createSnackbarError}
+                            onUpdateFiles={this.props.onUpdateFiles}
+                            onSelectFile={this.props.onSelectFile}
+                        />}
                 </List>
                 <Divider />
-                <List dense>{otherMailFolderListItems}</List>
+                <List dense>
+                    <ListItem button>
+                        <ListItemIcon>
+                            <StarBorderIcon className={classes.listItemColor} />
+                        </ListItemIcon>
+                        <ListItemText
+                            disableTypography
+                            primary={
+                                <Typography variant="subheading" className={classes.listItemColor}>
+                                    CS 220
+                            </Typography>}
+                            classes={{ root: classes.listItemColor }}
+                        />
+                    </ListItem>
+                </List>
             </Drawer>
         );
     }

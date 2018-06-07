@@ -6,7 +6,6 @@ import { GoogleLogin, GoogleLogout, GoogleLoginResponse, GoogleLoginResponseOffl
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Fade from '@material-ui/core/Fade';
 import Hidden from '@material-ui/core/Hidden';
-import ErrorSnackbar from './ErrorSnackbar';
 
 const styles: StyleRulesCallback = theme => ({
     emailText: {
@@ -21,13 +20,12 @@ type State = {
     auth: boolean,
     loading: boolean,
     email: string,
-    error: boolean,
-    errorMessage: string
 };
 
 type LoginButtonProps = {
     onLogin: () => void, // notifies the index (the top parent element that we're logged in)
     onLogout: () => void, // notifies the index (the top parent element that we're logged in)
+    createSnackbarError: (message: string) => void, // for creating snackbar notification message
 };
 
 class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps, State> {
@@ -35,9 +33,7 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
     state = {
         auth: false, // for showing user email, login/logout button
         loading: false, // for loading in button
-        error: false, // for showing snackbar for error (e.g. server is down)
         email: '', // storing email
-        errorMessage: '', // error message of snackbar
     };
 
     onSuccessResponse = async (googleUser: GoogleLoginResponse) => {
@@ -54,7 +50,7 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
         let data: { token: string, sessionId: string | null } = { token: id_token, sessionId: null }; // data to be sent
 
         const possibleSessionId = localStorage.getItem('sessionId');
-        if (possibleSessionId !== null && possibleSessionId !== undefined) {
+        if (possibleSessionId !== null) {
             data.sessionId = possibleSessionId;
         }
 
@@ -71,16 +67,15 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
             if (jsonResponse.message === 'Unauthorized') { // if messaged back as unauthorized
                 googleUser.disconnect(); // sign user out (revoke given permissions)
                 this.setState({
-                    loading: false,
-                    errorMessage: 'Only students and professors of CS 220 are allowed to log in',
-                    error: true,
+                    loading: false
                 });
+                this.props.createSnackbarError('Only students and professors of CS 220 are allowed to log in');
                 return;
             }
 
             // important: the key here is 'sessionId'
-            localStorage.setItem('sessionId', jsonResponse.sessionId);
-            localStorage.setItem('userEmail', this.state.email);
+            localStorage.setItem('sessionId', jsonResponse.data.sessionId);
+            localStorage.setItem('userEmail', googleUser.getBasicProfile().getEmail());
 
             this.setState({ loading: false });
             this.setState({ auth: true });
@@ -88,10 +83,9 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
 
         } catch (error) {
             this.setState({
-                loading: false,
-                errorMessage: 'The authentication server seems to be down. Try again in a bit.',
-                error: true
+                loading: false
             });
+            this.props.createSnackbarError('The authentication server seems to be down. Try again in a bit.');
             googleUser.disconnect();
         }
     };
@@ -151,31 +145,13 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
         );
     }
 
-    handleCloseSnackbar = (event: React.SyntheticEvent<any>, reason: string): void => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        this.setState({ error: false });
-    }
-    handleCloseClickSnackbar = (event: React.MouseEvent<HTMLElement>): void => {
-        this.setState({ error: false });
-    }
-
     render() {
-        const { auth, email, error, errorMessage } = this.state;
+        const { auth, email } = this.state;
         const { classes } = this.props;
 
         return (
             <div>
-
-                <ErrorSnackbar
-                    open={error}
-                    handleClose={this.handleCloseSnackbar}
-                    handleClick={this.handleCloseClickSnackbar}
-                    message={errorMessage}
-                />
                 <Hidden xsDown>
-
                     <Fade in={auth} {...(auth ? { timeout: 500 } : {})}>
                         <div
                             className={classes.emailText}

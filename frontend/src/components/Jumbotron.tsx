@@ -4,7 +4,7 @@ import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
-import './../styles/Jumbotron.css';
+// import PanelGroup from 'react-panelgroup';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 
@@ -12,6 +12,17 @@ const styles: StyleRulesCallback = theme => ({
     toolbar: theme.mixins.toolbar,
     button: {
         margin: theme.spacing.unit,
+    },
+    jumboContainer: {
+        flexGrow: 1,
+        display: 'flex',
+        height: '100%',
+        minWidth: '0',
+    },
+    col: {
+        // flex: 1,
+        width: '100%',
+        height: '100%',
     }
 });
 
@@ -21,18 +32,23 @@ const tempTheme = createMuiTheme({
     }
 });
 
-type State = {
-    code: string,
-    runner: any
+type Props = {
+    files: { name: string, content: string }[],
+    selectedFileIndex: number,
 };
 
-class Jumbotron extends React.Component<WithStyles<string>, State> {
+type State = {
+    code: string,
+    runner: any,
+};
 
-    constructor(props: WithStyles<string>) {
+class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
+
+    constructor(props: WithStyles<string> & Props) {
         super(props);
         this.state = {
             code: '// type your code...',
-            runner: undefined
+            runner: undefined,
         };
     }
 
@@ -82,8 +98,6 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
     handleResize = () => {
         if (this.editor !== null) {
             this.editor.layout();
-            // tslint:disable-next-line:no-console
-            console.log(this.state.code);
         }
 
     }
@@ -92,51 +106,60 @@ class Jumbotron extends React.Component<WithStyles<string>, State> {
         window.addEventListener('resize', this.handleResize);
     }
 
+    componentDidUpdate(prevProps: WithStyles<string> & Props) {
+        // involved right after updating, has more parameters if needed
+        if (prevProps.selectedFileIndex !== this.props.selectedFileIndex && this.props.selectedFileIndex > -1) {
+            const selectedFileCode = this.props.files[this.props.selectedFileIndex].content;
+            this.setState({ code: selectedFileCode });
+        }
+
+    }
+
     render() {
-        // const { code } = this.state;
+        const { code } = this.state;
         const options: monacoEditor.editor.IEditorConstructionOptions = {
             selectOnLineNumbers: true,
             mouseWheelZoom: true,
             fontSize: 18,
         };
 
-        const { classes } = this.props;
+        const { classes, } = this.props;
         const { runner } = this.state;
 
         return (
-            <div className="jumboContainer">
+            <div className={classes.jumboContainer}>
                 <div className={classes.toolbar} />
-                <div className="col">
-                    <Button
-                        style={{ display: runner === undefined ? 'inline-block' : 'none' }}
-                        color="secondary"
-                        className={classes.button}
-                        onClick={this.onRunClick}
-                    >
-                        Run
-                    </Button>
-                    <MuiThemeProvider theme={tempTheme}>
+                    <div className={classes.col}>
                         <Button
-                            style={{ display: runner === undefined ? 'none' : 'inline-block' }}
-                            color="primary"
+                            style={{ display: runner === undefined ? 'inline-block' : 'none' }}
+                            color="secondary"
                             className={classes.button}
-                            onClick={this.onStopClick}
+                            onClick={this.onRunClick}
                         >
-                            Stop
+                            Run
                         </Button>
-                    </MuiThemeProvider>
-                    <MonacoEditor // refreshing breaks it (something to do with cache and webworkers)
-                        language="javascript"
-                        theme="vs-dark"
-                        // value={code}
-                        options={options}
-                        onChange={this.onChange}
-                        editorDidMount={this.editorDidMount}
-                    />
-                </div>
-                <div className="col">
-                    <canvas />
-                </div>
+                        <MuiThemeProvider theme={tempTheme}>
+                            <Button
+                                style={{ display: runner === undefined ? 'none' : 'inline-block' }}
+                                color="primary"
+                                className={classes.button}
+                                onClick={this.onStopClick}
+                            >
+                                Stop
+                            </Button>
+                        </MuiThemeProvider>
+                        <MonacoEditor // refreshing breaks it (something to do with cache and webworkers)
+                            language="javascript"
+                            theme="vs-dark"
+                            value={code}
+                            options={options}
+                            onChange={this.onChange}
+                            editorDidMount={this.editorDidMount}
+                        />
+                    </div>
+                    <div className={classes.col}>
+                        <canvas />
+                    </div>
                 {/* <Typography noWrap>{'You think water moves fast? You should see ice.'}</Typography> */}
             </div>
         );
