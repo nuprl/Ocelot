@@ -5,7 +5,6 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-// import ExpandLess from '@material-ui/icons/ExpandLess';
 import IconButton from '@material-ui/core/IconButton';
 import '../styles/ConsoleTabs.css';
 
@@ -17,16 +16,38 @@ function TabContainer(props: { children: string }) {
   );
 }
 
+function EmptyDiv() {
+  return (
+    <div style={{ flex: 1 }} />
+  );
+}
+
+type CloseButtonProps = {
+  classes: Record<string, string>,
+  consoleDown: boolean,
+  toggleConsole: () => void;
+};
+
+function CloseButton(props: CloseButtonProps) {
+  return (
+    <IconButton
+      aria-label="delete"
+      color="inherit"
+      className={`${props.classes.iconButton} ${props.consoleDown ? '' : props.classes.iconButtonPressed}`}
+      onClick={props.toggleConsole}
+    >
+      <ExpandMore color="inherit" />
+    </IconButton>
+  );
+}
+
 const styles: StyleRulesCallback = theme => ({
   root: {
     flexGrow: 1,
     backgroundColor: theme.palette.primary.light,
     height: '100%'
   },
-  emptySpace: {
-    flex: 1,
-  },
-  IconButton: {
+  iconButton: {
     marginRight: theme.spacing.unit,
     transition: theme.transitions.create('transform', {
       easing: theme.transitions.easing.sharp,
@@ -34,7 +55,7 @@ const styles: StyleRulesCallback = theme => ({
     }),
     transform: 'rotate(0)',
   },
-  IconButtonPressed: {
+  iconButtonPressed: {
     transition: theme.transitions.create('transform', {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.short,
@@ -64,7 +85,7 @@ class ConsoleTabs extends React.Component<WithStyles<string>, State> {
 
   toggleConsole = () => {
     this.setState((prevState: State) => {
-      return {consoleDown: !prevState.consoleDown};
+      return { consoleDown: !prevState.consoleDown };
     });
   };
 
@@ -78,15 +99,8 @@ class ConsoleTabs extends React.Component<WithStyles<string>, State> {
           <Tabs value={index} onChange={this.handleChange}>
             <Tab label="Console" />
             <Tab label="Tests" />
-            <div className={classes.emptySpace} />
-            <IconButton
-              aria-label="delete"
-              color="inherit"
-              className={`${classes.IconButton} ${consoleDown ? '' : classes.IconButtonPressed}`}
-              onClick={this.toggleConsole}
-            >
-              <ExpandMore color="inherit"/>
-            </IconButton>
+            <EmptyDiv />
+            <CloseButton classes={classes} consoleDown={consoleDown} toggleConsole={this.toggleConsole} />
           </Tabs>
         </AppBar>
         {index === 0 && <TabContainer>ConsoleStuff</TabContainer>}

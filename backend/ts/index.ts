@@ -62,6 +62,19 @@ async function updateSessionId(userEmail: string, sessionId: string): Promise<vo
 
 }
 
+async function getArrayOfFiles(userEmail: string): Promise<Storage.File[]> {
+  // specifiying the prefix of the directory to list files
+  const prefixAndDelimiter = {
+    delimiter: '/',
+    prefix: userEmail + '/'
+  }; // delimiter makes it so that we get only the direct child of prefix
+
+  const [files] = await bucket.getFiles(prefixAndDelimiter);
+  // get files for folder
+
+  return files;
+}
+
 /**
  * Given the userEmail in req, get files of user accordingly
  * Otherwise, return unauthorized message if user is not authorized.
@@ -81,22 +94,16 @@ async function getUserFiles(req: Request) {
     return {
       statusCode: 200,
       body:
-        {
-          status: 'failure',
-          message: 'Invalid session'
-        }
+      {
+        status: 'failure',
+        message: 'Invalid session'
+      }
     };
   }
 
   try {
-    // specifiying the prefix of the directory to list files
-    const prefixAndDelimiter = {
-      delimiter: '/',
-      prefix: userEmail.split('@')[0] + '/'
-    }; // delimiter makes it so that we get only the direct child of prefix
+    const files = await getArrayOfFiles(userEmail);
 
-    const [files] = await bucket.getFiles(prefixAndDelimiter);
-    // get files for folder
     let userFiles: { name: string, content: string }[];
     userFiles = [];
 
@@ -127,6 +134,77 @@ async function getUserFiles(req: Request) {
     return { statusCode: 500, body: { status: 'error', message: e } };
   }
 
+}
+
+interface FileChange {
+  fileName: string;
+  type: 'delete' | 'create' | 'rename';
+  changes?: string;
+}
+/**
+ * Takes a request object with its body containing
+ * sessionId: string
+ * userEmail: string
+ * fileChanges: {fileName: string, type: 'delete' | 'create' | 'rename' , changes?: string}[]
+ * It parses the request and delete/change files accordingly
+ * @param {Request} req
+ * @returns object with statusCode and body
+ */
+async function modifyFiles(req: Request) {
+  const sessionId = req.body.sessionId;
+  const userEmail = req.body.userEmail;
+  const fileChanges : FileChange[] = req.body.fileChanges;
+
+  if (sessionId === undefined
+    || userEmail === undefined
+    || fileChanges === undefined) {
+
+    return { statusCode: 200, body: { status: 'failure', message: 'Incomplete request' } }
+  }
+
+  // check against database for sessionId
+  const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
+
+  if (!isValidSession) {
+    return {
+      statusCode: 200,
+      body:
+      {
+        status: 'failure',
+        message: 'Invalid session'
+      }
+    };
+  }
+
+  try {
+    let currentFileChange: FileChange , files, filteredFiles, fileExists;
+    for (let i = 0; i < fileChanges.length; i++) {
+      currentFileChange = fileChanges[i];
+      if (currentFileChange.type === 'create') {
+        const file = bucket.file(`${userEmail}/${currentFileChange.fileName}`);
+        await file.save(currentFileChange.changes!, {metadata: {contentType: 'text/javascript'}});
+        continue
+      }
+      files = await getArrayOfFiles(userEmail);
+      filteredFiles = files.filter((file: Storage.File) => file.name === currentFileChange.fileName);
+      fileExists = filteredFiles.length === 1;
+      if (!fileExists) {
+        continue;
+      }
+      if (currentFileChange.type === 'delete') {
+        await filteredFiles[0].delete();
+        continue
+      }
+      // guaranteed it's a rename
+      await filteredFiles[0].move(`${userEmail}/${currentFileChange.changes}`);
+    }
+
+
+
+
+  } catch (error) {
+
+  }
 }
 
 const CLIENT_ID = '883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com'
@@ -194,27 +272,46 @@ async function login(req: Request) {
 }
 
 // for testing stuff
+let s = 1;
 async function testDatastore() {
 
-  const kind = 'CS220AllowedAccounts';
-  const users = ['chunghinlee', 'arjunguha', 'rachitnigam', 'sambaxter'];
-  const emailDomain = 'umass.edu'
-  for (let i = 0; i < users.length; i++) {
-    const userKey = datastore.key([kind, users[i] + '@' + emailDomain]);
-    const userEntity = {
-      key: userKey,
-      data: {
-        email: users[i] + '@' + emailDomain
-      }
-    };
+  // const kind = 'CS220AllowedAccounts';
+  // const users = ['chunghinlee', 'arjunguha', 'rachitnigam', 'sambaxter'];
+  // const emailDomain = 'umass.edu'
+  // for (let i = 0; i < users.length; i++) {
+  //   const userKey = datastore.key([kind, users[i] + '@' + emailDomain]);
+  //   const userEntity = {
+  //     key: userKey,
+  //     data: {
+  //       email: users[i] + '@' + emailDomain
+  //     }
+  //   };
 
-    try {
-      await datastore.save(userEntity);
-      console.log(`Saved ${userEntity.key.name}: ${userEntity.data.email}`);
-    } catch (err) {
-      console.error('ERROR:', err);
+  //   try {
+  //     await datastore.save(userEntity);
+  //     console.log(`Saved ${userEntity.key.name}: ${userEntity.data.email}`);
+  //   } catch (err) {
+  //     console.error('ERROR:', err);
+  //   }
+  // }
+
+  const file = bucket.file('chunghinlee@umass.edu/lolDude.txt');
+  const contents = `LOL WHAT THIS IS? ${s++}`;
+
+
+  file.save(contents, {
+    metadata: {
+      contentType: 'text/plain'
     }
-  }
+  }).then(() => {
+    console.log('yayayaya');
+  });
+  // file.delete().then(() => {
+  //   console.log('DELETED');
+  // }).catch(err => {
+  //   console.log('ERror', err.message);
+  // });
+
 
 
 

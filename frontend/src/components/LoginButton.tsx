@@ -115,7 +115,7 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
                     onClick={() => { renderProps.onClick(); this.setState({ loading: true }); }}
                 >
                     {this.state.loading ?
-                        <CircularProgress size={14} color="inherit" /> :
+                        <CircularProgress size={14} color="inherit" thickness={6}/> :
                         <Typography color="inherit" variant="button">Sign in</Typography>
                     }
                 </Button>

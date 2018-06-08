@@ -6,6 +6,7 @@ import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
 import PanelGroup from './../modifiedNodeModules/PanelGroup';
 import ConsoleTabs from './ConsoleTabs';
+import Typography from '@material-ui/core/Typography';
 // import ReactResizeDetector from 'react-resize-detector';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
@@ -193,8 +194,12 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
                                 editorDidMount={this.editorDidMount}
                             />
                         </div>
-                        <div className={classes.panel} style={{backgroundColor: '#aaa'}}>
-                            <canvas />
+                        <div className={classes.panel} style={{backgroundColor: '#ccc'}}>
+                            <Typography
+                                variant="display3"
+                            >
+                                LOL
+                            </Typography>
                         </div>
                     </PanelGroup>
                     <div id="webconsole" className={classes.panel}>

@@ -48,7 +48,7 @@ class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
             >
                 <div className={classes.toolbar} />
                 <List dense>
-                    {loggedIn &&
+                    {loggedIn && // when user presses log out, it disappears immediately, maybe delay it to look better
                         <FilesFolderList
                             createSnackbarError={this.props.createSnackbarError}
                             onUpdateFiles={this.props.onUpdateFiles}

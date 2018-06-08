@@ -135,6 +135,7 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                     <ListItem
                         button
                         onClick={this.handleClick}
+                        disabled={filesLoading}
                     >
                         <ListItemIcon>
                             {filesLoading
@@ -159,6 +160,7 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                                     aria-label="create"
                                     color="inherit"
                                     className={classes.listItemColor}
+                                    disabled={filesLoading}
                                 >
                                     <AddIcon color="inherit" />
                                 </IconButton>
