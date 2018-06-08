@@ -10,11 +10,29 @@ const visitor: Visitor = {
   },
   MemberExpression(path) {
     // Turn m.x into typeof m.x === 'undefined' ? throw 'bad' : m.x
-    // path.replaceWith(
-    //   t.conditionalExpression(
-    //     t.binaryExpression('===',
-    //     t.unaryExpression('typeof', path.node),
-    //     t.s
+    if (t.isIdentifier(path.node.object)) {
+      path.replaceWith(
+        t.ifStatement(
+          t.binaryExpression(
+            '===',
+            t.unaryExpression('typeof', path.node),
+            t.stringLiteral('undefined')
+          ),
+          t.throwStatement(
+            t.newExpression(
+              t.identifier('Error'),
+              [t.stringLiteral(
+                `Bad`
+              )]
+            )
+          ),
+          t.returnStatement(
+            path.node
+          )
+        )
+      );
+      path.skip();
+    }
   }
 }
 
