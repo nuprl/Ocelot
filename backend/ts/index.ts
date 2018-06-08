@@ -2,7 +2,7 @@
 import * as Storage from '@google-cloud/storage'; // Google cloud storage
 import * as Datastore from '@google-cloud/datastore';
 import { OAuth2Client } from 'google-auth-library'; // for authenticating google login
-import { Request } from 'express'; // For response and request object autocomplete
+import { Request, Response } from 'express'; // For response and request object autocomplete
 import * as express from 'express'; // for routing different links
 import * as bodyParser from 'body-parser'; // for parsing JSON data
 import * as path from 'path'; // for manipulating paths
@@ -136,11 +136,13 @@ async function getUserFiles(req: Request) {
 
 }
 
+/*
 interface FileChange {
   fileName: string;
   type: 'delete' | 'create' | 'rename';
   changes?: string;
 }
+*/
 /**
  * Takes a request object with its body containing
  * sessionId: string
@@ -150,6 +152,7 @@ interface FileChange {
  * @param {Request} req
  * @returns object with statusCode and body
  */
+/*
 async function modifyFiles(req: Request) {
   const sessionId = req.body.sessionId;
   const userEmail = req.body.userEmail;
@@ -178,12 +181,14 @@ async function modifyFiles(req: Request) {
 
   try {
     let currentFileChange: FileChange , files, filteredFiles, fileExists;
-    for (let i = 0; i < fileChanges.length; i++) {
+    for (let i = 0; i < fileChanges.length; i++) { // TODO(arjun): consider for ... of loop
       currentFileChange = fileChanges[i];
       if (currentFileChange.type === 'create') {
+        // TODO(arjun): Security vulnerability. .fileName (sent from client)
+        // could start with ../other-student/file.js.
         const file = bucket.file(`${userEmail}/${currentFileChange.fileName}`);
         await file.save(currentFileChange.changes!, {metadata: {contentType: 'text/javascript'}});
-        continue
+        continue;
       }
       files = await getArrayOfFiles(userEmail);
       filteredFiles = files.filter((file: Storage.File) => file.name === currentFileChange.fileName);
@@ -198,14 +203,13 @@ async function modifyFiles(req: Request) {
       // guaranteed it's a rename
       await filteredFiles[0].move(`${userEmail}/${currentFileChange.changes}`);
     }
-
-
-
-
   } catch (error) {
 
   }
+
+  throw 'return missing';
 }
+*/
 
 const CLIENT_ID = '883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com'
 const client = new OAuth2Client(CLIENT_ID);
@@ -246,12 +250,12 @@ async function login(req: Request) {
   }
   // at this point the user is CS220 student/teacher of some sort.
 
-  let sessionId: string | null = req.body.sessionId // explicit null is passed into sessionId if it's not there
+  let sessionId: string | null = req.body.sessionId; // explicit null is passed into sessionId if it's not there
   if (sessionId === null || sessionId === undefined) {
     sessionId = uid.sync(18);
   }
 
-  const sessionEntityKey = datastore.key([datastoreKind, userEmail, 'session', sessionId])
+  const sessionEntityKey = datastore.key([datastoreKind, userEmail, 'session', sessionId]);
 
   await datastore.upsert({
     key: sessionEntityKey,
@@ -271,9 +275,9 @@ async function login(req: Request) {
   };
 }
 
-// for testing stuff
 let s = 1;
-async function testDatastore() {
+// for testing stuff
+async function testDatastore(req: Request) {
 
   // const kind = 'CS220AllowedAccounts';
   // const users = ['chunghinlee', 'arjunguha', 'rachitnigam', 'sambaxter'];
@@ -311,16 +315,9 @@ async function testDatastore() {
   // }).catch(err => {
   //   console.log('ERror', err.message);
   // });
-
-
-
-
+  return { statusCode: 200, body: { status: 'ok' } };
 
 }
-
-
-
-
 
 export const paws = express();
 paws.use(morgan('combined')); // logging all http traffic
@@ -332,31 +329,26 @@ paws.use(cors()); // shouldn't this have options for which domain to allow? (wil
 
 paws.use(bodyParser.json()); // parse all incoming json data
 
+
+type Body = { status: string, message?: string, data?: any };
+
+function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, body: Body }>) {
+  return (req: Request, res: Response) => {
+    handler(req).then(result => {
+      res.status(result.statusCode).json(result.body);
+    }).catch(reason => {
+      console.error(reason);
+      // TODO(arjun): In deployment, it may be unsafe to send the exception
+      // to the untrusted client.
+      res.status(500).send(reason.toString());
+    });
+  }
+}
+
 paws.get('/', (req, res) => { // simple get request
   res.status(200).send('Hello World');
 });
 
-paws.post('/getfile', (req, res) => { // post request to route /getfile
-  getUserFiles(req).then(responseObj => { // give req to getUserFiles and process it accordingly
-    res.status(responseObj.statusCode).json(responseObj.body);
-  }).catch(reason => { // for debugging
-    res.status(500).send(reason.toString());
-  });
-});
-
-paws.post('/login', (req, res) => { // post request to login to verify token
-  login(req).then(responseObj => {
-    res.status(responseObj.statusCode).json(responseObj.body);
-  }).catch(reason => {
-    res.status(500).send(reason.toString());
-  });
-});
-
-// testing datastore
-paws.get('/testo', (req, res) => {
-  testDatastore().then(() => {
-    res.status(200).send('Hello World!!');
-  }).catch(reason => {
-    res.status(500).send(reason.toString);
-  });
-});
+paws.post('/getfile', wrapHandler(getUserFiles));
+paws.post('/login', wrapHandler(login));
+paws.get('/testo', wrapHandler(testDatastore));
