@@ -1,10 +1,14 @@
 .fileItem:hover  .fadeIcon {
     opacity: 0.7;
+    -webkit-transition: opacity 0.2s ease-out;
+    -o-transition: opacity 0.2s ease-out;
     transition: opacity 0.2s ease-out;
 }
 
 .fileItem  .fadeIcon {
     opacity: 0;
+    -webkit-transition: opacity 0.1s ease-in;
+    -o-transition: opacity 0.1s ease-in;
     transition: opacity 0.1s ease-in;
 }
 

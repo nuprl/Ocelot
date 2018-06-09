@@ -75,6 +75,14 @@ async function getArrayOfFiles(userEmail: string): Promise<Storage.File[]> {
   return files;
 }
 
+function isSimpleValidEmail(email: string) { // incomplete but will do for now
+  return /^\w[.\w]*@\w+\.[a-zA-Z]+$/.test(email);
+}
+
+function isSimpleValidFileName(fileName: string) { // still incomplete but will do for now
+  return /^\w+\.\w+/.test(fileName);
+}
+
 /**
  * Given the userEmail in req, get files of user accordingly
  * Otherwise, return unauthorized message if user is not authorized.
@@ -148,7 +156,7 @@ interface FileChange {
  * sessionId: string
  * userEmail: string
  * fileChanges: {fileName: string, type: 'delete' | 'create' | 'rename' , changes?: string}[]
- * It parses the request and delete/change files accordingly
+ * It parses the request and delete/change files accordingly on data storage accordingly
  * @param {Request} req
  * @returns object with statusCode and body
  */
@@ -156,7 +164,7 @@ interface FileChange {
 async function modifyFiles(req: Request) {
   const sessionId = req.body.sessionId;
   const userEmail = req.body.userEmail;
-  const fileChanges : FileChange[] = req.body.fileChanges;
+  const fileChanges: FileChange[] = req.body.fileChanges;
 
   if (sessionId === undefined
     || userEmail === undefined
@@ -179,14 +187,25 @@ async function modifyFiles(req: Request) {
     };
   }
 
+  if (!isSimpleValidEmail(userEmail)) {
+    return {
+      statusCode: 200,
+      body: {
+        status: 'failure',
+        message: 'Invalid Email'
+      }
+    }
+  }
+
   try {
-    let currentFileChange: FileChange , files, filteredFiles, fileExists;
-    for (let currentFileChange of fileChanges) { // TODO(arjun): consider for ... of loop
+    let files, filteredFiles, fileExists;
+    for (let currentFileChange of fileChanges) {
+      if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid email
+        continue;
+      }
       if (currentFileChange.type === 'create') {
-        // TODO(arjun): Security vulnerability. .fileName (sent from client)
-        // could start with ../other-student/file.js.
         const file = bucket.file(`${userEmail}/${currentFileChange.fileName}`);
-        await file.save(currentFileChange.changes!, {metadata: {contentType: 'text/javascript'}});
+        await file.save(currentFileChange.changes!, { metadata: { contentType: 'text/javascript' } });
         continue;
       }
       files = await getArrayOfFiles(userEmail);
@@ -202,11 +221,23 @@ async function modifyFiles(req: Request) {
       // guaranteed it's a rename
       await filteredFiles[0].move(`${userEmail}/${currentFileChange.changes}`);
     }
+
+    return {
+      statusCode: 200,
+      body: {
+        status: 'success',
+        message: 'Files have been updated.'
+      }
+    }
   } catch (error) {
-
+    return {
+      statusCode: 500,
+      body: {
+        status: 'error',
+        message: 'Something went wrong!'
+      }
+    }
   }
-
-
 }
 
 
@@ -329,7 +360,11 @@ paws.use(cors()); // shouldn't this have options for which domain to allow? (wil
 paws.use(bodyParser.json()); // parse all incoming json data
 
 
-type Body = { status: string, message?: string, data?: any };
+type Body = { 
+  status: string, 
+  message?: string, 
+  data?: any, 
+};
 
 function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, body: Body }>) {
   return (req: Request, res: Response) => {
@@ -350,4 +385,5 @@ paws.get('/', (req: Request, res: Response) => { // simple get request
 
 paws.post('/getfile', wrapHandler(getUserFiles));
 paws.post('/login', wrapHandler(login));
+paws.post('/changefile',wrapHandler(modifyFiles))
 paws.get('/testo', wrapHandler(testDatastore));

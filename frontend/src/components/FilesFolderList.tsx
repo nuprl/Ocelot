@@ -155,15 +155,18 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                             classes={{ root: classes.listItemColor }}
                         />
                         <ListItemSecondaryAction className="fadeIcon">
-                            <Tooltip id="tooltip-icon" title="New File">
-                                <IconButton
-                                    aria-label="create"
-                                    color="inherit"
-                                    className={classes.listItemColor}
-                                    disabled={filesLoading}
-                                >
-                                    <AddIcon color="inherit" />
-                                </IconButton>
+                            <Tooltip id="tooltip-icon" title="New File" disableHoverListener={filesLoading}>
+                                <div>  {/* surround the button with a div to suppress the warning even though it's
+                            not really necessary*/}
+                                    <IconButton
+                                        aria-label="create"
+                                        color="inherit"
+                                        className={classes.listItemColor}
+                                        disabled={filesLoading}
+                                    >
+                                        <AddIcon color="inherit" />
+                                    </IconButton>
+                                </div>
                             </Tooltip>
                         </ListItemSecondaryAction>
                     </ListItem>
