@@ -7,7 +7,7 @@ import red from '@material-ui/core/colors/red';
 import PanelGroup from './../modifiedNodeModules/PanelGroup';
 import ConsoleTabs from './ConsoleTabs';
 import Typography from '@material-ui/core/Typography';
-// import ReactResizeDetector from 'react-resize-detector';
+import ReactResizeDetector from 'react-resize-detector';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 
@@ -166,7 +166,7 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
                         onUpdate={this.handleResize}
                     >
                         <div className={classes.panel} id="editorio">
-                            {/* <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} /> */}
+                            <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
                             <Button
                                 style={{ display: runner === undefined ? 'inline-block' : 'none' }}
                                 color="secondary"

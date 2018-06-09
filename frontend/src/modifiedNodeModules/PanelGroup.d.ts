@@ -13,7 +13,7 @@ interface PanelGroupProps {
     panelColor?: string;
     direction?: 'row' | 'column';
     panelWidths?: PanelWidthType[],
-    onUpdate?: (panelWidths: PanelWidthType[]) => void,
+    onUpdate?: (panelWidths?: PanelWidthType[]) => void,
 }
 
 declare const PanelGroup: React.ComponentType<PanelGroupProps>;
