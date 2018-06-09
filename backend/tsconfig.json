@@ -5,5 +5,8 @@
         "outDir": "./dist",
         "lib": ["es2016"],
         "target": "es5",
+        "typeRoots": [
+            "./node_modules/@types"
+        ]
     }
 }
