@@ -25,8 +25,8 @@
     "typescript": "^2.9.1"
   },
   "scripts": {
-    "start": "cp node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts start",
-    "build": "cp node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts build",
+    "start": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts start",
+    "build": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts build",
     "deploy": "gsutil -h Cache-Control:private -m rsync -d -r build gs://paws",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"

@@ -136,13 +136,13 @@ async function getUserFiles(req: Request) {
 
 }
 
-/*
+
 interface FileChange {
   fileName: string;
   type: 'delete' | 'create' | 'rename';
   changes?: string;
 }
-*/
+
 /**
  * Takes a request object with its body containing
  * sessionId: string
@@ -152,7 +152,7 @@ interface FileChange {
  * @param {Request} req
  * @returns object with statusCode and body
  */
-/*
+
 async function modifyFiles(req: Request) {
   const sessionId = req.body.sessionId;
   const userEmail = req.body.userEmail;
@@ -181,8 +181,7 @@ async function modifyFiles(req: Request) {
 
   try {
     let currentFileChange: FileChange , files, filteredFiles, fileExists;
-    for (let i = 0; i < fileChanges.length; i++) { // TODO(arjun): consider for ... of loop
-      currentFileChange = fileChanges[i];
+    for (let currentFileChange of fileChanges) { // TODO(arjun): consider for ... of loop
       if (currentFileChange.type === 'create') {
         // TODO(arjun): Security vulnerability. .fileName (sent from client)
         // could start with ../other-student/file.js.
@@ -207,9 +206,9 @@ async function modifyFiles(req: Request) {
 
   }
 
-  throw 'return missing';
+
 }
-*/
+
 
 const CLIENT_ID = '883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com'
 const client = new OAuth2Client(CLIENT_ID);
@@ -345,7 +344,7 @@ function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, bo
   }
 }
 
-paws.get('/', (req, res) => { // simple get request
+paws.get('/', (req: Request, res: Response) => { // simple get request
   res.status(200).send('Hello World');
 });
 
