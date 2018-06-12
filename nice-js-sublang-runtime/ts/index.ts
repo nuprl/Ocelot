@@ -11,4 +11,4 @@ function memberExpression(obj: any, name: any): any {
     }
 }
 
-module.exports = { raise, memberExpression };
+export = { raise, memberExpression };

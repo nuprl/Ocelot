@@ -7,13 +7,13 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@types/node": "^10.3.2",
     "babel-core": "^6.26.3",
     "babel-traverse": "^6.26.0",
     "typescript": "^2.9.1"
   },
   "devDependencies": {
     "@types/babel-core": "^6.25.4",
-    "@types/babel-traverse": "^6.25.3"
+    "@types/babel-traverse": "^6.25.3",
+    "@types/node": "^10.3.2"
   }
 }
