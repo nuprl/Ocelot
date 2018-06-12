@@ -70,6 +70,14 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         console.log('editorDidMount', editor);
         editor.focus();
         this.editor = editor;
+        editor.addCommand(
+            // tslint:disable-next-line:no-bitwise
+            monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
+            function () {
+                // tslint:disable-next-line:no-console
+                console.log('SAVE pressed!');
+            },
+            '');
     }
 
     onChange = (code: string) => {
@@ -119,7 +127,7 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
             this.setState({ editorWidth: editor.clientWidth });
         }
         if (webConsole !== null) {
-            this.setState({ consoleHeight: webConsole.clientHeight});
+            this.setState({ consoleHeight: webConsole.clientHeight });
         }
 
     }
@@ -194,11 +202,11 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
                                 editorDidMount={this.editorDidMount}
                             />
                         </div>
-                        <div className={classes.panel} style={{backgroundColor: '#ccc'}}>
+                        <div className={classes.panel} style={{ backgroundColor: '#ccc' }}>
                             <Typography
                                 variant="display3"
                             >
-                                LOL
+                                WELP
                             </Typography>
                         </div>
                     </PanelGroup>

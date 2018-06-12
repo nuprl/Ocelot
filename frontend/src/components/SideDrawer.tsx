@@ -10,7 +10,7 @@ import StarBorderIcon from '@material-ui/icons/StarBorder';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 
-export const drawerWidth = 240;
+export const drawerWidth = 300;
 
 const styles: StyleRulesCallback = theme => ({
     drawerPaper: {
@@ -29,13 +29,17 @@ type SideDrawerProps = {
     loggedIn: boolean,
     createSnackbarError: (message: string) => void,
     onUpdateFiles: (file: { name: string, content: string }[]) => void,
+    onDeleteFile: (index: number) => void,
     onSelectFile: (fileIndex: number) => void,
+    files: {name: string, content: string}[],
+    selectedFileIndex: number,
+    onCreatedFile: (fileName: string) => void
 };
 
 class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
 
     render() {
-        const { loggedIn, classes } = this.props;
+        const { loggedIn, classes, files, selectedFileIndex } = this.props;
 
         return (
             <Drawer
@@ -53,6 +57,10 @@ class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
                             createSnackbarError={this.props.createSnackbarError}
                             onUpdateFiles={this.props.onUpdateFiles}
                             onSelectFile={this.props.onSelectFile}
+                            onDeleteFile={this.props.onDeleteFile}
+                            files={files}
+                            selectedFileIndex={selectedFileIndex}
+                            onCreatedFile={this.props.onCreatedFile}
                         />}
                 </List>
                 <Divider />

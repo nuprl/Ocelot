@@ -18,6 +18,26 @@ const datastoreKind = 'CS220AllowedAccounts';
 
 const sessionDuration = 3; // hours
 
+// IMPORTANT: Should I wrap all function bodies in try catch just in case?
+
+function undefinedExists(...properties: (any | undefined)[]) {
+  function hasUndefined(acc: boolean, val: (any | undefined)) {
+    return acc || typeof val === 'undefined';
+  }
+  return properties.reduce(hasUndefined, false);
+}
+
+
+function failureResponse(message: string) {
+  return {
+    statusCode: 200,
+    body: {
+      status: 'failure',
+      message: message
+    }
+  }
+}
+
 function isWithinSessionTime(sessionTime: number) {
   const sessionDurationMili: number = sessionDuration * 3600000;
   if (Math.abs(sessionTime - Date.now()) > sessionDurationMili) {
@@ -90,23 +110,18 @@ function isSimpleValidFileName(fileName: string) { // still incomplete but will 
  * @param {Request} req with a userEmail attribute from JSON POST request
  * @returns statusCode and contents in body
  */
-async function getUserFiles(req: Request) {
+async function getFile(req: Request) {
   // Get sessionId from JSON
   const sessionId = req.body.sessionId;
   // Get user attribute 
   const userEmail = req.body.userEmail;
   // check against database for sessionId
+  if (undefinedExists(sessionId, userEmail)) {
+    return failureResponse('Incomplete request');
+  }
   const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
-
   if (!isValidSession) {
-    return {
-      statusCode: 200,
-      body:
-      {
-        status: 'failure',
-        message: 'Invalid session'
-      }
-    };
+    return failureResponse('Invalid session');
   }
 
   try {
@@ -161,64 +176,52 @@ interface FileChange {
  * @returns object with statusCode and body
  */
 
-async function modifyFiles(req: Request) {
+async function changeFile(req: Request) {
   const sessionId = req.body.sessionId;
   const userEmail = req.body.userEmail;
   const fileChanges: FileChange[] = req.body.fileChanges;
 
-  if (sessionId === undefined
-    || userEmail === undefined
-    || fileChanges === undefined) {
-
-    return { statusCode: 200, body: { status: 'failure', message: 'Incomplete request' } }
+  if (undefinedExists(sessionId, userEmail, fileChanges)) {
+    return failureResponse('Incomplete request');
   }
-
   // check against database for sessionId
   const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
-
   if (!isValidSession) {
-    return {
-      statusCode: 200,
-      body:
-      {
-        status: 'failure',
-        message: 'Invalid session'
-      }
-    };
+    return failureResponse('Invalid session');
   }
-
   if (!isSimpleValidEmail(userEmail)) {
-    return {
-      statusCode: 200,
-      body: {
-        status: 'failure',
-        message: 'Invalid Email'
-      }
-    }
+    return failureResponse('Invalid email');
   }
 
   try {
     let files, filteredFiles, fileExists;
     for (let currentFileChange of fileChanges) {
+      console.log('Looking at: ', currentFileChange.fileName);
       if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid email
+        console.log('No simple filename');
         continue;
       }
       if (currentFileChange.type === 'create') {
+        console.log('Creating file');
         const file = bucket.file(`${userEmail}/${currentFileChange.fileName}`);
         await file.save(currentFileChange.changes!, { metadata: { contentType: 'text/javascript' } });
         continue;
       }
       files = await getArrayOfFiles(userEmail);
-      filteredFiles = files.filter((file: Storage.File) => file.name === currentFileChange.fileName);
+      filteredFiles = files.filter((file: Storage.File) =>
+        path.basename(file.name) === currentFileChange.fileName);
       fileExists = filteredFiles.length === 1;
       if (!fileExists) {
+        console.log('File does not exist');
         continue;
       }
       if (currentFileChange.type === 'delete') {
+        console.log('Deleting file');
         await filteredFiles[0].delete();
         continue
       }
       // guaranteed it's a rename
+      console.log("Renaming File")
       await filteredFiles[0].move(`${userEmail}/${currentFileChange.changes}`);
     }
 
@@ -234,7 +237,7 @@ async function modifyFiles(req: Request) {
       statusCode: 500,
       body: {
         status: 'error',
-        message: 'Something went wrong!'
+        message: error
       }
     }
   }
@@ -360,10 +363,10 @@ paws.use(cors()); // shouldn't this have options for which domain to allow? (wil
 paws.use(bodyParser.json()); // parse all incoming json data
 
 
-type Body = { 
-  status: string, 
-  message?: string, 
-  data?: any, 
+type Body = {
+  status: string,
+  message?: string,
+  data?: any,
 };
 
 function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, body: Body }>) {
@@ -383,7 +386,7 @@ paws.get('/', (req: Request, res: Response) => { // simple get request
   res.status(200).send('Hello World');
 });
 
-paws.post('/getfile', wrapHandler(getUserFiles));
+paws.post('/getfile', wrapHandler(getFile));
 paws.post('/login', wrapHandler(login));
-paws.post('/changefile',wrapHandler(modifyFiles))
+paws.post('/changefile', wrapHandler(changeFile))
 paws.get('/testo', wrapHandler(testDatastore));

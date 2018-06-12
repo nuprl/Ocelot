@@ -31,17 +31,19 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 type Props = {
-    files?: { name: string, content: string }[],
+    files: { name: string, content: string }[],
+    selectedFileIndex: number
     createSnackbarError: (message: string) => void,
     onUpdateFiles: (file: { name: string, content: string }[]) => void,
     onSelectFile: (fileIndex: number) => void,
+    onDeleteFile: (index: number) => void,
+    onCreatedFile: (fileName: string) => void,
 };
 
 type State = {
     open: boolean,
     filesLoading: boolean,
-    files: { name: string, content: string }[],
-    selectedFileIndex: number,
+    newFile: boolean,
 };
 
 class FilesFolderList extends React.Component<WithStyles<string> & Props, State> {
@@ -50,8 +52,7 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
         this.state = {
             open: false,
             filesLoading: true,
-            files: [],
-            selectedFileIndex: -1,
+            newFile: false,
         };
     }
 
@@ -100,8 +101,8 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                 return;
             }
 
-            this.setState({ files: jsonResponse.data.userFiles });
             this.props.onUpdateFiles(jsonResponse.data.userFiles);
+            this.setState({ open: true });
 
         } catch (error) {
             // create snackbar
@@ -120,14 +121,37 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
 
     makeHandleClickFile = (index: number) => {
         return (() => {
-            this.setState({ selectedFileIndex: index });
             this.props.onSelectFile(index);
         });
     }
 
+    makeHandleDeleteFile = (index: number) => {
+        return (() => {
+            this.props.onDeleteFile(index);
+        });
+    }
+
+    onCreateFile = () => {
+        this.setState({
+            newFile: true,
+            open: true,
+        });
+    }
+
+    onCreatedFile = (fileName: string) => {
+        this.setState({ newFile: false });
+        this.props.onCreatedFile(fileName);
+    };
+
+    onNoNewFile = () => {
+        this.setState({
+            newFile: false,
+        });
+    };
+
     render() {
-        const { classes } = this.props;
-        const { open, files, selectedFileIndex, filesLoading } = this.state;
+        const { classes, files, selectedFileIndex } = this.props;
+        const { open, filesLoading, newFile } = this.state;
 
         return (
             <div>
@@ -163,6 +187,7 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                                         color="inherit"
                                         className={classes.listItemColor}
                                         disabled={filesLoading}
+                                        onClick={this.onCreateFile}
                                     >
                                         <AddIcon color="inherit" />
                                     </IconButton>
@@ -177,6 +202,10 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                             files={files}
                             selectedFileIndex={selectedFileIndex}
                             makeHandleClickFile={this.makeHandleClickFile}
+                            makeHandleDeleteFile={this.makeHandleDeleteFile}
+                            onCreatedFile={this.onCreatedFile}
+                            newFile={newFile}
+                            onNoNewFile={this.onNoNewFile}
                         />
                     </List>
                 </Collapse>

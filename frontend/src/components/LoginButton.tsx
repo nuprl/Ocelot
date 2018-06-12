@@ -64,7 +64,8 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
             });
 
             const jsonResponse = await response.json(); // get json response
-            if (jsonResponse.message === 'Unauthorized') { // if messaged back as unauthorized
+            if (response.status !== 200 || jsonResponse.message === 'Unauthorized') { 
+                // if messaged back as unauthorized
                 googleUser.disconnect(); // sign user out (revoke given permissions)
                 this.setState({
                     loading: false
