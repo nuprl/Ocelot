@@ -1,6 +1,9 @@
 {
   "name": "nice-js-sublang-runtime",
   "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT"
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  }
 }
