@@ -4,10 +4,12 @@ import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
-import PanelGroup from './../modifiedNodeModules/PanelGroup';
+// import PanelGroup from './../modifiedNodeModules/PanelGroup';
 import ConsoleTabs from './ConsoleTabs';
 import Typography from '@material-ui/core/Typography';
 import ReactResizeDetector from 'react-resize-detector';
+import SplitPane from 'react-split-pane';
+import '../styles/SplitPane.css';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 
@@ -16,14 +18,7 @@ const styles: StyleRulesCallback = theme => ({
     button: {
         margin: theme.spacing.unit,
     },
-    jumboContainer: {
-        flexGrow: 1,
-        display: 'flex',
-        height: '100%',
-        minWidth: '0',
-    },
     panel: {
-        flex: 1,
         width: '100%',
         height: '100%',
     }
@@ -40,6 +35,7 @@ type Props = {
     selectedFileIndex: number,
     onUpdateSelectedFile: (index: number, content: string) => void,
     onSaveSelectedFile: (fileIndex: number, fileName: string) => void,
+    loggedIn: boolean;
 };
 
 type State = {
@@ -53,14 +49,11 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
 
     constructor(props: WithStyles<string> & Props) {
         super(props);
-        const container = document.getElementsByClassName(props.classes.jumboContainer)[0];
-        // tslint:disable-next-line:no-console
-        console.log(container);
 
         this.state = {
             code: '// type your code...',
             runner: undefined,
-            editorWidth: 500,
+            editorWidth: Math.floor(1920 / 2.1),
             consoleHeight: 110,
         };
     }
@@ -73,6 +66,10 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         editor.focus();
         this.editor = editor;
         const onCtrlSave = () => {
+            if (this.props.selectedFileIndex < 0
+                || this.props.selectedFileIndex > this.props.files.length - 1) {
+                return;
+            }
             this.props.onSaveSelectedFile(
                 this.props.selectedFileIndex,
                 this.props.files[this.props.selectedFileIndex].name
@@ -88,9 +85,13 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
             '');
     }
 
+    componentDidMount() {
+        this.setState({ editorWidth: document.body.clientWidth / 2.1 });
+    }
+
     onChange = (code: string) => {
         this.setState({ code: code });
-        const {selectedFileIndex } = this.props;
+        const { selectedFileIndex } = this.props;
         if (this.props.selectedFileIndex > -1) {
             this.props.onUpdateSelectedFile(selectedFileIndex, code);
         }
@@ -144,15 +145,14 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
 
     }
 
-    // componentDidMount() {
-    //     window.addEventListener('resize', this.handleResize);
-    // }
-
     componentDidUpdate(prevProps: WithStyles<string> & Props) {
         // involved right after updating, has more parameters if needed
         if (prevProps.selectedFileIndex !== this.props.selectedFileIndex && this.props.selectedFileIndex > -1) {
             const selectedFileCode = this.props.files[this.props.selectedFileIndex].content;
             this.setState({ code: selectedFileCode });
+        }
+        if (prevProps.loggedIn && !this.props.loggedIn) {
+            this.setState({ code: '// type your code here' });
         }
 
     }
@@ -166,67 +166,61 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         };
 
         const { classes, } = this.props;
-        const { runner, editorWidth, consoleHeight } = this.state;
+        const { runner, /* editorWidth, consoleHeight*/ } = this.state;
 
         return (
-            <div className={classes.jumboContainer} onMouseUp={this.saveDimensions}>
-                <div className={classes.toolbar} />
-                <PanelGroup
-                    direction="column"
-                    panelWidths={[{}, { resize: 'dynamic', size: consoleHeight, minSize: 110 }]}
-                    borderColor="#201e1e"
-                    spacing={4}
-                    onUpdate={this.handleResize}
+            <SplitPane
+                split="horizontal"
+                minSize={48}
+                defaultSize={48}
+                primary="second"
+            >
+                <SplitPane
+                    split="vertical"
+                    minSize={200}
+                    defaultSize="50%"
                 >
-                    <PanelGroup
-                        direction="row"
-                        panelWidths={[{ minSize: 200, resize: 'dynamic', size: editorWidth }]}
-                        borderColor="#aaa"
-                        spacing={4}
-                        onUpdate={this.handleResize}
-                    >
-                        <div className={classes.panel} id="editorio">
-                            <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
+                    <div className={classes.panel} id="editorio">
+                        <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
+                        <Button
+                            style={{ display: runner === undefined ? 'inline-block' : 'none' }}
+                            color="secondary"
+                            className={classes.button}
+                            onClick={this.onRunClick}
+                        >
+                            Run
+                        </Button>
+                        <MuiThemeProvider theme={tempTheme}>
                             <Button
-                                style={{ display: runner === undefined ? 'inline-block' : 'none' }}
-                                color="secondary"
+                                style={{ display: runner === undefined ? 'none' : 'inline-block' }}
+                                color="primary"
                                 className={classes.button}
-                                onClick={this.onRunClick}
+                                onClick={this.onStopClick}
                             >
-                                Run
+                                Stop
                             </Button>
-                            <MuiThemeProvider theme={tempTheme}>
-                                <Button
-                                    style={{ display: runner === undefined ? 'none' : 'inline-block' }}
-                                    color="primary"
-                                    className={classes.button}
-                                    onClick={this.onStopClick}
-                                >
-                                    Stop
-                                </Button>
-                            </MuiThemeProvider>
-                            <MonacoEditor // refreshing breaks it (something to do with cache and webworkers)
-                                language="javascript"
-                                theme="vs-dark"
-                                value={code}
-                                options={options}
-                                onChange={this.onChange}
-                                editorDidMount={this.editorDidMount}
-                            />
-                        </div>
-                        <div className={classes.panel} style={{ backgroundColor: '#ccc' }}>
-                            <Typography
-                                variant="display3"
-                            >
-                                WELP
-                            </Typography>
-                        </div>
-                    </PanelGroup>
-                    <div id="webconsole" className={classes.panel}>
-                        <ConsoleTabs />
+                        </MuiThemeProvider>
+                        <MonacoEditor // refreshing breaks it (something to do with cache and webworkers)
+                            language="javascript"
+                            theme="vs-dark"
+                            value={code}
+                            options={options}
+                            onChange={this.onChange}
+                            editorDidMount={this.editorDidMount}
+                        />
                     </div>
-                </PanelGroup>
-            </div>
+                    <div className={classes.panel} style={{ backgroundColor: '#555' }}>
+                        <Typography
+                            variant="display3"
+                        >
+                            Test
+                        </Typography>
+                    </div>
+                </SplitPane>
+                <div id="webconsole" className={classes.panel}>
+                    <ConsoleTabs />
+                </div>
+            </SplitPane>
         );
     }
 }

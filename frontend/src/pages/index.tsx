@@ -1,42 +1,36 @@
 import * as React from 'react';
-import withStyles, { WithStyles, StyleRulesCallback } from '@material-ui/core/styles/withStyles';
+import withStyles, { WithStyles, StyleRulesCallback, } from '@material-ui/core/styles/withStyles';
+// import createMuiTheme, { Theme } from '@material-ui/core/styles/createMuiTheme';
 import customTheme from '../customTheme';
 import MenuAppbar from '../components/MenuAppbar';
 import Jumbotron from '../components/Jumbotron';
 import SideDrawer from '../components/SideDrawer';
-import { drawerWidth } from '../components/SideDrawer';
 import ErrorSnackbar from '../components/ErrorSnackbar';
+import '../styles/Jumbotron.css';
+import SplitPane from 'react-split-pane';
 
-const styles: StyleRulesCallback = theme => ({
-  root: {
-    flexGrow: 1,
-    height: '100vh',
-    zIndex: 1,
-    overflow: 'hidden',
-    position: 'relative',
-    display: 'flex',
-    backgroundColor: theme.palette.primary.main,
-  },
+// let themio: Theme = createMuiTheme({ palette: { type: 'dark' } });
 
-  content: {
-    flexGrow: 1,
-    minWidth: 0, // So the Typography noWrap works
-    // animations
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: -drawerWidth,
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  },
-  toolbar: theme.mixins.toolbar,
-});
+const styles: StyleRulesCallback = theme => {
+  // themio = theme;
+  return {
+    root: {
+      flexGrow: 1,
+      height: '100vh',
+      zIndex: 1,
+      overflow: 'hidden',
+      position: 'relative',
+      display: 'flex',
+      backgroundColor: theme.palette.primary.main,
+    },
+
+    content: {
+      flexGrow: 1,
+      minWidth: 0, // So the Typography noWrap works
+      // animations
+    }
+  };
+};
 
 type State = {
   loggedIn: boolean;
@@ -82,7 +76,13 @@ class Index extends React.Component<WithStyles<string>, State> {
   };
 
   onLogout = () => {
-    this.setState({ loggedIn: false });
+    this.setState(prevState => ({
+      loggedIn: false,
+      selectedFileIndex: -1,
+      fileSaved: [],
+      files: [],
+    }));
+
   };
 
   handleCloseSnackbar = (event: React.SyntheticEvent<any>, reason: string): void => {
@@ -102,7 +102,7 @@ class Index extends React.Component<WithStyles<string>, State> {
 
   onUpdateFiles = (newFiles: { name: string, content: string }[]) => {
     this.setState({ files: newFiles });
-    this.setState({fileSaved: new Array(newFiles.length).fill(true)});
+    this.setState({ fileSaved: new Array(newFiles.length).fill(true) });
   };
 
   onSelectFile = (fileIndex: number): void => {
@@ -125,7 +125,10 @@ class Index extends React.Component<WithStyles<string>, State> {
 
   onCreatedFile = (fileName: string) => {
     this.setState(prevState => ({
-      files: [...prevState.files, {name: fileName, content: ''}]
+      files: [...prevState.files, { name: fileName, content: '' }]
+    }));
+    this.setState(prevState => ({
+      fileSaved: [...prevState.fileSaved, true]
     }));
     this.fileChanges.push({ fileName: fileName, type: 'create' });
     this.onSave();
@@ -138,7 +141,7 @@ class Index extends React.Component<WithStyles<string>, State> {
     this.setState(prevState => ({
       files: prevState.files.map((elem, index) => {
         if (index === fileIndex) {
-          return {name: elem.name, content: content};
+          return { name: elem.name, content: content };
         }
         return elem;
       })
@@ -163,11 +166,11 @@ class Index extends React.Component<WithStyles<string>, State> {
     if (this.state.fileSaved[fileIndex]) {
       return;
     }
-    
+
     if (typeof this.state.files[fileIndex] === 'undefined') {
       return;
     }
-    this.fileChanges.push({fileName: fileName, type: 'create', changes: this.state.files[fileIndex].content});
+    this.fileChanges.push({ fileName: fileName, type: 'create', changes: this.state.files[fileIndex].content });
     this.onSave();
     this.setState((prevState) => ({
       fileSaved: prevState.fileSaved.map((elem, index) => {
@@ -218,7 +221,7 @@ class Index extends React.Component<WithStyles<string>, State> {
         return;
       }
       this.fileChanges = [];
-      
+
     } catch (error) {
       // create snackbar
       this.createSnackbarError(`Couldn't connect to the server at the moment, try again later`);
@@ -240,6 +243,12 @@ class Index extends React.Component<WithStyles<string>, State> {
   render() {
     const { classes } = this.props;
     const { loggedIn, error, errorMessage, files, selectedFileIndex } = this.state;
+    let transitionStyle: { transition?: string, width?: string } = {
+      // transition: themio.transitions.create('width', {
+      //   easing: themio.transitions.easing.sharp,
+      //   duration: themio.transitions.duration.leavingScreen
+      // })
+    };
 
     return (
       <div className={classes.root}>
@@ -254,28 +263,34 @@ class Index extends React.Component<WithStyles<string>, State> {
           onLogout={this.onLogout}
           createSnackbarError={this.createSnackbarError}
         />
-        <SideDrawer
-          loggedIn={loggedIn}
-          createSnackbarError={this.createSnackbarError}
-          onUpdateFiles={this.onUpdateFiles}
-          onSelectFile={this.onSelectFile}
-          onDeleteFile={this.onDeleteFile}
-          files={files}
-          selectedFileIndex={selectedFileIndex}
-          onCreatedFile={this.onCreatedFile}
-          fileSaved={this.state.fileSaved}
-        />
-        <main
-          className={`${classes.content} ${loggedIn ? classes.contentShift : ''}`}
+        <SplitPane
+          split="vertical"
+          minSize={0}
+          pane1Style={transitionStyle}
         >
-          <div className={classes.toolbar} />
-          <Jumbotron
+          <SideDrawer
+            loggedIn={loggedIn}
+            createSnackbarError={this.createSnackbarError}
+            onUpdateFiles={this.onUpdateFiles}
+            onSelectFile={this.onSelectFile}
+            onDeleteFile={this.onDeleteFile}
             files={files}
             selectedFileIndex={selectedFileIndex}
-            onUpdateSelectedFile={this.onUpdateSelectedFile}
-            onSaveSelectedFile={this.onSaveSelectedFile}
+            onCreatedFile={this.onCreatedFile}
+            fileSaved={this.state.fileSaved}
           />
-        </main>
+          <main
+            className={`jumboContent ${classes.content} ${loggedIn ? classes.contentShift : ''}`}
+          >
+            <Jumbotron
+              files={files}
+              selectedFileIndex={selectedFileIndex}
+              onUpdateSelectedFile={this.onUpdateSelectedFile}
+              onSaveSelectedFile={this.onSaveSelectedFile}
+              loggedIn={this.state.loggedIn}
+            />
+          </main>
+        </SplitPane>
       </div>
     );
   }

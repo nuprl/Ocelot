@@ -1,0 +1,25 @@
+.jumboContent {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 56px;
+}
+
+@media (min-width: 0px) and (orientation: landscape){
+    .jumboContent {
+        top: 48px;
+    }
+}
+
+
+@media (min-width: 600px) {
+    .jumboContent {
+        top: 64px;
+    }
+}
+
+
+
+
+

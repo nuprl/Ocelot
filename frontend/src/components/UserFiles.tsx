@@ -30,7 +30,6 @@ const styles: StyleRulesCallback = theme => ({
     },
     textField: {
         color: theme.palette.primary.contrastText,
-        width: '80%',
     },
     donut: {
         width: '0.6em',
@@ -38,6 +37,9 @@ const styles: StyleRulesCallback = theme => ({
     },
     donutDisappear: {
         visibility: 'hidden'
+    },
+    formControl: {
+        width: '100%'
     }
 });
 
@@ -66,6 +68,7 @@ class UserFiles extends React.Component<WithStyles<string> & Props> {
             const name = (event.target as HTMLTextAreaElement).value;
             const result = this.props.files.filter((elem) => elem.name === name);
             if (result.length !== 0) {
+                // maybe set a state to show an error because of file with same name exists
                 return;
             }
             this.props.onCreatedFile(name);

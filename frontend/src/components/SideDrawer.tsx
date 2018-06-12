@@ -10,13 +10,12 @@ import StarBorderIcon from '@material-ui/icons/StarBorder';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 
-export const drawerWidth = 300;
-
 const styles: StyleRulesCallback = theme => ({
     drawerPaper: {
         position: 'relative',
-        width: drawerWidth,
-        backgroundColor: theme.palette.primary.main
+        width: '100%',
+        backgroundColor: theme.palette.primary.main,
+        overflow: 'hidden'
     },
     toolbar: theme.mixins.toolbar,
     listItemColor: {

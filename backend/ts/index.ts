@@ -12,13 +12,54 @@ import * as morgan from 'morgan'; // for logging in all http traffic on console.
 
 const storage = Storage();
 const bucket = storage.bucket('paws-student-files');
+const settingsBucket = storage.bucket('paws-settings');
 
 const datastore = new Datastore({});
 const datastoreKind = 'CS220AllowedAccounts';
 
-const sessionDuration = 3; // hours
+let client: OAuth2Client | undefined = undefined;
+let CLIENT_ID: string| undefined = undefined;
+
+let sessionDuration: number | undefined = undefined; // hours
+type Settings = {clientID: string, sessionDuration: number};
+let settings: Settings | undefined = undefined;
 
 // IMPORTANT: Should I wrap all function bodies in try catch just in case?
+
+async function getSettings() {
+  if (settings !== undefined) {
+    return settings;
+  }
+  const settingsFile = await settingsBucket.file('settings.json').download();
+  settings = JSON.parse(settingsFile.toString());
+  return settings;
+}
+
+async function getClientID() {
+  if (CLIENT_ID !== undefined) {
+    return CLIENT_ID;
+  }
+  CLIENT_ID = ((await getSettings()) as Settings).clientID;
+  return CLIENT_ID;
+}
+
+async function getOAuthClient() {
+  if (client !== undefined) {
+    return client;
+  }
+  const clientID = (await getClientID());
+  client = new OAuth2Client(clientID);
+  return client;
+}
+
+async function getSessionDuration() {
+  if (sessionDuration !== undefined) {
+    return sessionDuration;
+  }
+  sessionDuration = ((await getSettings()) as Settings).sessionDuration;
+  return sessionDuration;
+}
+
 
 function undefinedExists(...properties: (any | undefined)[]) {
   function hasUndefined(acc: boolean, val: (any | undefined)) {
@@ -38,8 +79,8 @@ function failureResponse(message: string) {
   }
 }
 
-function isWithinSessionTime(sessionTime: number) {
-  const sessionDurationMili: number = sessionDuration * 3600000;
+async function isWithinSessionTime(sessionTime: number) {
+  const sessionDurationMili: number = (await getSessionDuration()) * 3600000;
   if (Math.abs(sessionTime - Date.now()) > sessionDurationMili) {
     return false;
   }
@@ -243,10 +284,6 @@ async function changeFile(req: Request) {
   }
 }
 
-
-const CLIENT_ID = '883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com'
-const client = new OAuth2Client(CLIENT_ID);
-
 /**
  * Verifies the given token in request
  * and check if user is allowed to be sign in.
@@ -258,9 +295,10 @@ async function login(req: Request) {
 
   // check if user has active session, if so, just return session
 
-  const ticket = await client.verifyIdToken({ // verify and get ticket
+
+  const ticket = await (await getOAuthClient()).verifyIdToken({ // verify and get ticket
     idToken: req.body.token,
-    audience: CLIENT_ID
+    audience: (await getClientID())
   });
 
   if (ticket == null) {
