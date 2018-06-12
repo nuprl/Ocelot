@@ -34,12 +34,13 @@ type SideDrawerProps = {
     files: {name: string, content: string}[],
     selectedFileIndex: number,
     onCreatedFile: (fileName: string) => void
+    fileSaved: boolean[]
 };
 
 class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
 
     render() {
-        const { loggedIn, classes, files, selectedFileIndex } = this.props;
+        const { loggedIn, classes, files, selectedFileIndex, fileSaved } = this.props;
 
         return (
             <Drawer
@@ -61,6 +62,7 @@ class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
                             files={files}
                             selectedFileIndex={selectedFileIndex}
                             onCreatedFile={this.props.onCreatedFile}
+                            fileSaved={fileSaved}
                         />}
                 </List>
                 <Divider />

@@ -43,6 +43,7 @@ type State = {
   error: boolean,
   errorMessage: string,
   files: { name: string, content: string }[],
+  fileSaved: boolean[],
   selectedFileIndex: number,
 };
 
@@ -54,22 +55,25 @@ type FileChange = {
 
 class Index extends React.Component<WithStyles<string>, State> {
   fileChanges: FileChange[];
-  fileChangesWhileSaving: FileChange[]; 
+  fileChangesWhileSaving: FileChange[];
   // since saving is asynchronous, a user can make changes to files while saving files.
   // What saving files does is it posts the data to the backend and clears fileChanges array
   // if they made changes and fileChanges has new changes while the old data is sent
   // the new changes could potentially be erased, to prevent that, we need a second 
   // array to make sure no changes gets erased while saving.
+  selectedFileSaved: number;
   constructor(props: WithStyles<string>) {
     super(props);
     this.fileChanges = [];
     this.fileChangesWhileSaving = [];
+    this.selectedFileSaved = -1;
     this.state = {
       loggedIn: false,
       error: false,
       errorMessage: '',
       files: [],
       selectedFileIndex: -1, // implying no file is selected.
+      fileSaved: []
     };
   }
 
@@ -98,6 +102,7 @@ class Index extends React.Component<WithStyles<string>, State> {
 
   onUpdateFiles = (newFiles: { name: string, content: string }[]) => {
     this.setState({ files: newFiles });
+    this.setState({fileSaved: new Array(newFiles.length).fill(true)});
   };
 
   onSelectFile = (fileIndex: number): void => {
@@ -112,16 +117,66 @@ class Index extends React.Component<WithStyles<string>, State> {
       fileName: this.state.files[fileIndex].name,
       type: 'delete'
     });
-    this.state.files.splice(fileIndex, 1);
-    this.setState({ files: this.state.files });
+    this.setState(prevState => ({
+      files: prevState.files.filter((elem, index) => index !== fileIndex)
+    }));
     this.onSave();
   };
 
   onCreatedFile = (fileName: string) => {
-    this.state.files.push({name: fileName, content: ''});
-    this.setState({files: this.state.files});
-    this.fileChanges.push({fileName: fileName, type: 'create'});
+    this.setState(prevState => ({
+      files: [...prevState.files, {name: fileName, content: ''}]
+    }));
+    this.fileChanges.push({ fileName: fileName, type: 'create' });
     this.onSave();
+  };
+
+  onUpdateSelectedFile = (fileIndex: number, content: string) => {
+    if (fileIndex < 0 || fileIndex > this.state.files.length - 1) {
+      return;
+    }
+    this.setState(prevState => ({
+      files: prevState.files.map((elem, index) => {
+        if (index === fileIndex) {
+          return {name: elem.name, content: content};
+        }
+        return elem;
+      })
+    }));
+
+    if (this.selectedFileSaved === fileIndex) {
+      return;
+    }
+    this.state.fileSaved[fileIndex] = false;
+    this.setState((prevState) => ({
+      fileSaved: prevState.fileSaved.map((elem, index) => {
+        if (index === fileIndex) {
+          return false;
+        }
+        return elem;
+      })
+    }));
+    this.selectedFileSaved = fileIndex;
+  };
+
+  onSaveSelectedFile = (fileIndex: number, fileName: string) => {
+    if (this.state.fileSaved[fileIndex]) {
+      return;
+    }
+    
+    if (typeof this.state.files[fileIndex] === 'undefined') {
+      return;
+    }
+    this.fileChanges.push({fileName: fileName, type: 'create', changes: this.state.files[fileIndex].content});
+    this.onSave();
+    this.setState((prevState) => ({
+      fileSaved: prevState.fileSaved.map((elem, index) => {
+        if (fileIndex === index) {
+          return true;
+        }
+        return elem;
+      })
+    }));
   };
 
   saveChanges = async (userEmail: string, sessionId: string) => {
@@ -162,7 +217,8 @@ class Index extends React.Component<WithStyles<string>, State> {
         this.createSnackbarError(`ASDSDSDAS`);
         return;
       }
-
+      this.fileChanges = [];
+      
     } catch (error) {
       // create snackbar
       this.createSnackbarError(`Couldn't connect to the server at the moment, try again later`);
@@ -207,12 +263,18 @@ class Index extends React.Component<WithStyles<string>, State> {
           files={files}
           selectedFileIndex={selectedFileIndex}
           onCreatedFile={this.onCreatedFile}
+          fileSaved={this.state.fileSaved}
         />
         <main
           className={`${classes.content} ${loggedIn ? classes.contentShift : ''}`}
         >
           <div className={classes.toolbar} />
-          <Jumbotron files={files} selectedFileIndex={selectedFileIndex} />
+          <Jumbotron
+            files={files}
+            selectedFileIndex={selectedFileIndex}
+            onUpdateSelectedFile={this.onUpdateSelectedFile}
+            onSaveSelectedFile={this.onSaveSelectedFile}
+          />
         </main>
       </div>
     );

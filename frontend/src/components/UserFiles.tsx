@@ -3,7 +3,7 @@ import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/st
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import CodeIcon from '@material-ui/icons/Code';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -12,6 +12,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import '../styles/FilesFolderList.css';
 import Input from '@material-ui/core/Input';
 import FormControl from '@material-ui/core/FormControl';
+import DonutIcon from '@material-ui/icons/DonutLarge';
 
 const styles: StyleRulesCallback = theme => ({
     nested: {
@@ -30,6 +31,13 @@ const styles: StyleRulesCallback = theme => ({
     textField: {
         color: theme.palette.primary.contrastText,
         width: '80%',
+    },
+    donut: {
+        width: '0.6em',
+        marginRight: '1em',
+    },
+    donutDisappear: {
+        visibility: 'hidden'
     }
 });
 
@@ -41,6 +49,7 @@ type Props = {
     onCreatedFile: (fileName: string) => void,
     newFile: boolean,
     onNoNewFile: () => void,
+    fileSaved: boolean[]
 };
 
 class UserFiles extends React.Component<WithStyles<string> & Props> {
@@ -65,7 +74,7 @@ class UserFiles extends React.Component<WithStyles<string> & Props> {
     }
 
     render() {
-        const { files, classes, selectedFileIndex, newFile } = this.props;
+        const { files, classes, selectedFileIndex, newFile, fileSaved } = this.props;
         return (
             <div>
                 {files.map((fileObj: { name: string, content: string }, index: number) => (
@@ -82,7 +91,7 @@ class UserFiles extends React.Component<WithStyles<string> & Props> {
                             key={`${name}${index + 2}`}
                         >
                             <ListItemIcon key={`${name}${index + 3}`}>
-                                <InsertDriveFileIcon
+                                <CodeIcon
                                     className={selectedFileIndex === index
                                         ? classes.listItemSelectedColor
                                         : classes.listItemColor}
@@ -102,6 +111,14 @@ class UserFiles extends React.Component<WithStyles<string> & Props> {
                                     </Typography>}
                                 classes={{ root: classes.listItemColor }}
                                 key={`${name}${index + 5}`}
+                            />
+                            <DonutIcon
+                                key={`${name}${index + 10}`}
+                                className={`
+                                    ${classes.listItemColor} 
+                                    ${classes.donut} 
+                                    ${fileSaved[index] && classes.donutDisappear}`}
+
                             />
                             <ListItemSecondaryAction
                                 key={`${name}${index + 6}`}
@@ -125,7 +142,7 @@ class UserFiles extends React.Component<WithStyles<string> & Props> {
                 {newFile &&
                     <ListItem className={`${classes.nested} ${classes.listItemColor}`}>
                         <ListItemIcon>
-                            <InsertDriveFileIcon className={classes.listItemColor} />
+                            <CodeIcon className={classes.listItemColor} />
                         </ListItemIcon>
                         <ListItemText
                             disableTypography

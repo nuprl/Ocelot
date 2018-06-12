@@ -38,6 +38,7 @@ type Props = {
     onSelectFile: (fileIndex: number) => void,
     onDeleteFile: (index: number) => void,
     onCreatedFile: (fileName: string) => void,
+    fileSaved: boolean[],
 };
 
 type State = {
@@ -150,7 +151,7 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
     };
 
     render() {
-        const { classes, files, selectedFileIndex } = this.props;
+        const { classes, files, selectedFileIndex, fileSaved } = this.props;
         const { open, filesLoading, newFile } = this.state;
 
         return (
@@ -206,6 +207,7 @@ class FilesFolderList extends React.Component<WithStyles<string> & Props, State>
                             onCreatedFile={this.onCreatedFile}
                             newFile={newFile}
                             onNoNewFile={this.onNoNewFile}
+                            fileSaved={fileSaved}
                         />
                     </List>
                 </Collapse>

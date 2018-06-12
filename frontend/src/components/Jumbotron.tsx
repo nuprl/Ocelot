@@ -38,6 +38,8 @@ const tempTheme = createMuiTheme({
 type Props = {
     files: { name: string, content: string }[],
     selectedFileIndex: number,
+    onUpdateSelectedFile: (index: number, content: string) => void,
+    onSaveSelectedFile: (fileIndex: number, fileName: string) => void,
 };
 
 type State = {
@@ -70,18 +72,28 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         console.log('editorDidMount', editor);
         editor.focus();
         this.editor = editor;
+        const onCtrlSave = () => {
+            this.props.onSaveSelectedFile(
+                this.props.selectedFileIndex,
+                this.props.files[this.props.selectedFileIndex].name
+            );
+        };
         editor.addCommand(
             // tslint:disable-next-line:no-bitwise
             monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
             function () {
                 // tslint:disable-next-line:no-console
-                console.log('SAVE pressed!');
+                onCtrlSave();
             },
             '');
     }
 
     onChange = (code: string) => {
         this.setState({ code: code });
+        const {selectedFileIndex } = this.props;
+        if (this.props.selectedFileIndex > -1) {
+            this.props.onUpdateSelectedFile(selectedFileIndex, code);
+        }
     }
 
     onRunClick = () => {
