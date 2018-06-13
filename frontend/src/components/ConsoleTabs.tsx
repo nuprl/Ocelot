@@ -3,16 +3,16 @@ import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
+import ConsoleScreen from './ConsoleScreen';
 import '../styles/ConsoleTabs.css';
 
 function TabContainer(props: { children: string }) {
   return (
-    <Typography component="div">
+    <div>
       {props.children}
-    </Typography>
+    </div>
   );
 }
 
@@ -103,7 +103,7 @@ class ConsoleTabs extends React.Component<WithStyles<string>, State> {
             <CloseButton classes={classes} consoleDown={consoleDown} toggleConsole={this.toggleConsole} />
           </Tabs>
         </AppBar>
-        {index === 0 && <TabContainer>ConsoleStuff</TabContainer>}
+        {index === 0 && <ConsoleScreen />}
         {index === 1 && <TabContainer>Tests</TabContainer>}
       </div>
     );

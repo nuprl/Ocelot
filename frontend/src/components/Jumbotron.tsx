@@ -109,8 +109,6 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
             });
         this.setState({ runner: runner });
         runner.run((result: any) => {
-            // tslint:disable-next-line:no-console
-            console.log(result);
             this.setState({ runner: undefined });
         });
     }
@@ -171,8 +169,8 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         return (
             <SplitPane
                 split="horizontal"
-                minSize={48}
-                defaultSize={48}
+                minSize={148}
+                defaultSize={148}
                 primary="second"
             >
                 <SplitPane

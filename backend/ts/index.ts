@@ -18,19 +18,33 @@ const datastore = new Datastore({});
 const datastoreKind = 'CS220AllowedAccounts';
 
 let client: OAuth2Client | undefined = undefined;
-let CLIENT_ID: string| undefined = undefined;
+let CLIENT_ID: string | undefined = undefined;
 
 let sessionDuration: number | undefined = undefined; // hours
-type Settings = {clientID: string, sessionDuration: number};
+type Settings = { clientID: string, sessionDuration: number };
 let settings: Settings | undefined = undefined;
 
+let verbose: boolean = true;
+let miliTimes: number[] = [];
+
 // IMPORTANT: Should I wrap all function bodies in try catch just in case?
+
+function timePromise<T>(promise: Promise<T>) {
+  const now = Date.now();
+  return promise.then((data: T) => {
+    const timeElapsed = Date.now() - now;
+    verbose && console.log(`\t\tMiliseconds: ${timeElapsed}`);
+    verbose && miliTimes.push(timeElapsed);
+    return data;
+  })
+}
 
 async function getSettings() {
   if (settings !== undefined) {
     return settings;
   }
-  const settingsFile = await settingsBucket.file('settings.json').download();
+  verbose && console.log('\tGetting settings.json');
+  const settingsFile = await timePromise(settingsBucket.file('settings.json').download());
   settings = JSON.parse(settingsFile.toString());
   return settings;
 }
@@ -91,9 +105,11 @@ async function checkValidSession(userEmail: string, sessionId: string): Promise<
   const key = datastore.key([datastoreKind, userEmail, 'session', sessionId]);
   // kind: session, name is a sessionId
   const query = datastore.createQuery('session').filter('__key__', '=', key);
-  const [results] = await datastore.runQuery(query);
+  verbose && console.log('\tQuerying valid session');
+  const [results] = await timePromise(datastore.runQuery(query));
   if (results.length === 1 && isWithinSessionTime((results[0] as any).time)) {
-    await updateSessionId(userEmail, sessionId);
+    verbose && console.log('\tUpdating session id');
+    await timePromise(updateSessionId(userEmail, sessionId));
     return true;
   }
   return false;
@@ -103,8 +119,8 @@ async function checkValidUser(userEmail: string): Promise<boolean> {
   const query = datastore
     .createQuery(datastoreKind)
     .filter('__key__', '=', datastore.key([datastoreKind, userEmail]));
-
-  const [results] = await datastore.runQuery(query);
+  verbose && console.log('\tQuerying valid user');
+  const [results] = await timePromise(datastore.runQuery(query));
   if (results.length === 1) {
     return true;
   }
@@ -129,8 +145,8 @@ async function getArrayOfFiles(userEmail: string): Promise<Storage.File[]> {
     delimiter: '/',
     prefix: userEmail + '/'
   }; // delimiter makes it so that we get only the direct child of prefix
-
-  const [files] = await bucket.getFiles(prefixAndDelimiter);
+  verbose && console.log('\tQuerying list of files');
+  const [files] = await timePromise(bucket.getFiles(prefixAndDelimiter));
   // get files for folder
 
   return files;
@@ -172,7 +188,8 @@ async function getFile(req: Request) {
     userFiles = [];
 
     for (let i = 0; i < files.length; i++) { // loop through all files
-      const [fileContents] = await files[i].download();
+      verbose && console.log(`\tDownloading file: ${files[i].name}`);
+      const [fileContents] = await timePromise(files[i].download());
       const fileName: string = files[i].name;
 
       if (fileName.substr(fileName.length - 1, 1) !== '/') { // if it's not directory directory
@@ -182,6 +199,9 @@ async function getFile(req: Request) {
         });
       }
     }
+
+    verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val)}`)
+    miliTimes = [];
 
     return {
       statusCode: 200,
@@ -237,15 +257,15 @@ async function changeFile(req: Request) {
   try {
     let files, filteredFiles, fileExists;
     for (let currentFileChange of fileChanges) {
-      console.log('Looking at: ', currentFileChange.fileName);
+      // verbose && console.log('Looking at: ', currentFileChange.fileName);
       if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid email
-        console.log('No simple filename');
+        verbose && console.log('No simple filename');
         continue;
       }
       if (currentFileChange.type === 'create') {
-        console.log('Creating file');
         const file = bucket.file(`${userEmail}/${currentFileChange.fileName}`);
-        await file.save(currentFileChange.changes!, { metadata: { contentType: 'text/javascript' } });
+        verbose && console.log(`\tSaving file: ${currentFileChange.fileName}`);
+        await timePromise(file.save(currentFileChange.changes!, { metadata: { contentType: 'text/javascript' } }));
         continue;
       }
       files = await getArrayOfFiles(userEmail);
@@ -253,18 +273,21 @@ async function changeFile(req: Request) {
         path.basename(file.name) === currentFileChange.fileName);
       fileExists = filteredFiles.length === 1;
       if (!fileExists) {
-        console.log('File does not exist');
+        verbose && console.log('File does not exist');
         continue;
       }
       if (currentFileChange.type === 'delete') {
-        console.log('Deleting file');
-        await filteredFiles[0].delete();
+        verbose && console.log(`\tDeleting file: ${currentFileChange.fileName}`)
+        await timePromise(filteredFiles[0].delete());
         continue
       }
       // guaranteed it's a rename
-      console.log("Renaming File")
-      await filteredFiles[0].move(`${userEmail}/${currentFileChange.changes}`);
+      verbose && console.log(`\tRenaming file: ${currentFileChange.fileName}`)
+      await timePromise(filteredFiles[0].move(`${userEmail}/${currentFileChange.changes}`));
     }
+
+    verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val)}`)
+    miliTimes = [];
 
     return {
       statusCode: 200,
@@ -327,13 +350,16 @@ async function login(req: Request) {
   }
 
   const sessionEntityKey = datastore.key([datastoreKind, userEmail, 'session', sessionId]);
-
-  await datastore.upsert({
+  verbose && console.log(`\tSaving session to datastore`);
+  await timePromise(datastore.upsert({
     key: sessionEntityKey,
     data: {
       time: Date.now()
     }
-  });
+  }));
+
+  verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val)}`)
+  miliTimes = [];
 
   return {
     statusCode: 200,
@@ -364,7 +390,7 @@ async function testDatastore(req: Request) {
 
   //   try {
   //     await datastore.save(userEntity);
-  //     console.log(`Saved ${userEntity.key.name}: ${userEntity.data.email}`);
+  //     verbose && console.log(`Saved ${userEntity.key.name}: ${userEntity.data.email}`);
   //   } catch (err) {
   //     console.error('ERROR:', err);
   //   }
@@ -379,19 +405,19 @@ async function testDatastore(req: Request) {
       contentType: 'text/plain'
     }
   }).then(() => {
-    console.log('yayayaya');
+    verbose && console.log('yayayaya');
   });
   // file.delete().then(() => {
-  //   console.log('DELETED');
+  //   verbose && console.log('DELETED');
   // }).catch(err => {
-  //   console.log('ERror', err.message);
+  //   verbose && console.log('ERror', err.message);
   // });
   return { statusCode: 200, body: { status: 'ok' } };
 
 }
 
 export const paws = express();
-paws.use(morgan('combined')); // logging all http traffic
+paws.use(morgan(':method :url :status :res[content-length] - :response-time ms')); // logging all http traffic
 
 paws.use(cors()); // shouldn't this have options for which domain to allow? (will be dealt later)
 // allows cross-origin resource sharing, i.e stops Same Origin Policy from 
