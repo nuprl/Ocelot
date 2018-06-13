@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import ReactResizeDetector from 'react-resize-detector';
 import SplitPane from 'react-split-pane';
 import '../styles/SplitPane.css';
+import { debounce } from 'lodash';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 
@@ -58,7 +59,7 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         };
     }
 
-    editor: any;
+    editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         // tslint:disable-next-line:no-console
@@ -92,8 +93,12 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
     onChange = (code: string) => {
         this.setState({ code: code });
         const { selectedFileIndex } = this.props;
-        if (this.props.selectedFileIndex > -1) {
+        const debounceFunc = () => {
             this.props.onUpdateSelectedFile(selectedFileIndex, code);
+        };
+        const updateFunc = debounce(debounceFunc, 150);
+        if (this.props.selectedFileIndex > -1) {
+            updateFunc();
         }
     }
 
@@ -126,7 +131,7 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
     }
 
     handleResize = (panelWidths: any) => {
-        if (this.editor !== null) {
+        if (this.editor !== undefined) {
             this.editor.layout();
         }
     }

@@ -55,12 +55,10 @@ class Index extends React.Component<WithStyles<string>, State> {
   // if they made changes and fileChanges has new changes while the old data is sent
   // the new changes could potentially be erased, to prevent that, we need a second 
   // array to make sure no changes gets erased while saving.
-  selectedFileSaved: number;
   constructor(props: WithStyles<string>) {
     super(props);
     this.fileChanges = [];
     this.fileChangesWhileSaving = [];
-    this.selectedFileSaved = -1;
     this.state = {
       loggedIn: false,
       error: false,
@@ -146,11 +144,6 @@ class Index extends React.Component<WithStyles<string>, State> {
         return elem;
       })
     }));
-
-    if (this.selectedFileSaved === fileIndex) {
-      return;
-    }
-    this.state.fileSaved[fileIndex] = false;
     this.setState((prevState) => ({
       fileSaved: prevState.fileSaved.map((elem, index) => {
         if (index === fileIndex) {
@@ -159,7 +152,6 @@ class Index extends React.Component<WithStyles<string>, State> {
         return elem;
       })
     }));
-    this.selectedFileSaved = fileIndex;
   };
 
   onSaveSelectedFile = (fileIndex: number, fileName: string) => {
