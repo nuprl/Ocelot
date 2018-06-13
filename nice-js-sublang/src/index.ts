@@ -28,7 +28,7 @@ const visitor: Visitor = {
     }
   },
   MemberExpression: {
-    // Turn m.x into typeof m.x === 'undefined' ? throw 'bad' : m.x
+    // Turn m.x into typeof m.x === 'undefined' ? rts.raise('badd') : m.x
     exit(path: NodePath<t.MemberExpression>) {
       path.replaceWith(
         t.conditionalExpression(
@@ -44,6 +44,11 @@ const visitor: Visitor = {
         )
       )
       path.skip();
+    }
+  },
+  WithStatement: {
+    enter(path: NodePath<t.WithStatement>) {
+      throw path.buildCodeFrameError(`Do not use with.`);
     }
   }
 }
