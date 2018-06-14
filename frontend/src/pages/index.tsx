@@ -257,7 +257,7 @@ class Index extends React.Component<WithStyles<string>, State> {
         />
         <SplitPane
           split="vertical"
-          minSize={0}
+          minSize={250}
           pane1Style={transitionStyle}
         >
           <SideDrawer

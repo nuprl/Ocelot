@@ -30,7 +30,7 @@ type SideDrawerProps = {
     onUpdateFiles: (file: { name: string, content: string }[]) => void,
     onDeleteFile: (index: number) => void,
     onSelectFile: (fileIndex: number) => void,
-    files: {name: string, content: string}[],
+    files: { name: string, content: string }[],
     selectedFileIndex: number,
     onCreatedFile: (fileName: string) => void
     fileSaved: boolean[]
@@ -43,16 +43,15 @@ class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
 
         return (
             <Drawer
-                variant="persistent"
-                open={loggedIn}
+                variant="permanent"
                 anchor="left"
                 classes={{
                     paper: classes.drawerPaper,
                 }}
             >
                 <div className={classes.toolbar} />
-                <List dense>
-                    {loggedIn && // when user presses log out, it disappears immediately, maybe delay it to look better
+                {loggedIn &&
+                    <List dense>
                         <FilesFolderList
                             createSnackbarError={this.props.createSnackbarError}
                             onUpdateFiles={this.props.onUpdateFiles}
@@ -62,9 +61,9 @@ class SideDrawer extends React.Component<WithStyles<string> & SideDrawerProps> {
                             selectedFileIndex={selectedFileIndex}
                             onCreatedFile={this.props.onCreatedFile}
                             fileSaved={fileSaved}
-                        />}
-                </List>
-                <Divider />
+                        />
+                    </List>}
+                {loggedIn && <Divider />}
                 <List dense>
                     <ListItem button>
                         <ListItemIcon>

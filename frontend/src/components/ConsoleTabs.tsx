@@ -8,14 +8,6 @@ import IconButton from '@material-ui/core/IconButton';
 import ConsoleScreen from './ConsoleScreen';
 import '../styles/ConsoleTabs.css';
 
-function TabContainer(props: { children: string }) {
-  return (
-    <div>
-      {props.children}
-    </div>
-  );
-}
-
 function EmptyDiv() {
   return (
     <div style={{ flex: 1 }} />
@@ -98,13 +90,13 @@ class ConsoleTabs extends React.Component<WithStyles<string>, State> {
         <AppBar position="static" id="tabs">
           <Tabs value={index} onChange={this.handleChange}>
             <Tab label="Console" />
-            <Tab label="Tests" />
+            {/* <Tab label="Tests" /> */}
             <EmptyDiv />
             <CloseButton classes={classes} consoleDown={consoleDown} toggleConsole={this.toggleConsole} />
           </Tabs>
         </AppBar>
         {index === 0 && <ConsoleScreen />}
-        {index === 1 && <TabContainer>Tests</TabContainer>}
+        {/* {index === 1 && <TabContainer>Tests</TabContainer>} */}
       </div>
     );
   }
