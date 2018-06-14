@@ -21,8 +21,8 @@ const visitor: Visitor = {
     }
   },
   VariableDeclaration: {
-    enter(path) {
-      if ((<NodePath<t.VariableDeclaration>>path).node.kind === 'var') {
+    enter(path: NodePath<t.VariableDeclaration>) {
+      if ((path).node.kind === 'var') {
         throw path.buildCodeFrameError(`Do not use var. Use let or const`);
       }
     }
