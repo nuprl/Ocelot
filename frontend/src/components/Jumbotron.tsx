@@ -9,7 +9,7 @@ import ConsoleTabs from './ConsoleTabs';
 import Typography from '@material-ui/core/Typography';
 import ReactResizeDetector from 'react-resize-detector';
 import SplitPane from 'react-split-pane';
-import '../styles/SplitPane.css';
+import '../static/SplitPane.css';
 import { debounce } from 'lodash';
 
 declare const stopify: any; // TODO(arjun): we need to fix this

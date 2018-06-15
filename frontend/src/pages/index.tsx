@@ -1,7 +1,7 @@
 import * as React from 'react';
 import withStyles, { WithStyles, StyleRulesCallback, } from '@material-ui/core/styles/withStyles';
 // import createMuiTheme, { Theme } from '@material-ui/core/styles/createMuiTheme';
-import customTheme from '../customTheme';
+import customTheme from '../components/customTheme';
 import MenuAppbar from '../components/MenuAppbar';
 import Jumbotron from '../components/Jumbotron';
 import SideDrawer from '../components/SideDrawer';

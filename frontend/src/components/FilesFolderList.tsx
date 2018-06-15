@@ -13,7 +13,7 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import UserFiles from './UserFiles';
-import '../styles/FilesFolderList.css';
+import '../static/FilesFolderList.css';
 
 const styles: StyleRulesCallback = theme => ({
     nested: {

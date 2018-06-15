@@ -9,7 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
-import '../styles/FilesFolderList.css';
+import '../static/FilesFolderList.css';
 import Input from '@material-ui/core/Input';
 import FormControl from '@material-ui/core/FormControl';
 import DonutIcon from '@material-ui/icons/DonutLarge';
