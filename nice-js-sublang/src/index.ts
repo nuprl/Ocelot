@@ -21,17 +21,19 @@ const visitor: Visitor = {
     }
   },
   VariableDeclaration: {
+    // This could be done with linting
     enter(path: NodePath<t.VariableDeclaration>) {
-      if ((path).node.kind === 'var') {
+      if (path.node.kind === 'var') {
         throw path.buildCodeFrameError(`Do not use var. Use let or const`);
       }
     }
   },
   MemberExpression: {
     // Turn m.x into typeof m.x === 'undefined' ? rts.raise('badd') : m.x
+    // I don't think field access lead to side effects.
     exit(path: NodePath<t.MemberExpression>) {
       path.replaceWith(
-        t.conditionalExpression(
+          t.conditionalExpression(
           t.binaryExpression(
             '===',
             t.unaryExpression('typeof', path.node),
