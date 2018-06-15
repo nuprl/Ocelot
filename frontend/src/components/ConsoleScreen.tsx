@@ -8,14 +8,14 @@ import ConsoleInput from './ConsoleInput';
 class ConsoleScreen extends React.Component {
   state = {
     logs: [
-      {
-        method: 'result',
-        data: ['Result']
-      },
-      {
-        method: 'command',
-        data: ['Command']
-      }
+      // {
+      //   method: 'result',
+      //   data: ['Result']
+      // },
+      // {
+      //   method: 'command',
+      //   data: ['Command']
+      // }
     ] as any[],
     filter: []
   };

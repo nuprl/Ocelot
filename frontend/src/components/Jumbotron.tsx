@@ -174,8 +174,8 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
         return (
             <SplitPane
                 split="horizontal"
-                minSize={148}
-                defaultSize={148}
+                minSize={48}
+                defaultSize={300}
                 primary="second"
             >
                 <SplitPane
@@ -212,11 +212,19 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
                             editorDidMount={this.editorDidMount}
                         />
                     </div>
-                    <div className={classes.panel} style={{ backgroundColor: '#555' }}>
+                    <div
+                        className={classes.panel}
+                        style={{ 
+                            backgroundColor: '#eee', 
+                            textAlign: 'center', 
+                            color: 'grey' }}
+                    >
                         <Typography
                             variant="display3"
+                            color="inherit"
+                            style={{lineHeight: '200px'}}
                         >
-                            Test
+                            [Insert Canvas here]
                         </Typography>
                     </div>
                 </SplitPane>
