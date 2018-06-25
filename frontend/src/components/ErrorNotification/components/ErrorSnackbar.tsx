@@ -13,11 +13,20 @@ const styles: StyleRulesCallback = theme => ({
 
 type ErrorSnackbarProps = {
     open: boolean,
-    handleClose: (event: React.SyntheticEvent<any>, reason: string) => void,
-    handleClick: (event: React.MouseEvent<HTMLElement>) => void,
+    handleClose: () => {type: string},
     message: string
 };
 function ErrorSnackbar(props: WithStyles<'close'> & ErrorSnackbarProps) {
+    const handleClose = (event: React.SyntheticEvent<any>, reason: string): void => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        props.handleClose();
+    }
+
+    const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
+        props.handleClose();
+    }
     return (
         <Snackbar
             anchorOrigin={{
@@ -26,7 +35,7 @@ function ErrorSnackbar(props: WithStyles<'close'> & ErrorSnackbarProps) {
             }}
             open={props.open}
             autoHideDuration={5000}
-            onClose={props.handleClose}
+            onClose={handleClose}
             ContentProps={{
                 'aria-describedby': 'message-id',
             }}
@@ -37,9 +46,9 @@ function ErrorSnackbar(props: WithStyles<'close'> & ErrorSnackbarProps) {
                     aria-label="Close"
                     color="inherit"
                     className={props.classes.close}
-                    onClick={props.handleClick}
+                    onClick={handleClick}
                 >
-                    <CloseIcon color="secondary"/>
+                    <CloseIcon color="secondary" />
                 </IconButton>,
             ]}
         />

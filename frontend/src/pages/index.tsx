@@ -5,9 +5,9 @@ import customTheme from '../components/customTheme';
 import MenuAppbar from '../components/MenuAppbar';
 import Jumbotron from '../components/Jumbotron';
 import SideDrawer from '../components/SideDrawer';
-import ErrorSnackbar from '../components/ErrorSnackbar';
 import '../styles/Jumbotron.css';
 import SplitPane from 'react-split-pane';
+import ErrorNotification from '../components/ErrorNotification';
 
 // let themio: Theme = createMuiTheme({ palette: { type: 'dark' } });
 
@@ -244,12 +244,7 @@ class Index extends React.Component<WithStyles<string>, State> {
 
     return (
       <div className={classes.root}>
-        <ErrorSnackbar
-          open={error}
-          handleClose={this.handleCloseSnackbar}
-          handleClick={this.handleCloseClickSnackbar}
-          message={errorMessage}
-        />
+        <ErrorNotification />
         <MenuAppbar
           onLogin={this.onLogin}
           onLogout={this.onLogout}
