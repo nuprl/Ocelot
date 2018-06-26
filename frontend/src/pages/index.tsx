@@ -234,7 +234,7 @@ class Index extends React.Component<WithStyles<string>, State> {
 
   render() {
     const { classes } = this.props;
-    const { loggedIn, error, errorMessage, files, selectedFileIndex } = this.state;
+    const { loggedIn, files, selectedFileIndex } = this.state;
     let transitionStyle: { transition?: string, width?: string } = {
       // transition: themio.transitions.create('width', {
       //   easing: themio.transitions.easing.sharp,
@@ -245,11 +245,7 @@ class Index extends React.Component<WithStyles<string>, State> {
     return (
       <div className={classes.root}>
         <ErrorNotification />
-        <MenuAppbar
-          onLogin={this.onLogin}
-          onLogout={this.onLogout}
-          createSnackbarError={this.createSnackbarError}
-        />
+        <MenuAppbar />
         <SplitPane
           split="vertical"
           minSize={250}
