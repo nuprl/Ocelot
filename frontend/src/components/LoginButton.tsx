@@ -140,7 +140,7 @@ class LoginButton extends React.Component<WithStyles<string> & LoginButtonProps,
             );
         }
         return (
-            <Button variant="outlined" color="primary">
+            <Button color="inherit">
                 Logout
             </Button>
         );

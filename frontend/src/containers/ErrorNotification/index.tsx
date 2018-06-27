@@ -3,6 +3,7 @@ import { Dispatch } from 'redux';
 import { closeErrorNotification } from './actions';
 import ErrorSnackbar from './components/ErrorSnackbar'
 import { ErrorNotificationState } from './constants';
+
 /**
  * Get the current state of the error notification
  * The state and the message of the error notification

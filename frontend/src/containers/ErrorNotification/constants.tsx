@@ -5,3 +5,11 @@ export type ErrorNotificationState = {
     open: boolean,
     message: string,
 };
+
+/**
+ * An ErrorNotifcationActionType must have the type and an optional message
+ */
+export type ErrorNotificationAction = {
+    type: string,
+    message?: string
+};

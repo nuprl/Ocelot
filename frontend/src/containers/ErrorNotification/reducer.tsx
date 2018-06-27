@@ -1,6 +1,5 @@
-import { ErrorNotificationActionType } from  './actions';
 import {TRIGGER_ERROR_NOTIFICATION, CLOSE_ERROR_NOTIFICATION} from './actionTypes';
-import { ErrorNotificationState } from './constants';
+import { ErrorNotificationState, ErrorNotificationAction } from './constants';
 
 const initialState = {open: false, message: ''};
 
@@ -14,18 +13,18 @@ const initialState = {open: false, message: ''};
 
 export const errorNotification = (
     state: ErrorNotificationState = initialState,
-    action: ErrorNotificationActionType): ErrorNotificationState => {
-    switch(action.type) {
+    action: ErrorNotificationAction): ErrorNotificationState => {
+    switch (action.type) {
         case TRIGGER_ERROR_NOTIFICATION:
             return {
                 open: true,
                 message: action.message!
-            }
+            };
         case CLOSE_ERROR_NOTIFICATION:
             return {
                 open: false,
                 message: ''
-            }
+            };
         default:
             return state;
     }

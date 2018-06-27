@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { errorNotification } from './components/ErrorNotification/reducer';
+import { errorNotification } from './containers/ErrorNotification/reducer';
 
 export default combineReducers({
     errorNotification
