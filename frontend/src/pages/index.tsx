@@ -5,9 +5,9 @@ import customTheme from '../components/customTheme';
 import MenuAppbar from '../components/MenuAppbar';
 import Jumbotron from '../components/Jumbotron';
 import SideDrawer from '../components/SideDrawer';
-import '../styles/Jumbotron.css';
+import '../static/Jumbotron.css';
 import SplitPane from 'react-split-pane';
-import ErrorNotification from '../components/ErrorNotification';
+import ErrorNotification from '../containers/ErrorNotification';
 
 // let themio: Theme = createMuiTheme({ palette: { type: 'dark' } });
 
@@ -245,7 +245,7 @@ class Index extends React.Component<WithStyles<string>, State> {
     return (
       <div className={classes.root}>
         <ErrorNotification />
-        <MenuAppbar />
+        <MenuAppbar title="Ocelot"/>
         <SplitPane
           split="vertical"
           minSize={250}

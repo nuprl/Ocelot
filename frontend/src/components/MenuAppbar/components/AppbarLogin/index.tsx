@@ -57,6 +57,6 @@ const AppbarLogin: React.StatelessComponent<WithStyles<string> & AppbarLoginProp
             </Toolbar>
         </AppBar>
     );
-}
+};
 
 export default withStyles(styles)(AppbarLogin);

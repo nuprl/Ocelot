@@ -1,8 +1,7 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { closeErrorNotification } from './actions';
-import ErrorSnackbar from './components/ErrorSnackbar'
-import { ErrorNotificationState } from './constants';
+import ErrorSnackbar from './components/ErrorSnackbar';
 
 /**
  * Get the current state of the error notification
@@ -11,9 +10,9 @@ import { ErrorNotificationState } from './constants';
  *
  * @param {ErrorNotificationState} state
  */
-const mapStateToProps = (state: ErrorNotificationState) => ({
-    open: state.open,
-    message: state.message
+const mapStateToProps = (state: any) => ({
+    open: state.errorNotification.open,
+    message: state.errorNotification.message
 });
 /**
  * Using the dispatch function, make a handleClose function
@@ -23,7 +22,7 @@ const mapStateToProps = (state: ErrorNotificationState) => ({
  * @param {Dispatch} dispatch
  */
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    handleClose: () => dispatch(closeErrorNotification())
-})
+    handleClose: () => { dispatch(closeErrorNotification()); }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ErrorSnackbar);

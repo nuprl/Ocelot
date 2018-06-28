@@ -1,5 +1,0 @@
-export const LOG_OUT_USER = "LOG_OUT_USER";
-export const LOG_IN_USER = "LOG_IN_USER";
-export const VALIDATE_USER = "VALIDATE_USER";
-export const LOADING_ONGOING = "LOADING_ONGOING";
-export const LOADING_FINISHED = "LOADING_FINISHED";

@@ -7,7 +7,7 @@ export type validateUserResponse = {
         email?: string
     }
 };
-export async function validateUser(googleUser: GoogleLoginResponse): Promise<validateUserResponse> {
+export async function validateUser(googleUser: GoogleLoginResponse) {
     const email = googleUser.getBasicProfile().getEmail();
 
     const id_token = googleUser.getAuthResponse().id_token; // get id token

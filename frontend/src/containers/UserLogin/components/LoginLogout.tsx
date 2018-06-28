@@ -8,21 +8,20 @@ type LoginLogoutProps = {
     loggedIn: boolean,
     loading: boolean,
     email: string,
-    onLogin: () => void,
+    onLogin: (googleUser: GoogleLoginResponse) => void,
     onLogout: () => void,
-    checkValidUser: (googleUser: GoogleLoginResponse) => void,
     onLoading: () => void,
-    onNotLoading: () => void,
 };
 
 class LoginLogout extends React.Component<LoginLogoutProps> {
 
     onSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-        this.props.checkValidUser(response as GoogleLoginResponse);
+        this.props.onLogin(response as GoogleLoginResponse);
     }
 
     onFailure = (response: { error: string }) => {
-        this.props.onNotLoading();
+        this.props.onLogout(); // need a better way to have less logic in this module
+        // there's way too much logic embedded for a presentational component
     }
 
     render() {
@@ -32,13 +31,13 @@ class LoginLogout extends React.Component<LoginLogoutProps> {
         return (
             <div>
                 <EmailText show={loggedIn} email={email} />
-                <GoogleLogoutButton show={loggedIn} onLogout={props.onLogout}/>
+                <GoogleLogoutButton show={loggedIn} onClick={this.props.onLogout} />
                 <GoogleLoginButton
                     show={!loggedIn}
                     loading={loading}
                     onSuccess={this.onSuccess}
                     onFailure={this.onFailure}
-                    onLoading={props.onLoading}
+                    onClick={props.onLoading}
                 />
             </div >
         );

@@ -10,7 +10,7 @@ type GoogleLoginButtonProps = {
     loading: boolean,
     onSuccess: (response: GoogleLoginResponse | GoogleLoginResponseOffline) => void,
     onFailure: (response: { error: string }) => void,
-    onLoading: () => void,
+    onClick: () => void,
 };
 
 class GoogleLoginButton extends React.Component<GoogleLoginButtonProps> {
@@ -24,8 +24,8 @@ class GoogleLoginButton extends React.Component<GoogleLoginButtonProps> {
 
         const onClick = () => {
             onClickProp.onClick();
-            this.props.onLoading();
-        }
+            this.props.onClick();
+        };
 
         let buttonContent = <Typography color="inherit" variant="button">Sign in</Typography>;
         if (this.props.loading) {
@@ -40,12 +40,12 @@ class GoogleLoginButton extends React.Component<GoogleLoginButtonProps> {
     };
 
     render() {
-        const {show } = this.props;
+        const { show } = this.props;
         const props = this.props;
 
         return (
             <Fade in={show}>
-                <div style={{ display: (show ? 'inline-block': 'none') }}>
+                <div style={{ display: (show ? 'inline-block' : 'none') }}>
                     <GoogleLogin
                         clientId="883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com"
                         onSuccess={props.onSuccess}
@@ -61,4 +61,4 @@ class GoogleLoginButton extends React.Component<GoogleLoginButtonProps> {
 
 }
 
-export default GoogleLoginButton
+export default GoogleLoginButton;

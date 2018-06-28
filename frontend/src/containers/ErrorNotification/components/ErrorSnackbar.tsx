@@ -15,10 +15,9 @@ const styles: StyleRulesCallback = theme => ({
     }
 });
 
-
 type ErrorSnackbarProps = {
     open: boolean, // whether the notification is open
-    handleClose: () => {type: string}, // let snackbar close when it needs to
+    handleClose: () => void, // let snackbar close when it needs to
     message: string // the message of notification
 };
 
@@ -36,11 +35,11 @@ function ErrorSnackbar(props: WithStyles<'close'> & ErrorSnackbarProps) {
             return;
         }
         props.handleClose();
-    }
+    };
 
     const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
         props.handleClose();
-    }
+    };
 
     return (
         <Snackbar

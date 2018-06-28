@@ -6,29 +6,29 @@ import Typography from '@material-ui/core/Typography';
 /**
  * An alternate log out button for logging out
  * This overrides the default given by react-google-login
- * @param {{ onClick: () => void }} [onClickProp]
- * @returns {React.ReactNode}
+ * @param {{ onClick: () => void }} onClickProp
+ * @returns A button
  */
 const alternateLogoutButton = (onClickProp?: { onClick: () => void }) => {
     if (typeof onClickProp === 'undefined') {
-        return (<Button color="inherit">Sign out</Button>);
+        return (<Button color="inherit">Logout</Button>);
     }
     return (
         <Button color="inherit" onClick={onClickProp.onClick}>
             <Typography color="inherit" variant="button">Sign out</Typography>
         </Button>
     );
-}
+};
 
 type GoogleLogoutButtonProps = {
     show: boolean, // whether to show it or not 
-    onLogout: () => void, // when logging out
-}
+    onClick: () => void, // when they press log out button
+};
 /**
  * A GoogleLogoutButton (a stateless component)
  *
  * @param {GoogleLogoutButtonProps} props
- * @returns {JSX.Element} a Logout btton
+ * @returns {JSX.Element} a Logout button
  */
 function GoogleLogoutButton(props: GoogleLogoutButtonProps): JSX.Element {
     const { show } = props;
@@ -36,7 +36,7 @@ function GoogleLogoutButton(props: GoogleLogoutButtonProps): JSX.Element {
         <Fade in={show}>
             <div style={{ display: (show ? 'inline-block' : 'none') }}>
                 <GoogleLogout
-                    onLogoutSuccess={props.onLogout}
+                    onLogoutSuccess={props.onClick}
                     render={alternateLogoutButton}
                 />
             </div>
