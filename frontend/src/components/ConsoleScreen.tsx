@@ -1,8 +1,8 @@
 import * as React from 'react';
 import update from 'immutability-helper';
 import { Hook, Console, Decode } from 'console-feed';
-import { inspectorTheme } from '../static/consoleStyle';
-import '../static/ConsoleScreen.css';
+import { inspectorTheme } from '../static/styles/consoleStyle';
+import 'static/styles/ConsoleScreen.css';
 import ConsoleInput from './ConsoleInput';
 
 class ConsoleScreen extends React.Component {

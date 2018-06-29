@@ -2,15 +2,16 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { closeErrorNotification } from 'store/errorNotification/actions';
 import ErrorSnackbar from './components/ErrorSnackbar';
+import { RootState } from 'store/';
 
 /**
  * Get the current state of the error notification
  * The state and the message of the error notification
  * The open and message will be props for ErrorSnackbar
  *
- * @param {ErrorNotificationState} state
+ * @param {RootState} state
  */
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: RootState) => ({
     open: state.errorNotification.open,
     message: state.errorNotification.message
 });

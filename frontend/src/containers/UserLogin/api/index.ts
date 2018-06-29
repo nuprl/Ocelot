@@ -1,3 +1,5 @@
+// BEING USED IN A SAGA at store/userLogin/
+
 import { GoogleLoginResponse } from 'react-google-login';
 
 interface SuccessResponse {

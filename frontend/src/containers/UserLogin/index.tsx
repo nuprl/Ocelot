@@ -3,8 +3,9 @@ import { Dispatch } from 'redux';
 import LoginLogout from './components/LoginLogout';
 import { GoogleLoginResponse } from 'react-google-login';
 import { logInUserRequest, logOutUser, loadingOngoing } from 'store/userLogin/actions';
+import { RootState } from 'store/';
 
-const mapStateToProps = (state: any) => ({
+const mapStateToProps = (state: RootState) => ({
     loggedIn: state.userLogin.loggedIn,
     loading: state.userLogin.loading,
     email: state.userLogin.email,

@@ -33,9 +33,7 @@ const styles: StyleRulesCallback = theme => {
 };
 
 type State = {
-  loggedIn: boolean;
-  error: boolean,
-  errorMessage: string,
+  loggedIn: boolean,
   files: { name: string, content: string }[],
   fileSaved: boolean[],
   selectedFileIndex: number,
@@ -61,8 +59,6 @@ class Index extends React.Component<WithStyles<string>, State> {
     this.fileChangesWhileSaving = [];
     this.state = {
       loggedIn: false,
-      error: false,
-      errorMessage: '',
       files: [],
       selectedFileIndex: -1, // implying no file is selected.
       fileSaved: []
@@ -84,18 +80,14 @@ class Index extends React.Component<WithStyles<string>, State> {
   };
 
   handleCloseSnackbar = (event: React.SyntheticEvent<any>, reason: string): void => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    this.setState({ error: false });
+    return;
   };
   handleCloseClickSnackbar = (event: React.MouseEvent<HTMLElement>): void => {
-    this.setState({ error: false });
+    return;
   };
 
   createSnackbarError = (message: string) => {
-    this.setState({ error: true });
-    this.setState({ errorMessage: message });
+    return;
   };
 
   onUpdateFiles = (newFiles: { name: string, content: string }[]) => {

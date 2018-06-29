@@ -24,9 +24,9 @@ const userLogin: Reducer<t.UserLoginState> = (
             };
         case t.LOG_IN_USER_SUCCESS:
             return {
-                ...state,
                 loading: false,
                 email: action.email,
+                loggedIn: true,
             };
         case t.LOADING_ONGOING:
             return {

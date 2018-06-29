@@ -4,12 +4,13 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { rootReducer, rootSaga } from './store';
+import { enableBatching } from './store/batchActions';
 import Index from './pages/index';
 
 const sagaMiddleware = createSagaMiddleware();
 
 const store = createStore(
-    rootReducer,
+    enableBatching(rootReducer),
     applyMiddleware(sagaMiddleware)
 );
 
