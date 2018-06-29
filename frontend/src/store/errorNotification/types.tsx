@@ -1,4 +1,4 @@
-import { Action } from 'redux'
+import { Action } from 'redux';
 
 // ---------- ACTION TYPES ----------
 export const TRIGGER_ERROR_NOTIFICATION = 'TRIGGER_ERROR_NOTIFICATION';

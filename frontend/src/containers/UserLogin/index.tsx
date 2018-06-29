@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import LoginLogout from './components/LoginLogout';
 import { GoogleLoginResponse } from 'react-google-login';
-import { logoutUser, loginUserRequest, loadingOngoing } from './actions';
+import { logInUserRequest, logOutUser, loadingOngoing } from 'store/userLogin/actions';
 
 const mapStateToProps = (state: any) => ({
     loggedIn: state.userLogin.loggedIn,
@@ -11,8 +11,8 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    onLogin: (googleUser: GoogleLoginResponse) => { dispatch(loginUserRequest(googleUser)); },
-    onLogout: () => { dispatch(logoutUser()); }, 
+    onLogin: (googleUser: GoogleLoginResponse) => { dispatch(logInUserRequest(googleUser)); },
+    onLogout: () => { dispatch(logOutUser()); },
     // surround with curly braces so that it does not return what dispatch returns
     onLoading: () => { dispatch(loadingOngoing()); },
 });

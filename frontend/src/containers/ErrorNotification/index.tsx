@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { closeErrorNotification } from './actions';
+import { closeErrorNotification } from 'store/errorNotification/actions';
 import ErrorSnackbar from './components/ErrorSnackbar';
 
 /**

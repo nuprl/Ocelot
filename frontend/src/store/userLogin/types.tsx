@@ -36,4 +36,4 @@ export type UserLoginState = {
     loggedIn: boolean,
     loading: boolean,
     email: string,
-}
+};

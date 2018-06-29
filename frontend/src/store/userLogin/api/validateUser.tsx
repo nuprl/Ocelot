@@ -1,13 +1,20 @@
 import { GoogleLoginResponse } from 'react-google-login';
 
-export type validateUserResponse = {
-    status: 'SUCCESS' | 'FAILURE',
-    data: {
-        message?: string,
-        email?: string
-    }
-};
-export async function validateUser(googleUser: GoogleLoginResponse) {
+interface SuccessResponse {
+    status: 'SUCCESS';
+    data: { email: string };
+}
+
+interface FailureResponse {
+    status: 'FAILURE';
+    data: { message: string };
+}
+
+export type validateUserResponse = SuccessResponse | FailureResponse;
+
+export const isFailureResponse = (arg: validateUserResponse): arg is FailureResponse => arg.status === 'FAILURE';
+
+export async function validateUser(googleUser: GoogleLoginResponse): Promise<validateUserResponse> {
     const email = googleUser.getBasicProfile().getEmail();
 
     const id_token = googleUser.getAuthResponse().id_token; // get id token
