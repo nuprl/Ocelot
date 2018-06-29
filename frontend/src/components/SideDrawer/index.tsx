@@ -4,7 +4,7 @@ import List from '@material-ui/core/List';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
 import ListItemButton from './components/ListItemButton'
 import StarBorderIcon from '@material-ui/icons/StarBorder';
-import FilesFolderList from 'containers/FilesFolderList';
+import FilesList from 'containers/FileList';
 
 const styles: StyleRulesCallback = theme => ({
     drawerPaper: {
@@ -30,7 +30,7 @@ const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
         >
             <div className={classes.toolbar} />
             <List dense>
-                <FilesFolderList />
+                <FilesList />
             </List>
             <List dense>
                 <ListItemButton

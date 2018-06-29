@@ -20,6 +20,7 @@
     "react-scripts-ts": "^2.16.0",
     "react-split-pane": "^0.1.77",
     "redux": "^4.0.0",
+    "redux-logger": "^3.0.6",
     "redux-saga": "^0.16.0"
   },
   "devDependencies": {
@@ -34,10 +35,10 @@
     "typescript": "^2.9.1"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "start": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts start",
+    "build": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts build",
     "deploy": "gsutil -h Cache-Control:private -m rsync -d -r build gs://paws",
-    "test": "react-scripts-ts test --env=jsdom",
+    "test": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
   "homepage": "https://storage.googleapis.com/paws/"

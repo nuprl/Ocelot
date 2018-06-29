@@ -1,6 +1,7 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
 import { LogInUserRequestAction, LOG_IN_USER_REQUEST } from './types';
 import { triggerErrorNotification } from 'store/errorNotification/actions';
+import { loadFilesRequest } from 'store/userFiles/actions';
 import { logInUserSuccess, logOutUser } from './actions';
 import { batchActions } from 'store/batchActions';
 
@@ -15,7 +16,10 @@ function* validateUser(action: LogInUserRequestAction) {
         ));
         return;
     }
-    yield put(logInUserSuccess(response.data.email));
+    yield put(batchActions(
+        logInUserSuccess(response.data.email),
+        loadFilesRequest()
+    ));
 }
 
 export function* watchUserLoginRequest() {
