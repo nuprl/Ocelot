@@ -7,6 +7,14 @@ import CreateFileButton from 'containers/CreateFileButton';
 import UserFiles from './UserFiles';
 import 'static/styles/DrawerIconButton.css';
 import LoadingFolderIcon from '../LoadingFolderIcon';
+import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core';
+
+const styles: StyleRulesCallback = theme => ({
+    listItemColor: {
+        color: theme.palette.primary.contrastText,
+        opacity: 0.85,
+    }
+})
 
 type FilesFolderProps = {
     open: boolean,
@@ -14,10 +22,10 @@ type FilesFolderProps = {
     toggleFolder: () => void,
 }
 
-type Props = FilesFolderProps;
+type Props = FilesFolderProps & WithStyles<'listItemColor'>;
 
 const FilesFolder: React.StatelessComponent<Props>
-    = ({ open, disabled, toggleFolder }) => (
+    = ({ open, disabled, toggleFolder, classes }) => (
         <div>
             {/* Maybe need a div with fileItem className */}
             <ListItem
@@ -26,8 +34,8 @@ const FilesFolder: React.StatelessComponent<Props>
                 disabled={disabled}
                 className="fileItem"
             >
-                <LoadingFolderIcon loading={disabled} />
-                <CustomListItemText text="Files" />
+                <LoadingFolderIcon loading={disabled} className={classes.listItemColor}/>
+                <CustomListItemText text="Files" className={classes.listItemColor}/>
                 <CreateFileButton />
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
@@ -38,4 +46,4 @@ const FilesFolder: React.StatelessComponent<Props>
         </div>
     )
 
-export default FilesFolder;
+export default withStyles(styles)(FilesFolder);

@@ -1,9 +1,7 @@
 import * as React from 'react';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-
-import ListItemText from '@material-ui/core/ListItemText';
-import Typography from '@material-ui/core/Typography';
+import CustomListItemText from '../CustomListItemText';
 import {SvgIconProps} from '@material-ui/core/SvgIcon';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
 
@@ -26,13 +24,9 @@ const ListItemButton: React.StatelessComponent<WithStyles<'listItemColor'> & Lis
             <ListItemIcon className={classes.listItemColor}>
                 {icon}
             </ListItemIcon>
-            <ListItemText
-                disableTypography
-                primary={
-                    <Typography variant="subheading" className={classes.listItemColor}>
-                        {text}
-                    </Typography>}
-                classes={{ root: classes.listItemColor }}
+            <CustomListItemText 
+                text={text}
+                className={classes.listItemColor}
             />
         </ListItem>
     )

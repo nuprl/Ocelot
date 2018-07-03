@@ -1,26 +1,18 @@
 import * as React from 'react';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
-import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core';
 
-const styles: StyleRulesCallback = theme => ({
-    listItemColor: {
-        color: theme.palette.primary.contrastText,
-        opacity: 0.85,
-    }
-});
+type Props = { text: string, className: string };
 
-type Props = { text: string } & WithStyles<'listItemColor'>;
-
-const CustomListItemText: React.StatelessComponent<Props> = ({ text, classes }) => (
+const CustomListItemText: React.StatelessComponent<Props> = ({ text, className }) => (
     <ListItemText
         disableTypography
         primary={
-            <Typography variant="subheading" className={classes.listItemColor}>
+            <Typography variant="subheading" className={className}>
                 {text}
             </Typography>}
-        classes={{ root: classes.listItemColor }}
+        classes={{ root: className }}
     />
 )
 
-export default withStyles(styles)(CustomListItemText);
+export default CustomListItemText;

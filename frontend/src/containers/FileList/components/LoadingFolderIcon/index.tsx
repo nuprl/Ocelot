@@ -1,30 +1,22 @@
 import * as React from 'react';
-import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import FolderIcon from '@material-ui/icons/Folder';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-type LoadingFolderIconProps = WithStyles<'listItemColor'> & { loading: boolean };
-
-const styles: StyleRulesCallback = theme => ({
-    listItemColor: {
-        color: theme.palette.primary.contrastText,
-        opacity: 0.85,
-    }
-})
+type LoadingFolderIconProps = { loading: boolean, className: string };
 
 const LoadingFolderIcon: React.StatelessComponent<LoadingFolderIconProps>
-    = ({ classes, loading }) => (
+    = ({ loading, className }) => (
         <ListItemIcon>
             {loading
                 ? <CircularProgress
-                    className={`${classes.listItemColor}`}
+                    className={`${className}`}
                     // Does classes.progress do anything? ${classes.progress} 
                     size={24}
                     thickness={5}
                 />
-                : <FolderIcon className={classes.listItemColor} />}
+                : <FolderIcon className={className} />}
         </ListItemIcon>
     );
 
-export default withStyles(styles)(LoadingFolderIcon);
+export default LoadingFolderIcon;
