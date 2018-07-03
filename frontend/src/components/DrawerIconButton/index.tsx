@@ -3,10 +3,11 @@ import { SvgIconProps } from '@material-ui/core/SvgIcon';
 import IconButton from '@material-ui/core/IconButton';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
+import 'static/styles/DrawerIconButton.css';
 
 interface DrawerIconButtonProps {
     onClick: () => void;
-    disabled: boolean;
+    disabled?: boolean;
     icon: React.ReactElement<SvgIconProps>;
     title: string;
     className: string
@@ -16,7 +17,7 @@ type Props = DrawerIconButtonProps
 
 const DrawerIconButton: React.StatelessComponent<Props> = ({
     onClick,
-    disabled,
+    disabled=false,
     icon,
     title,
     className
