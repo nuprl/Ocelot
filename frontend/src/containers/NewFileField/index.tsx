@@ -77,6 +77,8 @@ class NewFileField extends React.Component<Props> {
                                 classes={{
                                     root: classes.textField
                                 }}
+                                autoFocus
+                                
                             />
                         </FormControl>}
                     classes={{ root: classes.listItemColor }}
