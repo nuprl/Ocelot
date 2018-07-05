@@ -5,7 +5,7 @@ import { loadFilesRequest } from 'store/userFiles/actions';
 import { logInUserSuccess, logOutUser } from './actions';
 import { batchActions } from 'store/batchActions';
 
-import * as Api from 'containers/UserLogin/api';
+import * as Api from 'containers/UserLogin/Api';
 
 function* validateUser(action: LogInUserRequestAction) {
     const response: Api.validateUserResponse = yield call(Api.validateUser, action.googleUser);
