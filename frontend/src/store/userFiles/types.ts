@@ -8,6 +8,10 @@ export const TOGGLE_FILES_FOLDER = 'TOGGLE_FILES_FOLDER';
 export const CREATE_NEW_FILE_FIELD = 'CREATE_NEW_FILE_FIELD';
 export const DELETE_NEW_FILE_FIELD = 'DELETE_NEW_FILE_FIELD';
 export const CREATE_NEW_FILE = 'CREATE_NEW_FILE';
+// this should have a saga 
+export const SELECT_FILE = 'SELECT_FILE';
+export const DELETE_FILE = 'DELETE_FILE';
+// this should also have a saga
 
 export type UserFiles = { name: string, content: string }[];
 
@@ -37,13 +41,25 @@ export interface CreateNewFileAction {
     fileName: string,
 }
 
+export interface SelectFileAction {
+    type: 'SELECT_FILE',
+    fileIndex: number,
+}
+
+export interface DeleteFileAction {
+    type: 'DELETE_FILE',
+    fileIndex: number,
+}
+
 export type UserFilesActions =
     | LoadFilesRequestAction
     | LoadFilesSuccessAction
     | ToggleFilesFolderAction
     | CreateNewFileFieldAction
     | DeleteNewFileFieldAction
-    | CreateNewFileAction;
+    | CreateNewFileAction
+    | SelectFileAction
+    | DeleteFileAction;
 
 // State type
 

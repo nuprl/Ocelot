@@ -1,24 +1,19 @@
 import * as React from 'react';
-import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import DrawerIconButton from 'components/DrawerIconButton';
 import AddIcon from '@material-ui/icons/Add';
 import { RootState } from 'store';
 import { Dispatch, connect } from 'react-redux';
 import { createNewFileField } from 'store/userFiles/actions';
-
-const styles: StyleRulesCallback = theme => ({
-    listItemColor: {
-        color: theme.palette.primary.contrastText,
-        opacity: 0.80,
-    }
-})
+import ListItemStyles from 'components/ListItemStyles';
+import { ListItemStylesTypes } from 'components/ListItemStyles';
+import { WithStyles } from '@material-ui/core';
 
 type CreateFileButtonProps = {
     disabled: boolean,
     onCreateFile: () => void,
 }
 
-type Props = CreateFileButtonProps & WithStyles<'listItemColor'>;
+type Props = CreateFileButtonProps & WithStyles<ListItemStylesTypes>;
 
 const CreateFileButton: React.StatelessComponent<Props>
     = ({ classes, disabled, onCreateFile }) => (
@@ -31,7 +26,7 @@ const CreateFileButton: React.StatelessComponent<Props>
         />
     )
 
-const CreateFileButtonStyled = withStyles(styles)(CreateFileButton);
+const CreateFileButtonStyled = ListItemStyles(CreateFileButton);
 
 const mapStateToProps = (state: RootState) => ({
     disabled: state.userFiles.folderInfo.filesLoading

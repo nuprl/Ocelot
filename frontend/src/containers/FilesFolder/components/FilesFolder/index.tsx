@@ -4,17 +4,12 @@ import ListItem from '@material-ui/core/ListItem';
 import Collapse from '@material-ui/core/Collapse';
 import CustomListItemText from 'components/CustomListItemText'
 import CreateFileButton from 'containers/CreateFileButton';
-import UserFiles from './UserFiles';
+import UserFiles from 'components/UserFiles';
 import 'static/styles/DrawerIconButton.css';
 import LoadingFolderIcon from '../LoadingFolderIcon';
-import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core';
-
-const styles: StyleRulesCallback = theme => ({
-    listItemColor: {
-        color: theme.palette.primary.contrastText,
-        opacity: 0.85,
-    }
-})
+import ListItemStyles from 'components/ListItemStyles';
+import { ListItemStylesTypes } from 'components/ListItemStyles';
+import { WithStyles } from '@material-ui/core';
 
 type FilesFolderProps = {
     open: boolean,
@@ -22,7 +17,7 @@ type FilesFolderProps = {
     toggleFolder: () => void,
 }
 
-type Props = FilesFolderProps & WithStyles<'listItemColor'>;
+type Props = FilesFolderProps & WithStyles<ListItemStylesTypes>;
 
 const FilesFolder: React.StatelessComponent<Props>
     = ({ open, disabled, toggleFolder, classes }) => (
@@ -46,4 +41,4 @@ const FilesFolder: React.StatelessComponent<Props>
         </div>
     )
 
-export default withStyles(styles)(FilesFolder);
+export default ListItemStyles(FilesFolder);

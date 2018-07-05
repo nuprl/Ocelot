@@ -77,6 +77,24 @@ const userFiles: Reducer<t.UserFilesState> = (
                     ]
                 }
             };
+        case t.SELECT_FILE:
+            return {
+                ...state,
+                filesInfo: {
+                    ...state.filesInfo,
+                    selectedFileIndex: action.fileIndex
+                }
+            };
+        case t.DELETE_FILE:
+            return {
+                ...state,
+                filesInfo: {
+                    ...state.filesInfo,
+                    files: state.filesInfo.files.filter(
+                        (elem, index) => index !== action.fileIndex
+                    ),
+                }
+            };
         default:
             return state;
     }

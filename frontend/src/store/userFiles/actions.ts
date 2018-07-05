@@ -31,4 +31,16 @@ export const createNewFile: ActionCreator<t.CreateNewFileAction>
 = (fileName: string) => ({
     type: t.CREATE_NEW_FILE,
     fileName: fileName
-}) 
+});
+
+export const selectFile: ActionCreator<t.SelectFileAction>
+= (fileIndex: number) => ({
+    type: t.SELECT_FILE,
+    fileIndex: fileIndex
+})
+
+export const deleteFile: ActionCreator<t.DeleteFileAction>
+= (fileIndex: number) => ({
+    type: t.DELETE_FILE,
+    fileIndex: fileIndex,
+})

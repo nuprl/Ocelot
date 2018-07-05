@@ -6,30 +6,9 @@ import DonutIcon from '@material-ui/icons/DonutLarge';
 import CustomListItemText from 'components/CustomListItemText';
 import DrawerIconButton from 'components/DrawerIconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core';
-
-const styles: StyleRulesCallback = theme => ({
-    nested: {
-        paddingLeft: theme.spacing.unit * 4
-    },
-    listItemSelectedColor: {
-        color: theme.palette.secondary.main,
-        opacity: 1,
-        // backgroundColor: 'rgba(0, 0, 0, 0.10)', 
-        // some way to avoid (without css) making the children text have background color
-    },
-    listItemColor: {
-        color: theme.palette.primary.contrastText,
-        opacity: 0.80,
-    },
-    donut: {
-        width: '0.6em',
-        marginRight: '1em',
-    },
-    donutDisappear: {
-        visibility: 'hidden'
-    },
-})
+import ListItemStyles from 'components/ListItemStyles';
+import { ListItemStylesTypes } from 'components/ListItemStyles';
+import { WithStyles } from '@material-ui/core';
 
 type FileItemProps = {
     isSelected?: boolean,
@@ -39,14 +18,7 @@ type FileItemProps = {
     name: string
 };
 
-type Styles =
-    |'nested'
-    | 'listItemSelectedColor'
-    | 'listItemColor'
-    | 'donut'
-    | 'donutDisappear';
-
-type Props = FileItemProps & WithStyles<Styles>
+type Props = FileItemProps & WithStyles<ListItemStylesTypes>
 
 const FileItem: React.StatelessComponent<Props> = ({
     isSelected = false,
@@ -93,4 +65,4 @@ const FileItem: React.StatelessComponent<Props> = ({
     )
 }
 
-export default withStyles(styles)(FileItem);
+export default ListItemStyles(FileItem);
