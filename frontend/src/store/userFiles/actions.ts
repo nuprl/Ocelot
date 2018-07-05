@@ -12,6 +12,11 @@ export const loadFilesSuccess: ActionCreator<t.LoadFilesSuccessAction>
         userFiles: userFiles
     });
 
+export const loadFilesFailure: ActionCreator<t.LoadFilesFailureAction>
+    = () => ({
+        type: t.LOAD_FILES_FAILURE
+    });
+
 export const toggleFilesFolder: ActionCreator<t.ToggleFilesFolderAction>
     = () => ({
         type: t.TOGGLE_FILES_FOLDER

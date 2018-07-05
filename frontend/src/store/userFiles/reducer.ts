@@ -28,11 +28,22 @@ const userFiles: Reducer<t.UserFilesState> = (
             };
         case t.LOAD_FILES_SUCCESS:
             return {
-                ...state,
                 filesInfo: {
                     ...state.filesInfo,
                     files: action.userFiles,
                     fileSaved: new Array(action.userFiles.length).fill(true)
+                },
+                folderInfo: {
+                    ...state.folderInfo,
+                    filesLoading: false,
+                }
+            };
+        case t.LOAD_FILES_FAILURE:
+            return {
+                ...state,
+                folderInfo: {
+                    ...state.folderInfo,
+                    filesLoading: false,
                 }
             };
         case t.TOGGLE_FILES_FOLDER:

@@ -3,7 +3,7 @@ import { Action } from 'redux';
 // Action types
 export const LOAD_FILES_REQUEST = 'LOAD_FILES_REQUEST';
 export const LOAD_FILES_SUCCESS = 'LOAD_FILES_SUCCESS'; 
-// Failures are handled by the saga and user is notified accordingly
+export const LOAD_FILES_FAILURE = 'LOAD_FILES_FAILURE';
 export const TOGGLE_FILES_FOLDER = 'TOGGLE_FILES_FOLDER';
 export const CREATE_NEW_FILE_FIELD = 'CREATE_NEW_FILE_FIELD';
 export const DELETE_NEW_FILE_FIELD = 'DELETE_NEW_FILE_FIELD';
@@ -22,6 +22,10 @@ export interface LoadFilesRequestAction extends Action {
 export interface LoadFilesSuccessAction extends Action {
     type: 'LOAD_FILES_SUCCESS';
     userFiles: UserFiles;
+}
+
+export interface LoadFilesFailureAction extends Action {
+    type: 'LOAD_FILES_FAILURE';
 }
 
 export interface ToggleFilesFolderAction extends Action {
@@ -54,6 +58,7 @@ export interface DeleteFileAction extends Action {
 export type UserFilesActions =
     | LoadFilesRequestAction
     | LoadFilesSuccessAction
+    | LoadFilesFailureAction
     | ToggleFilesFolderAction
     | CreateNewFileFieldAction
     | DeleteNewFileFieldAction
