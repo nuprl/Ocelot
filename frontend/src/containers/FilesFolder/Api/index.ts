@@ -31,7 +31,8 @@ export const getUserFiles = async (): Promise<UserFilesResponse> => {
 
     const userEmail = localStorage.getItem('userEmail');
     const sessionId = localStorage.getItem('sessionId');
-    if (userEmail !== null && sessionId !== null) {
+    
+    if (userEmail === null || sessionId === null) {
         return failureResponse('Seems like your session expired, try logging in again');
     }
     let url = 'https://us-central1-umass-compsci220.cloudfunctions.net/paws/getfile';
