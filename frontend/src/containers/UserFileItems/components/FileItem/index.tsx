@@ -4,11 +4,14 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import CodeIcon from '@material-ui/icons/Code';
 import DonutIcon from '@material-ui/icons/DonutLarge';
 import CustomListItemText from 'components/CustomListItemText';
-import DrawerIconButton from 'components/DrawerIconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemStyles from 'components/ListItemStyles';
 import { ListItemStylesTypes } from 'components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';
+import IconButton from '@material-ui/core/IconButton';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Tooltip from '@material-ui/core/Tooltip';
+import 'static/styles/DrawerIconButton.css';
 
 type FileItemProps = {
     isSelected?: boolean,
@@ -47,7 +50,8 @@ const FileItem: React.StatelessComponent<Props> = ({
             </ListItemIcon>
             <CustomListItemText
                 text={name}
-                className={classes.listItemColor}
+                className={currentStyleClass}
+                styleBody
             />
             <DonutIcon
                 className={`${classes.listItemColor}
@@ -55,12 +59,20 @@ const FileItem: React.StatelessComponent<Props> = ({
                 ${isSaved && classes.donutDisappear}`}
 
             />
-            <DrawerIconButton
-                onClick={onDelete}
-                icon={<DeleteIcon color="inherit" />}
-                title="Delete"
-                className={classes.listItemColor}
-            />
+            < ListItemSecondaryAction className={`fadeIcon ${classes.listItemColor}`} >
+            <Tooltip id="tooltip-icon" title="Delete">
+                <div>  {/* surround the button with a div to suppress the warning even though it's
+                            not really necessary*/}
+                    <IconButton
+                        aria-label="Delete"
+                        color="inherit"
+                        onClick={onDelete}
+                    >
+                        <DeleteIcon color="inherit" />
+                    </IconButton>
+                </div>
+            </Tooltip>
+        </ListItemSecondaryAction>
         </ListItem>
     );
 };
