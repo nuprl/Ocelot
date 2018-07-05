@@ -3,7 +3,7 @@ import * as t from './types';
 
 const initialState: t.UserFilesState = {
     folderInfo: {
-        open: true,
+        open: false,
         filesLoading: false,
     },
     filesInfo: {
@@ -34,8 +34,8 @@ const userFiles: Reducer<t.UserFilesState> = (
                     fileSaved: new Array(action.userFiles.length).fill(true)
                 },
                 folderInfo: {
-                    ...state.folderInfo,
                     filesLoading: false,
+                    open: true,
                 }
             };
         case t.LOAD_FILES_FAILURE:
