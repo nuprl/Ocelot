@@ -2,7 +2,7 @@ import * as React from 'react';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import CustomListItemText from '../CustomListItemText';
-import {SvgIconProps} from '@material-ui/core/SvgIcon';
+import { SvgIconProps } from '@material-ui/core/SvgIcon';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
 
 const styles: StyleRulesCallback = theme => ({
@@ -11,7 +11,6 @@ const styles: StyleRulesCallback = theme => ({
         opacity: 0.85,
     }
 });
-
 
 type ListItemButtonProps = {
     icon: React.ReactElement<SvgIconProps>,
@@ -24,11 +23,11 @@ const ListItemButton: React.StatelessComponent<WithStyles<'listItemColor'> & Lis
             <ListItemIcon className={classes.listItemColor}>
                 {icon}
             </ListItemIcon>
-            <CustomListItemText 
+            <CustomListItemText
                 text={text}
                 className={classes.listItemColor}
             />
         </ListItem>
-    )
+    );
 
 export default withStyles(styles)(ListItemButton);

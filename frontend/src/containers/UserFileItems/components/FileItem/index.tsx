@@ -18,7 +18,7 @@ type FileItemProps = {
     name: string
 };
 
-type Props = FileItemProps & WithStyles<ListItemStylesTypes>
+type Props = FileItemProps & WithStyles<ListItemStylesTypes>;
 
 const FileItem: React.StatelessComponent<Props> = ({
     isSelected = false,
@@ -62,7 +62,7 @@ const FileItem: React.StatelessComponent<Props> = ({
                 className={classes.listItemColor}
             />
         </ListItem>
-    )
-}
+    );
+};
 
 export default ListItemStyles(FileItem);

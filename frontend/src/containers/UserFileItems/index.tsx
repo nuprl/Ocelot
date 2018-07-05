@@ -27,7 +27,7 @@ class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props>
                     key={`${fileObj.name}${index + 1}`}
                 >
                     <FileItem
-                        isSelected={selectedFileIndex == index}
+                        isSelected={selectedFileIndex === index}
                         onSelect={this.props.makeHandleClickFile(index)}
                         onDelete={this.props.makeHandleDeleteFile(index)}
                         isSaved={fileSaved[index]}

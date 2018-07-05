@@ -10,14 +10,14 @@ interface DrawerIconButtonProps {
     disabled?: boolean;
     icon: React.ReactElement<SvgIconProps>;
     title: string;
-    className: string
-};
+    className: string;
+}
 
-type Props = DrawerIconButtonProps
+type Props = DrawerIconButtonProps;
 
 const DrawerIconButton: React.StatelessComponent<Props> = ({
     onClick,
-    disabled=false,
+    disabled = false,
     icon,
     title,
     className
@@ -37,6 +37,6 @@ const DrawerIconButton: React.StatelessComponent<Props> = ({
                 </div>
             </Tooltip>
         </ListItemSecondaryAction>
-    )
+    );
 
 export default DrawerIconButton;

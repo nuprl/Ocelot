@@ -6,7 +6,7 @@ import Tab from '@material-ui/core/Tab';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import IconButton from '@material-ui/core/IconButton';
 import ConsoleScreen from './ConsoleScreen';
-import '../static/ConsoleTabs.css';
+import 'static/styles/ConsoleTabs.css';
 
 function EmptyDiv() {
   return (

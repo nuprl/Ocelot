@@ -43,4 +43,4 @@ export const configureStore = () => {
 
     sagaMiddleware.run(rootSaga);
     return store;
-}
+};

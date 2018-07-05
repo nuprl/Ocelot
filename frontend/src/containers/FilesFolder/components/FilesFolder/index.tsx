@@ -2,7 +2,7 @@ import * as React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Collapse from '@material-ui/core/Collapse';
-import CustomListItemText from 'components/CustomListItemText'
+import CustomListItemText from 'components/CustomListItemText';
 import CreateFileButton from 'containers/CreateFileButton';
 import UserFiles from 'components/UserFiles';
 import 'static/styles/DrawerIconButton.css';
@@ -15,19 +15,17 @@ type FilesFolderProps = {
     open: boolean,
     disabled: boolean,
     toggleFolder: () => void,
-}
+};
 
 type Props = FilesFolderProps & WithStyles<ListItemStylesTypes>;
 
 const FilesFolder: React.StatelessComponent<Props>
     = ({ open, disabled, toggleFolder, classes }) => (
-        <div>
-            {/* Maybe need a div with fileItem className */}
+        <div className="fileItem">
             <ListItem
                 button
                 onClick={toggleFolder}
                 disabled={disabled}
-                className="fileItem"
             >
                 <LoadingFolderIcon loading={disabled} className={classes.listItemColor}/>
                 <CustomListItemText text="Files" className={classes.listItemColor}/>
@@ -39,6 +37,6 @@ const FilesFolder: React.StatelessComponent<Props>
                 </List>
             </Collapse>
         </div>
-    )
+    );
 
 export default ListItemStyles(FilesFolder);

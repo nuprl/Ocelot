@@ -11,7 +11,7 @@ import { WithStyles } from '@material-ui/core';
 type CreateFileButtonProps = {
     disabled: boolean,
     onCreateFile: () => void,
-}
+};
 
 type Props = CreateFileButtonProps & WithStyles<ListItemStylesTypes>;
 
@@ -24,7 +24,7 @@ const CreateFileButton: React.StatelessComponent<Props>
             onClick={onCreateFile}
             className={classes.listItemColor}
         />
-    )
+    );
 
 const CreateFileButtonStyled = ListItemStyles(CreateFileButton);
 

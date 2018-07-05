@@ -53,7 +53,7 @@ class NewFileField extends React.Component<Props> {
     }
 
     render() {
-        const {wantNewFile, deleteFileField, classes } = this.props;
+        const { wantNewFile, deleteFileField, classes } = this.props;
 
         if (!wantNewFile) {
             return null;
@@ -104,14 +104,18 @@ class NewFileField extends React.Component<Props> {
 const mapStateToProps = (state: RootState) => ({
     wantNewFile: state.userFiles.filesInfo.newFile,
     files: state.userFiles.filesInfo.files,
-})
+});
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     deleteFileField: () => { dispatch(deleteNewFileField()); },
-    onCreateFile: (fileName: string) => { batchActions(
-        createNewFile(fileName),
-        deleteNewFileField(),
-    ); }
-})
+    onCreateFile: (fileName: string) => {
+        dispatch(
+            batchActions(
+                createNewFile(fileName),
+                deleteNewFileField(),
+            )
+        );
+    }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ListItemStyles(NewFileField));

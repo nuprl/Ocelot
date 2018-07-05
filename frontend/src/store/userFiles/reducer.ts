@@ -18,7 +18,7 @@ const userFiles: Reducer<t.UserFilesState> = (
     state: t.UserFilesState = initialState,
     action: t.UserFilesActions): t.UserFilesState => {
     switch (action.type) {
-        case t.LOAD_FILES_REQUEST: 
+        case t.LOAD_FILES_REQUEST:
             return {
                 ...state,
                 folderInfo: {
@@ -101,4 +101,3 @@ const userFiles: Reducer<t.UserFilesState> = (
 };
 
 export default userFiles;
-

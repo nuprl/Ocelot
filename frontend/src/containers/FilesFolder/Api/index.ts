@@ -2,13 +2,13 @@
 type UserFile = { name: string, content: string };
 
 interface SuccessResponse {
-    status: 'SUCCCESS',
-    data: { userFiles: UserFile[] }
+    status: 'SUCCESS';
+    data: { userFiles: UserFile[]; };
 }
 
 interface FailureResponse {
-    status: 'FAILURE',
-    data: { message: string },
+    status: 'FAILURE';
+    data: { message: string; };
 }
 
 export type UserFilesResponse = SuccessResponse | FailureResponse;
@@ -19,7 +19,7 @@ const failureResponse = (message: string): FailureResponse => ({
 });
 
 const successResponse = (userFiles: UserFile[]): SuccessResponse => ({
-    status: 'SUCCCESS',
+    status: 'SUCCESS',
     data: { userFiles: userFiles }
 });
 

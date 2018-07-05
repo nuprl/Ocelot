@@ -2,9 +2,9 @@ import * as React from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
-import ListItemButton from '../ListItemButton'
+import ListItemButton from '../ListItemButton';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
-import FilesList from 'containers/FileList';
+import FilesList from 'containers/FilesFolder';
 
 const styles: StyleRulesCallback = theme => ({
     drawerPaper: {
@@ -16,7 +16,7 @@ const styles: StyleRulesCallback = theme => ({
     toolbar: theme.mixins.toolbar,
 });
 
-type Styles = 'drawerPaper' | 'toolbar'
+type Styles = 'drawerPaper' | 'toolbar';
 
 const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
     { classes }

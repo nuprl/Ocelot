@@ -5,7 +5,7 @@ import customTheme from '../components/customTheme';
 import MenuAppbar from '../components/MenuAppbar';
 import Jumbotron from '../components/Jumbotron';
 import SideDrawer from '../components/SideDrawer';
-import '../static/Jumbotron.css';
+import 'static/styles/Jumbotron.css';
 import SplitPane from 'react-split-pane';
 import ErrorNotification from '../containers/ErrorNotification';
 
@@ -243,17 +243,7 @@ class Index extends React.Component<WithStyles<string>, State> {
           minSize={250}
           pane1Style={transitionStyle}
         >
-          <SideDrawer
-            loggedIn={loggedIn}
-            createSnackbarError={this.createSnackbarError}
-            onUpdateFiles={this.onUpdateFiles}
-            onSelectFile={this.onSelectFile}
-            onDeleteFile={this.onDeleteFile}
-            files={files}
-            selectedFileIndex={selectedFileIndex}
-            onCreatedFile={this.onCreatedFile}
-            fileSaved={this.state.fileSaved}
-          />
+          <SideDrawer />
           <main
             className={`jumboContent ${classes.content} ${loggedIn ? classes.contentShift : ''}`}
           >

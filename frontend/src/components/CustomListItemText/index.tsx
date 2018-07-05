@@ -13,6 +13,6 @@ const CustomListItemText: React.StatelessComponent<Props> = ({ text, className }
             </Typography>}
         classes={{ root: className }}
     />
-)
+);
 
 export default CustomListItemText;

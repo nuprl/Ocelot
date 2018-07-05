@@ -15,40 +15,40 @@ export const DELETE_FILE = 'DELETE_FILE';
 
 export type UserFiles = { name: string, content: string }[];
 
-export interface LoadFilesRequestAction {
-    type: 'LOAD_FILES_REQUEST'
+export interface LoadFilesRequestAction extends Action {
+    type: 'LOAD_FILES_REQUEST';
 }
 
-export interface LoadFilesSuccessAction {
+export interface LoadFilesSuccessAction extends Action {
     type: 'LOAD_FILES_SUCCESS';
-    userFiles: UserFiles
+    userFiles: UserFiles;
 }
 
-export interface ToggleFilesFolderAction {
-    type: 'TOGGLE_FILES_FOLDER'
+export interface ToggleFilesFolderAction extends Action {
+    type: 'TOGGLE_FILES_FOLDER';
 }
 
-export interface CreateNewFileFieldAction {
-    type: 'CREATE_NEW_FILE_FIELD'
+export interface CreateNewFileFieldAction extends Action {
+    type: 'CREATE_NEW_FILE_FIELD';
 }
 
-export interface DeleteNewFileFieldAction {
+export interface DeleteNewFileFieldAction extends Action {
     type: 'DELETE_NEW_FILE_FIELD';
 }
 
-export interface CreateNewFileAction {
+export interface CreateNewFileAction extends Action {
     type: 'CREATE_NEW_FILE';
-    fileName: string,
+    fileName: string;
 }
 
-export interface SelectFileAction {
-    type: 'SELECT_FILE',
-    fileIndex: number,
+export interface SelectFileAction extends Action {
+    type: 'SELECT_FILE';
+    fileIndex: number;
 }
 
-export interface DeleteFileAction {
-    type: 'DELETE_FILE',
-    fileIndex: number,
+export interface DeleteFileAction extends Action {
+    type: 'DELETE_FILE';
+    fileIndex: number;
 }
 
 export type UserFilesActions =
@@ -74,4 +74,4 @@ export type UserFilesState = {
         newFile: boolean,
         fileSaved: boolean[],
     }
-}
+};
