@@ -23,6 +23,8 @@ const successResponse = (userFiles: UserFile[]): SuccessResponse => ({
     data: { userFiles: userFiles }
 });
 
+export const isFailureResponse = (arg: UserFilesResponse): arg is FailureResponse => arg.status === 'FAILURE';
+
 export const getUserFiles = async (): Promise<UserFilesResponse> => {
     // This function should be called in a SAGA right after logging in
     // BE SURE TO SET LOADING BEFORE CALLING THIS FUNCTION
