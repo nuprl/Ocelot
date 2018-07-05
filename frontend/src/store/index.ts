@@ -7,13 +7,14 @@ import { UserFilesState } from './userFiles/types';
 import errorNotificationReducer from './errorNotification/reducer';
 import userLoginReducer from './userLogin/reducer';
 import userFilesReducer from './userFiles/reducer';
-
+// -- Redux Store --
 import { createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { enableBatching } from './batchActions';
-// -- Saga stuff
+// -- Saga stuff -- 
 import { all } from 'redux-saga/effects';
 import { watchUserLoginRequest } from './userLogin/saga';
+import { watchLoadUserFilesRequest } from './userFiles/saga';
 
 export interface RootState {
     errorNotification: ErrorNotificationState;
@@ -30,6 +31,7 @@ const rootReducer: Reducer<RootState> = combineReducers<RootState>({
 function* rootSaga() {
     yield all([
         watchUserLoginRequest(),
+        watchLoadUserFilesRequest(),
     ]);
 }
 
