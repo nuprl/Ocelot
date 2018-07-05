@@ -258,7 +258,7 @@ async function changeFile(req: Request) {
     let files, filteredFiles, fileExists;
     for (let currentFileChange of fileChanges) {
       // verbose && console.log('Looking at: ', currentFileChange.fileName);
-      if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid email
+      if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid filename
         verbose && console.log('No simple filename');
         continue;
       }
