@@ -6,9 +6,10 @@ import 'static/styles/ConsoleScreen.css';
 import { RootState } from 'store/';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { addNewLog } from 'store/consoleLogs/actions';
+import { addNewLog, removeOldLogs } from 'store/consoleLogs/actions';
 // NOTE TO SELF, Filtering of logs are possible, maybe nice to include
 // There's a difference between code input and output, so use that for the repl
+// Current bug: Console feed 'remembers' it's console method 
 type Log = {
   data: any[],
   id: string,
@@ -18,10 +19,25 @@ type Log = {
 type Props = {
   logs: Log[]
   addNewLog: (decodeLog: Log) => void,
+  removeOldLogs: (amount: number) => void,
 };
 
 class ConsoleIO extends React.Component<Props> {
   logRef: HTMLDivElement | null = null;
+  intervalId: NodeJS.Timer;
+
+  constructor(props: Props) {
+    super(props);
+    this.intervalId = setInterval(
+      () => {
+        const logLength = this.props.logs.length;
+        if (logLength > 230) {
+          this.props.removeOldLogs(Math.floor(logLength * 0.35));
+        }
+      },
+      3000
+    );
+  }
 
   componentDidUpdate() {
     if (this.logRef !== null) {
@@ -36,23 +52,27 @@ class ConsoleIO extends React.Component<Props> {
     });
   }
 
+  componentWillUnmount() {
+    clearInterval(this.intervalId);
+  }
+
   render() {
     const { logs } = this.props;
 
     return (
-        <div
-          className="scrollbars"
-          style={{ backgroundColor: '#242424', overflowY: 'auto', flexGrow: 1 }}
-          ref={(divElem) => this.logRef = divElem}
-        >
-          {/* <button onClick={this.switch}>Show only logs</button> */}
-          <Console
-            logs={logs}
-            variant="dark"
-            styles={inspectorTheme}
-          />
+      <div
+        className="scrollbars"
+        style={{ backgroundColor: '#242424', overflowY: 'auto', flexGrow: 1 }}
+        ref={(divElem) => this.logRef = divElem}
+      >
+        {/* <button onClick={this.switch}>Show only logs</button> */}
+        <Console
+          logs={logs}
+          variant="dark"
+          styles={inspectorTheme}
+        />
 
-        </div>
+      </div>
     );
   }
 
@@ -63,7 +83,8 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  addNewLog: (newLog: Log) => { dispatch(addNewLog(newLog)); }
+  addNewLog: (newLog: Log) => { dispatch(addNewLog(newLog)); },
+  removeOldLogs: (amount: number) => { dispatch(removeOldLogs(amount)); }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ConsoleIO);
