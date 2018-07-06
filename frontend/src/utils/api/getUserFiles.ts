@@ -1,46 +1,28 @@
+import { 
+    failureResponse, 
+    successResponse,
+    validEmailSession, 
+    FailureResponse,
+    getUrl,
+    SuccessResponse
+ } from './apiHelpers';
 
 type UserFile = { name: string, content: string };
 
-interface SuccessResponse {
-    status: 'SUCCESS';
-    data: { userFiles: UserFile[]; };
-}
-
-interface FailureResponse {
-    status: 'FAILURE';
-    data: { message: string; };
-}
-
-export type UserFilesResponse = SuccessResponse | FailureResponse;
-
-const failureResponse = (message: string): FailureResponse => ({
-    status: 'FAILURE',
-    data: { message: message }
-});
-
-const successResponse = (userFiles: UserFile[]): SuccessResponse => ({
-    status: 'SUCCESS',
-    data: { userFiles: userFiles }
-});
-
-export const isFailureResponse = (arg: UserFilesResponse): arg is FailureResponse => arg.status === 'FAILURE';
+export type UserFilesResponse = SuccessResponse<{userFiles: UserFile[]}> | FailureResponse;
 
 export const getUserFiles = async (): Promise<UserFilesResponse> => {
     // This function should be called in a SAGA right after logging in
     // BE SURE TO SET LOADING BEFORE CALLING THIS FUNCTION
 
-    const userEmail = localStorage.getItem('userEmail');
-    const sessionId = localStorage.getItem('sessionId');
-    
-    if (userEmail === null || sessionId === null) {
+    if (!validEmailSession()) {
         return failureResponse('Seems like your session expired, try logging in again');
     }
-    let url = 'https://us-central1-umass-compsci220.cloudfunctions.net/paws/getfile';
-    // domain to send post requests to
 
-    if (window.location.host.substring(0, 9) === 'localhost') { // if hosted on localhost
-        url = 'http://localhost:8000/getfile';
-    }
+    const url = getUrl('getfile');
+
+    const userEmail = localStorage.getItem('userEmail');
+    const sessionId = localStorage.getItem('sessionId');
 
     const data = { userEmail: userEmail, sessionId: sessionId };
 
@@ -65,7 +47,9 @@ export const getUserFiles = async (): Promise<UserFilesResponse> => {
         }
 
         // be sure to open this list (set state to open)
-        return successResponse(jsonResponse.data.userFiles);
+        return successResponse<{userFiles: UserFile[]}>({
+            userFiles: jsonResponse.data.userFiles
+        });
 
     } catch (error) {
         // Stop loading the file (set state to not loading)
