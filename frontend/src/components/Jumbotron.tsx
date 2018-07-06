@@ -210,6 +210,7 @@ class Jumbotron extends React.Component<WithStyles<string> & Props, State> {
                             options={options}
                             onChange={this.onChange}
                             editorDidMount={this.editorDidMount}
+                            height="calc(100% - 52px)"
                         />
                     </div>
                     <div
