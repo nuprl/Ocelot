@@ -22,6 +22,16 @@ export const toggleFilesFolder: ActionCreator<t.ToggleFilesFolderAction>
         type: t.TOGGLE_FILES_FOLDER
     });
 
+export const openFilesFolder: ActionCreator<t.OpenFilesFolderAction>
+= () => ({
+    type: t.OPEN_FILES_FOLDER
+});
+
+export const closeFilesFolder: ActionCreator<t.CloseFilesFolderAction>
+= () => ({
+    type: t.CLOSE_FILES_FOLDER
+});
+
 export const createNewFileField: ActionCreator<t.CreateNewFileFieldAction>
     = () => ({
         type: t.CREATE_NEW_FILE_FIELD
@@ -54,4 +64,22 @@ export const deleteFile: ActionCreator<t.DeleteFileAction>
 export const triggerNewFileError: ActionCreator<t.TriggerNewFileErrorAction>
     = () => ({
         type: t.TRIGGER_NEW_FILE_ERROR
+    });
+
+export const editFile: ActionCreator<t.EditFileAction>
+    = (fileIndex: number, fileName: string, content: string) => ({
+        type: t.EDIT_FILE,
+        fileIndex: fileIndex,
+        fileName: fileName,
+        content: content,
+    });
+
+export const clearFiles: ActionCreator<t.ClearFilesAction>
+    = () => ({
+        type: t.CLEAR_FILES
+    });
+
+export const resetDefaultFiles: ActionCreator<t.ResetDefaultFilesAction>
+    = () => ({
+        type: t.RESET_DEFAULT_FILES
     });
