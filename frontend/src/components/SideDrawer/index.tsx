@@ -2,7 +2,7 @@ import * as React from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
-import ListItemButton from '../ListItemButton';
+import ListButton from '../ListButton';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import FilesList from 'containers/FilesFolder';
 
@@ -33,7 +33,7 @@ const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
                 <FilesList />
             </List>
             <List dense>
-                <ListItemButton
+                <ListButton
                     icon={<StarBorderIcon />}
                     text="CS 220"
                 />
