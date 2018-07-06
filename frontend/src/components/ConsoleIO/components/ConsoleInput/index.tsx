@@ -61,11 +61,12 @@ class ConsoleInput extends React.Component<WithStyles<string>> {
         const { classes } = this.props;
         return (
             <div className={classes.container}>
-                <div style={{color: 'white', height: '24px'}}>
-                    <RightArrowIcon color="inherit"/>
+                <div style={{ color: 'white', height: '24px' }}>
+                    <RightArrowIcon color="inherit" />
                 </div>
                 <div style={{ verticalAlign: 'middle', width: '100%', height: '20px' }}>
                     <MonacoEditor
+                        theme="vs-dark"
                         options={monacoOptions}
                     />
                 </div>
