@@ -8,6 +8,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { addNewLog } from 'store/consoleLogs/actions';
 // NOTE TO SELF, Filtering of logs are possible, maybe nice to include
+// There's a difference between code input and output, so use that for the repl
 type Log = {
   data: any[],
   id: string,
