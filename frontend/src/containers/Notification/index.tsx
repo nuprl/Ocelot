@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { closeErrorNotification } from 'store/errorNotification/actions';
-import ErrorSnackbar from './components/ErrorSnackbar';
+import NotificationBar from './components/NotificationBar';
 import { RootState } from 'store/';
 
 /**
@@ -26,4 +26,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     handleClose: () => { dispatch(closeErrorNotification()); }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ErrorSnackbar);
+export default connect(mapStateToProps, mapDispatchToProps)(NotificationBar);
