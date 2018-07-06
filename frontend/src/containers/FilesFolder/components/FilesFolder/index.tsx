@@ -2,12 +2,12 @@ import * as React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Collapse from '@material-ui/core/Collapse';
-import CustomListItemText from 'components/CustomListItemText';
+import ItemTypography from 'components/ItemTypography';
 import IconButton from '@material-ui/core/IconButton';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
 import 'static/styles/DrawerIconButton.css';
-import UserFiles from 'components/UserFiles';
+import UserFiles from '../UserFiles';
 import 'static/styles/DrawerIconButton.css';
 import LoadingFolderIcon from '../LoadingFolderIcon';
 import ListItemStyles from 'components/ListItemStyles';
@@ -27,33 +27,34 @@ type Props = FilesFolderProps & WithStyles<ListItemStylesTypes>;
 const FilesFolder: React.StatelessComponent<Props>
     = ({ open, disabled, toggleFolder, onCreateFile, classes }) => (
         <div>
-            <ListItem
-                button
-                onClick={toggleFolder}
-                disabled={disabled}
-                className="fileItem"
-            >
-                <LoadingFolderIcon loading={disabled} className={classes.listItemColor} />
-                <CustomListItemText text="Files" className={classes.listItemColor} />
-                {/* -- Delete Button -- */}
-                < ListItemSecondaryAction className={`fadeIcon ${classes.listItemColor}`} >
-                    <Tooltip id="tooltip-icon" title="New File" disableHoverListener={disabled}>
-                        <div>  {/* surround the button with a div to suppress the warning even though it's
+            <div className="fileItem">
+                <ListItem
+                    button
+                    onClick={toggleFolder}
+                    disabled={disabled}
+                >
+                    <LoadingFolderIcon loading={disabled} className={classes.listItemColor} />
+                    <ItemTypography text="Files" className={classes.listItemColor} />
+                    {/* -- Delete Button -- */}
+                    < ListItemSecondaryAction className={`fadeIcon ${classes.listItemColor}`} >
+                        <Tooltip id="tooltip-icon" title="New File" disableHoverListener={disabled}>
+                            <div>  {/* surround the button with a div to suppress the warning even though it's
                             not really necessary*/}
-                            <IconButton
-                                aria-label="New File"
-                                color="inherit"
-                                disabled={disabled}
-                                onClick={onCreateFile}
-                            >
-                                <AddIcon color="inherit" />
-                            </IconButton>
-                        </div>
-                    </Tooltip>
-                </ListItemSecondaryAction>
-                {/* ---- */}
-            </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+                                <IconButton
+                                    aria-label="New File"
+                                    color="inherit"
+                                    disabled={disabled}
+                                    onClick={onCreateFile}
+                                >
+                                    <AddIcon color="inherit" />
+                                </IconButton>
+                            </div>
+                        </Tooltip>
+                    </ListItemSecondaryAction>
+                    {/* ---- */}
+                </ListItem>
+            </div>
+            <Collapse in={open} timeout="auto">
                 <List component="div" disablePadding dense>
                     <UserFiles />
                 </List>
