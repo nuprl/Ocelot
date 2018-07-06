@@ -5,11 +5,12 @@ import { loadFilesRequest } from '../userFiles/actions';
 import { logInUserSuccess, logOutUser } from './actions';
 import { batchActions } from 'store/batchActions';
 
-import * as Api from 'containers/UserLogin/Api';
+import { validateUserResponse, validateUser } from 'utils/api/validateUser';
+import { isFailureResponse } from 'utils/api/apiHelpers';
 
-function* validateUser(action: LogInUserRequestAction) {
-    const response: Api.validateUserResponse = yield call(Api.validateUser, action.googleUser);
-    if (Api.isFailureResponse(response)) {
+function* validate(action: LogInUserRequestAction) {
+    const response: validateUserResponse = yield call(validateUser, action.googleUser);
+    if (isFailureResponse(response)) {
         yield put(batchActions(
             triggerErrorNotification(response.data.message),
             logOutUser()
@@ -22,5 +23,5 @@ function* validateUser(action: LogInUserRequestAction) {
 }
 
 export function* watchUserLoginRequest() {
-    yield takeEvery(LOG_IN_USER_REQUEST, validateUser);
+    yield takeEvery(LOG_IN_USER_REQUEST, validate);
 }
