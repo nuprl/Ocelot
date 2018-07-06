@@ -3,7 +3,7 @@ import { combineReducers, Reducer } from 'redux';
 import { ErrorNotificationState } from './errorNotification/types';
 import { UserLoginState } from './userLogin/types';
 import { UserFilesState } from './userFiles/types';
-import { ConsoleLogsState } from './consoleLogs/types';
+import { ConsoleLogsState, ADD_NEW_LOG } from './consoleLogs/types';
 // -- Reducers --
 import errorNotificationReducer from './errorNotification/reducer';
 import userLoginReducer from './userLogin/reducer';
@@ -18,8 +18,9 @@ import { all } from 'redux-saga/effects';
 import { watchUserLoginRequest } from './userLogin/saga';
 import { watchLoadUserFilesRequest, watchCreateNewFile, watchDeleteFile } from './userFiles/saga';
 // -- logger --
-// import logger from 'redux-logger';
+import { createLogger } from 'redux-logger';
 
+// root state
 export interface RootState {
     errorNotification: ErrorNotificationState;
     userLogin: UserLoginState;
@@ -27,6 +28,7 @@ export interface RootState {
     consoleLogs: ConsoleLogsState;
 }
 
+// combine all reducers
 const rootReducer: Reducer<RootState> = combineReducers<RootState>({
     errorNotification: errorNotificationReducer,
     userLogin: userLoginReducer,
@@ -34,7 +36,7 @@ const rootReducer: Reducer<RootState> = combineReducers<RootState>({
     consoleLogs: consoleLogsReducer,
 });
 
-function* rootSaga() {
+function* rootSaga() { // Combine all sagas 
     yield all([
         watchUserLoginRequest(),
         watchLoadUserFilesRequest(),
@@ -43,12 +45,17 @@ function* rootSaga() {
     ]);
 }
 
+const logger = createLogger({ // logger to log all actions
+    predicate: (getState, action) => action.type !== ADD_NEW_LOG
+    // will not log the actions done by the Console (else infinite loop)
+});
+
 export const configureStore = () => {
 
     const sagaMiddleware = createSagaMiddleware();
     const store = createStore(
         enableBatching(rootReducer),
-        applyMiddleware(sagaMiddleware, )
+        applyMiddleware(sagaMiddleware, logger)
     );
 
     sagaMiddleware.run(rootSaga);
