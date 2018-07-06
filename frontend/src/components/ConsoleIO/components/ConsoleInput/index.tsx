@@ -48,7 +48,6 @@ class ConsoleInput extends React.Component<WithStyles<string>> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
-        // tslint:disable-next-line:no-console
         window.addEventListener('resize', this.resizeEditor);
     }
 
