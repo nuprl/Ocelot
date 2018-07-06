@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 
 type Props = { text: string, className: string, styleBody?: boolean };
 
-const CustomListItemText: React.StatelessComponent<Props> = ({
+const ItemTypography: React.StatelessComponent<Props> = ({
      text, className, styleBody = false
     }) => (
     <ListItemText
@@ -17,4 +17,4 @@ const CustomListItemText: React.StatelessComponent<Props> = ({
     />
 );
 
-export default CustomListItemText;
+export default ItemTypography;
