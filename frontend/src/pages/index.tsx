@@ -3,11 +3,11 @@ import withStyles, { WithStyles, StyleRulesCallback, } from '@material-ui/core/s
 // import createMuiTheme, { Theme } from '@material-ui/core/styles/createMuiTheme';
 import customTheme from '../components/customTheme';
 import MenuAppbar from '../components/MenuAppbar';
-import Jumbotron from '../components/Jumbotron';
 import SideDrawer from '../components/SideDrawer';
-import 'static/styles/Jumbotron.css';
+import 'static/styles/JumboContent.css';
 import SplitPane from 'react-split-pane';
-import ErrorNotification from '../containers/ErrorNotification';
+import ErrorNotification from '../containers/Notification';
+import JumboContent from 'components/JumboContent';
 
 // let themio: Theme = createMuiTheme({ palette: { type: 'dark' } });
 
@@ -23,12 +23,6 @@ const styles: StyleRulesCallback = theme => {
       display: 'flex',
       backgroundColor: theme.palette.primary.main,
     },
-
-    content: {
-      flexGrow: 1,
-      minWidth: 0, // So the Typography noWrap works
-      // animations
-    }
   };
 };
 
@@ -226,7 +220,6 @@ class Index extends React.Component<WithStyles<string>, State> {
 
   render() {
     const { classes } = this.props;
-    const { loggedIn, files, selectedFileIndex } = this.state;
     let transitionStyle: { transition?: string, width?: string } = {
       // transition: themio.transitions.create('width', {
       //   easing: themio.transitions.easing.sharp,
@@ -240,20 +233,12 @@ class Index extends React.Component<WithStyles<string>, State> {
         <MenuAppbar title="Ocelot"/>
         <SplitPane
           split="vertical"
-          minSize={250}
+          defaultSize={250}
           pane1Style={transitionStyle}
         >
           <SideDrawer />
-          <main
-            className={`jumboContent ${classes.content} ${loggedIn ? classes.contentShift : ''}`}
-          >
-            <Jumbotron
-              files={files}
-              selectedFileIndex={selectedFileIndex}
-              onUpdateSelectedFile={this.onUpdateSelectedFile}
-              onSaveSelectedFile={this.onSaveSelectedFile}
-              loggedIn={this.state.loggedIn}
-            />
+          <main className="jumboContent">
+            <JumboContent />
           </main>
         </SplitPane>
       </div>

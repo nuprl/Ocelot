@@ -45,7 +45,13 @@ export const selectFile: ActionCreator<t.SelectFileAction>
     });
 
 export const deleteFile: ActionCreator<t.DeleteFileAction>
-    = (fileIndex: number) => ({
+    = (fileIndex: number, fileName: string) => ({
         type: t.DELETE_FILE,
         fileIndex: fileIndex,
+        fileName: fileName
+    });
+
+export const triggerNewFileError: ActionCreator<t.TriggerNewFileErrorAction>
+    = () => ({
+        type: t.TRIGGER_NEW_FILE_ERROR
     });

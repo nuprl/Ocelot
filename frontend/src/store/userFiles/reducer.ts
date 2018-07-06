@@ -10,6 +10,7 @@ const initialState: t.UserFilesState = {
         files: [],
         selectedFileIndex: -1,
         newFile: false,
+        newFileError: false,
         fileSaved: []
     }
 };
@@ -80,8 +81,9 @@ const userFiles: Reducer<t.UserFilesState> = (
                         {
                             name: action.fileName,
                             content: ''
-                        }
+                        },
                     ],
+                    newFileError: false,
                     fileSaved: [
                         ...state.filesInfo.fileSaved,
                         true,
@@ -104,6 +106,14 @@ const userFiles: Reducer<t.UserFilesState> = (
                     files: state.filesInfo.files.filter(
                         (elem, index) => index !== action.fileIndex
                     ),
+                }
+            };
+        case t.TRIGGER_NEW_FILE_ERROR:
+            return {
+                ...state,
+                filesInfo: {
+                    ...state.filesInfo,
+                    newFileError: true
                 }
             };
         default:

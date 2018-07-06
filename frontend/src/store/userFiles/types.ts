@@ -2,7 +2,7 @@ import { Action } from 'redux';
 
 // Action types
 export const LOAD_FILES_REQUEST = 'LOAD_FILES_REQUEST';
-export const LOAD_FILES_SUCCESS = 'LOAD_FILES_SUCCESS'; 
+export const LOAD_FILES_SUCCESS = 'LOAD_FILES_SUCCESS';
 export const LOAD_FILES_FAILURE = 'LOAD_FILES_FAILURE';
 export const TOGGLE_FILES_FOLDER = 'TOGGLE_FILES_FOLDER';
 export const CREATE_NEW_FILE_FIELD = 'CREATE_NEW_FILE_FIELD';
@@ -12,6 +12,7 @@ export const CREATE_NEW_FILE = 'CREATE_NEW_FILE';
 export const SELECT_FILE = 'SELECT_FILE';
 export const DELETE_FILE = 'DELETE_FILE';
 // this should also have a saga
+export const TRIGGER_NEW_FILE_ERROR = 'TRIGGER_NEW_FILE_ERROR';
 
 export type UserFiles = { name: string, content: string }[];
 
@@ -53,6 +54,11 @@ export interface SelectFileAction extends Action {
 export interface DeleteFileAction extends Action {
     type: 'DELETE_FILE';
     fileIndex: number;
+    fileName: string;
+}
+
+export interface TriggerNewFileErrorAction extends Action {
+    type: 'TRIGGER_NEW_FILE_ERROR';
 }
 
 export type UserFilesActions =
@@ -64,7 +70,8 @@ export type UserFilesActions =
     | DeleteNewFileFieldAction
     | CreateNewFileAction
     | SelectFileAction
-    | DeleteFileAction;
+    | DeleteFileAction
+    | TriggerNewFileErrorAction;
 
 // State type
 
@@ -77,6 +84,7 @@ export type UserFilesState = {
         files: UserFiles,
         selectedFileIndex: number,
         newFile: boolean,
+        newFileError: boolean,
         fileSaved: boolean[],
     }
 };
