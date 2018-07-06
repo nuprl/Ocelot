@@ -2,6 +2,7 @@ import * as React from 'react';
 import SplitPane from 'react-split-pane';
 import CanvasOutput from 'components/CanvasOutput';
 import OutputPanel from 'components/OutputPanel';
+import EditorSuite from 'components/EditorSuite';
 import 'static/styles/SplitPane.css';
 
 const JumboContent: React.StatelessComponent = () => (
@@ -15,8 +16,7 @@ const JumboContent: React.StatelessComponent = () => (
             split="vertical"
             defaultSize="50%"
         >
-            {/* <EditorSuite /> */}
-            <div/>
+            <EditorSuite />
             <CanvasOutput />
         </SplitPane>
         <OutputPanel />
