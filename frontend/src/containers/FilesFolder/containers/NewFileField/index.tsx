@@ -14,20 +14,42 @@ import ListItemStyles from 'components/ListItemStyles';
 import { ListItemStylesTypes } from 'components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';
 import { RootState } from 'store';
-import { Dispatch } from 'react-redux';
-import { deleteNewFileField, createNewFile } from 'store/userFiles/actions';
+import { Dispatch } from 'redux';
+import { deleteNewFileField, createNewFile, triggerNewFileError } from 'store/userFiles/actions';
 import { UserFiles } from 'store/userFiles/types';
-import { batchActions } from 'store/batchActions';
+import FormHelperText from '@material-ui/core/FormHelperText';
+
+// this is copied from backend
+const isSimpleValidFileName = (fileName: string) => { // still incomplete but will do for now
+    return /^\w+\.js/.test(fileName);
+};
 
 type Props = {
     wantNewFile: boolean,
+    files: UserFiles,
+    newFileError: boolean,
     deleteFileField: () => void,
     onCreateFile: (fileName: string) => void,
-    files: UserFiles
-}
-    & WithStyles<ListItemStylesTypes>;
+    notifyError: () => void,
+} & WithStyles<ListItemStylesTypes>;
 
 class NewFileField extends React.Component<Props> {
+    listener: (event: KeyboardEvent) => void;
+    constructor(props: Props) {
+        super(props);
+        this.listener = (event) => {
+            if (event.keyCode !== 13 || event.target === null) {
+                return;
+            }
+            const name = (event.target as HTMLTextAreaElement).value;
+            const result = this.props.files.filter((elem) => elem.name === name);
+            if (result.length !== 0 || !isSimpleValidFileName(name)) {
+                this.props.notifyError();
+                return;
+            }
+            this.props.onCreateFile(name);
+        };
+    }
 
     componentDidUpdate(prevProps: Props) {
         if (this.props.wantNewFile === prevProps.wantNewFile) {
@@ -37,23 +59,19 @@ class NewFileField extends React.Component<Props> {
         if (filenameInput === null || !this.props.wantNewFile) {
             return;
         }
-        filenameInput.addEventListener('keyup', (event) => {
-            if (event.keyCode !== 13 || event.target === null) {
-                return;
-            }
-            const name = (event.target as HTMLTextAreaElement).value;
-            const result = this.props.files.filter((elem) => elem.name === name);
-            if (result.length !== 0) {
-                // maybe set a state to show an error because of file with same name exists
-                // highlight text field in red
-                return;
-            }
-            this.props.onCreateFile(name);
-        });
+        filenameInput.addEventListener('keyup', this.listener);
+    }
+
+    componentWillUnmount() {
+        let filenameInput = document.getElementById('filename-input');
+        if (filenameInput === null || !this.props.wantNewFile) {
+            return;
+        }
+        filenameInput.removeEventListener('keyup', this.listener);
     }
 
     render() {
-        const { wantNewFile, deleteFileField, classes } = this.props;
+        const { wantNewFile, deleteFileField, classes, newFileError } = this.props;
 
         if (!wantNewFile) {
             return null;
@@ -71,6 +89,7 @@ class NewFileField extends React.Component<Props> {
                             className={classes.formControl}
                             aria-describedby="name-helper-text"
                             margin="none"
+                            error={newFileError}
                         >
                             <Input
                                 id="filename-input"
@@ -78,9 +97,19 @@ class NewFileField extends React.Component<Props> {
                                     root: classes.textField
                                 }}
                                 autoFocus
-                                
+
                             />
-                        </FormControl>}
+                            {
+                                newFileError &&
+                                <FormHelperText
+                                    id="duplicate-error"
+                                    margin="dense"
+                                >
+                                    Duplicate Filename
+                                </FormHelperText>
+                            }
+                        </FormControl>
+                    }
                     classes={{ root: classes.listItemColor }}
                 />
                 <ListItemSecondaryAction
@@ -106,17 +135,17 @@ class NewFileField extends React.Component<Props> {
 const mapStateToProps = (state: RootState) => ({
     wantNewFile: state.userFiles.filesInfo.newFile,
     files: state.userFiles.filesInfo.files,
+    newFileError: state.userFiles.filesInfo.newFileError
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     deleteFileField: () => { dispatch(deleteNewFileField()); },
     onCreateFile: (fileName: string) => {
-        dispatch(
-            batchActions(
-                createNewFile(fileName),
-                deleteNewFileField(),
-            )
-        );
+        dispatch(createNewFile(fileName));
+        dispatch(deleteNewFileField());
+    },
+    notifyError: () => {
+        dispatch(triggerNewFileError());
     }
 });
 

@@ -13,7 +13,7 @@ type Props = {
     selectedFileIndex: number,
     fileSaved: boolean[]
     makeHandleClickFile: (index: number) => () => void,
-    makeHandleDeleteFile: (index: number) => () => void,
+    makeHandleDeleteFile: (index: number, name: string) => () => void,
 };
 
 class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props> {
@@ -29,7 +29,7 @@ class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props>
                     <FileItem
                         isSelected={selectedFileIndex === index}
                         onSelect={this.props.makeHandleClickFile(index)}
-                        onDelete={this.props.makeHandleDeleteFile(index)}
+                        onDelete={this.props.makeHandleDeleteFile(index, fileObj.name)}
                         isSaved={fileSaved[index]}
                         name={fileObj.name}
                         key={`${fileObj.name}${index + 2}`}
@@ -50,8 +50,10 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     makeHandleClickFile: (index: number) => (() => {
         dispatch(selectFile(index));
     }),
-    makeHandleDeleteFile: (index: number) => (() => {
-        dispatch(deleteFile(index));
+    makeHandleDeleteFile: (index: number, name: string) => (() => {
+        // index is used for removing the file from store
+        // the name is for removing the file from the database
+        dispatch(deleteFile(index, name));
     })
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ListItemStyles(UserFiles));

@@ -3,7 +3,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import CodeIcon from '@material-ui/icons/Code';
 import DonutIcon from '@material-ui/icons/DonutLarge';
-import CustomListItemText from 'components/CustomListItemText';
+import CustomListItemText from 'components/ItemTypography';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ListItemStyles from 'components/ListItemStyles';
 import { ListItemStylesTypes } from 'components/ListItemStyles';
