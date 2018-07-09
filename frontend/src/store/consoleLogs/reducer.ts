@@ -2,7 +2,8 @@ import { Reducer } from 'redux';
 import {
     ADD_NEW_LOG,
     ConsoleLogsState,
-    ConsoleLogsActions
+    ConsoleLogsActions,
+    REMOVE_OLD_LOGS
 } from './types';
 
 const initialState: ConsoleLogsState = {
@@ -19,6 +20,10 @@ const consoleLogs: Reducer<ConsoleLogsState, ConsoleLogsActions> = (
                     ...state.logs,
                     action.log
                 ]
+            };
+        case REMOVE_OLD_LOGS:
+            return {
+                logs: state.logs.filter((log, index) => index >= action.amount)  
             };
         default:
             return state;

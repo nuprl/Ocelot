@@ -1,12 +1,5 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
-import {
-    LoadFilesRequestAction,
-    CreateNewFileAction,
-    DeleteFileAction,
-    CREATE_NEW_FILE,
-    DELETE_FILE,
-    LOAD_FILES_REQUEST
-} from './types';
+import * as t from './types';
 import { triggerErrorNotification } from 'store/errorNotification/actions';
 import { logOutUser } from 'store/userLogin/actions';
 import { loadFilesSuccess, loadFilesFailure } from 'store/userFiles/actions';
@@ -16,7 +9,7 @@ import { UserFilesResponse, getUserFiles } from 'utils/api/getUserFiles';
 import { SaveFilesResponse, saveChanges } from 'utils/api/saveFileChanges';
 import { isFailureResponse, FileChange } from 'utils/api/apiHelpers';
 
-function* fetchFiles(action: LoadFilesRequestAction) {
+function* fetchFiles(action: t.LoadFilesRequestAction) {
     const response: UserFilesResponse = yield call(getUserFiles);
     if (isFailureResponse(response)) {
         yield put(
@@ -32,17 +25,21 @@ function* fetchFiles(action: LoadFilesRequestAction) {
 }
 
 export function* watchLoadUserFilesRequest() {
-    yield takeEvery(LOAD_FILES_REQUEST, fetchFiles);
+    yield takeEvery(t.LOAD_FILES_REQUEST, fetchFiles);
 }
 
 const isDeleteFileAction =
-    (arg: CreateNewFileAction | DeleteFileAction): arg is DeleteFileAction => (arg.type === 'DELETE_FILE');
+    (arg: t.ChangeFileActions): arg is t.DeleteFileAction => (arg.type === 'DELETE_FILE');
 
-function* makeFileChanges(action: CreateNewFileAction | DeleteFileAction) {
+const isEditFileAction =
+    (arg: t.ChangeFileActions): arg is t.EditFileAction => (arg.type === 'EDIT_FILE');
+
+function* makeFileChanges(action: t.ChangeFileActions) {
     let fileChangeRequest: FileChange[] = [
         {
             fileName: action.fileName,
             type: 'create',
+            changes: '',
         }
     ];
     if (isDeleteFileAction(action)) {
@@ -50,6 +47,14 @@ function* makeFileChanges(action: CreateNewFileAction | DeleteFileAction) {
             {
                 fileName: action.fileName,
                 type: 'delete'
+            }
+        ];
+    }
+    if (isEditFileAction(action)) {
+        fileChangeRequest = [
+            {
+                ...fileChangeRequest[0],
+                changes: action.content
             }
         ];
     }
@@ -63,9 +68,11 @@ function* makeFileChanges(action: CreateNewFileAction | DeleteFileAction) {
 }
 
 export function* watchCreateNewFile() {
-    yield takeEvery(CREATE_NEW_FILE, makeFileChanges);
+    yield takeEvery(t.CREATE_NEW_FILE, makeFileChanges);
 }
 
 export function* watchDeleteFile() {
-    yield takeEvery(DELETE_FILE, makeFileChanges);
+    yield takeEvery(t.DELETE_FILE, makeFileChanges);
 }
+
+// watch edit file but not constantly, new action may be needed

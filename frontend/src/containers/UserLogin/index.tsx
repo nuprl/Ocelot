@@ -4,6 +4,8 @@ import LoginLogout from './components/LoginLogout';
 import { GoogleLoginResponse } from 'react-google-login';
 import { logInUserRequest, logOutUser, loadingOngoing } from 'store/userLogin/actions';
 import { RootState } from 'store/';
+import { batchActions } from 'store/batchActions';
+import { clearFiles, resetDefaultFiles, closeFilesFolder, openFilesFolder } from 'store/userFiles/actions';
 
 const mapStateToProps = (state: RootState) => ({
     loggedIn: state.userLogin.loggedIn,
@@ -13,7 +15,19 @@ const mapStateToProps = (state: RootState) => ({
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     onLogin: (googleUser: GoogleLoginResponse) => { dispatch(logInUserRequest(googleUser)); },
-    onLogout: () => { dispatch(logOutUser()); },
+    onLogout: () => { 
+        dispatch(
+            batchActions(
+                logOutUser(),
+            )
+        ); 
+        dispatch(closeFilesFolder());
+        dispatch(batchActions(
+            clearFiles(),
+            resetDefaultFiles(),
+        ));
+        dispatch(openFilesFolder());
+    },
     // surround with curly braces so that it does not return what dispatch returns
     onLoading: () => { dispatch(loadingOngoing()); },
 });

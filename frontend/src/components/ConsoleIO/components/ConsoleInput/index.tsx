@@ -48,7 +48,6 @@ class ConsoleInput extends React.Component<WithStyles<string>> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
-        // tslint:disable-next-line:no-console
         window.addEventListener('resize', this.resizeEditor);
     }
 
@@ -62,11 +61,12 @@ class ConsoleInput extends React.Component<WithStyles<string>> {
         const { classes } = this.props;
         return (
             <div className={classes.container}>
-                <div style={{color: 'white', height: '24px'}}>
-                    <RightArrowIcon color="inherit"/>
+                <div style={{ color: 'white', height: '24px' }}>
+                    <RightArrowIcon color="inherit" />
                 </div>
                 <div style={{ verticalAlign: 'middle', width: '100%', height: '20px' }}>
                     <MonacoEditor
+                        theme="vs-dark"
                         options={monacoOptions}
                     />
                 </div>

@@ -265,6 +265,7 @@ async function changeFile(req: Request) {
       if (currentFileChange.type === 'create') {
         const file = bucket.file(`${userEmail}/${currentFileChange.fileName}`);
         verbose && console.log(`\tSaving file: ${currentFileChange.fileName}`);
+        // Non-null assertion of changes can be saved
         await timePromise(file.save(currentFileChange.changes!, { metadata: { contentType: 'text/javascript' } }));
         continue;
       }
