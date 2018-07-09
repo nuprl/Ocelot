@@ -3,7 +3,6 @@ import * as t from './types';
 
 const initialState: t.UserFilesState = {
     folderInfo: {
-        open: false,
         filesLoading: false,
     },
     filesInfo: {
@@ -36,7 +35,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                 },
                 folderInfo: {
                     filesLoading: false,
-                    open: true,
                 }
             };
         case t.LOAD_FILES_FAILURE:
@@ -45,14 +43,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                 folderInfo: {
                     ...state.folderInfo,
                     filesLoading: false,
-                }
-            };
-        case t.TOGGLE_FILES_FOLDER:
-            return {
-                ...state,
-                folderInfo: {
-                    ...state.folderInfo,
-                    open: !state.folderInfo.open
                 }
             };
         case t.CREATE_NEW_FILE_FIELD:

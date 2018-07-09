@@ -17,11 +17,6 @@ export const loadFilesFailure: ActionCreator<t.LoadFilesFailureAction>
         type: t.LOAD_FILES_FAILURE
     });
 
-export const toggleFilesFolder: ActionCreator<t.ToggleFilesFolderAction>
-    = () => ({
-        type: t.TOGGLE_FILES_FOLDER
-    });
-
 export const createNewFileField: ActionCreator<t.CreateNewFileFieldAction>
     = () => ({
         type: t.CREATE_NEW_FILE_FIELD

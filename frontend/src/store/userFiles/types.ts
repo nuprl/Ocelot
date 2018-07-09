@@ -4,7 +4,6 @@ import { Action } from 'redux';
 export const LOAD_FILES_REQUEST = 'LOAD_FILES_REQUEST';
 export const LOAD_FILES_SUCCESS = 'LOAD_FILES_SUCCESS';
 export const LOAD_FILES_FAILURE = 'LOAD_FILES_FAILURE';
-export const TOGGLE_FILES_FOLDER = 'TOGGLE_FILES_FOLDER';
 export const CREATE_NEW_FILE_FIELD = 'CREATE_NEW_FILE_FIELD';
 export const DELETE_NEW_FILE_FIELD = 'DELETE_NEW_FILE_FIELD';
 export const CREATE_NEW_FILE = 'CREATE_NEW_FILE';
@@ -27,10 +26,6 @@ export interface LoadFilesSuccessAction extends Action {
 
 export interface LoadFilesFailureAction extends Action {
     type: 'LOAD_FILES_FAILURE';
-}
-
-export interface ToggleFilesFolderAction extends Action {
-    type: 'TOGGLE_FILES_FOLDER';
 }
 
 export interface CreateNewFileFieldAction extends Action {
@@ -65,7 +60,6 @@ export type UserFilesActions =
     | LoadFilesRequestAction
     | LoadFilesSuccessAction
     | LoadFilesFailureAction
-    | ToggleFilesFolderAction
     | CreateNewFileFieldAction
     | DeleteNewFileFieldAction
     | CreateNewFileAction
@@ -77,7 +71,6 @@ export type UserFilesActions =
 
 export type UserFilesState = {
     folderInfo: {
-        open: boolean,
         filesLoading: boolean
     },
     filesInfo: {
