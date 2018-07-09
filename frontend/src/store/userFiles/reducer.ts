@@ -15,10 +15,7 @@ console.log(greeting('World'));
 
 const initialState: t.UserFilesState = {
     folderInfo: {
-<<<<<<< HEAD
-=======
         open: true,
->>>>>>> 1baad788f44d1d6dca1477fcd30af0089f93c341
         filesLoading: false,
     },
     filesInfo: {
@@ -53,6 +50,7 @@ const userFiles: Reducer<t.UserFilesState> = (
                     fileSaved: new Array(action.userFiles.length).fill(true)
                 },
                 folderInfo: {
+                    ...state.folderInfo,
                     filesLoading: false,
                 }
             };
@@ -64,8 +62,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                     filesLoading: false,
                 }
             };
-<<<<<<< HEAD
-=======
         case t.TOGGLE_FILES_FOLDER:
             return {
                 ...state,
@@ -90,7 +86,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                     open: false,
                 }
             };
->>>>>>> 1baad788f44d1d6dca1477fcd30af0089f93c341
         case t.CREATE_NEW_FILE_FIELD:
             return {
                 ...state,

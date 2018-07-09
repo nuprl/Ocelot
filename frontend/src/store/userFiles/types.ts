@@ -4,12 +4,9 @@ import { Action } from 'redux';
 export const LOAD_FILES_REQUEST = 'LOAD_FILES_REQUEST';
 export const LOAD_FILES_SUCCESS = 'LOAD_FILES_SUCCESS';
 export const LOAD_FILES_FAILURE = 'LOAD_FILES_FAILURE';
-<<<<<<< HEAD
-=======
 export const TOGGLE_FILES_FOLDER = 'TOGGLE_FILES_FOLDER';
 export const OPEN_FILES_FOLDER = 'OPEN_FILES_FOLDER';
 export const CLOSE_FILES_FOLDER = 'CLOSE_FILES_FOLDER';
->>>>>>> 1baad788f44d1d6dca1477fcd30af0089f93c341
 export const CREATE_NEW_FILE_FIELD = 'CREATE_NEW_FILE_FIELD';
 export const DELETE_NEW_FILE_FIELD = 'DELETE_NEW_FILE_FIELD';
 export const CREATE_NEW_FILE = 'CREATE_NEW_FILE';
@@ -40,8 +37,6 @@ export interface LoadFilesFailureAction extends Action {
     type: 'LOAD_FILES_FAILURE';
 }
 
-<<<<<<< HEAD
-=======
 export interface ToggleFilesFolderAction extends Action {
     type: 'TOGGLE_FILES_FOLDER';
 }
@@ -54,7 +49,6 @@ export interface CloseFilesFolderAction extends Action {
     type: 'CLOSE_FILES_FOLDER';
 }
 
->>>>>>> 1baad788f44d1d6dca1477fcd30af0089f93c341
 export interface CreateNewFileFieldAction extends Action {
     type: 'CREATE_NEW_FILE_FIELD';
 }
@@ -102,12 +96,9 @@ export type UserFilesActions =
     | LoadFilesRequestAction
     | LoadFilesSuccessAction
     | LoadFilesFailureAction
-<<<<<<< HEAD
-=======
     | ToggleFilesFolderAction
     | OpenFilesFolderAction
     | CloseFilesFolderAction
->>>>>>> 1baad788f44d1d6dca1477fcd30af0089f93c341
     | CreateNewFileFieldAction
     | DeleteNewFileFieldAction
     | CreateNewFileAction
@@ -128,6 +119,7 @@ export type ChangeFileActions =
 export type UserFilesState = {
     folderInfo: {
         filesLoading: boolean
+        open: boolean,
     },
     filesInfo: {
         files: UserFiles,
