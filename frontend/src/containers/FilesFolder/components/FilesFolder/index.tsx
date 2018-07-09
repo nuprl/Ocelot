@@ -16,38 +16,25 @@ import { WithStyles } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
 type FilesFolderProps = {
+    open: boolean,
     disabled: boolean,
     onCreateFile: () => void,
+    toggleFolder: () => void,
 };
 
 type Props = FilesFolderProps & WithStyles<ListItemStylesTypes>;
 
-type State = {
-    open: boolean,
-};
-
-class FilesFolder extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            open: false,
-        };
-    }
-
-    toggleFolder = () => {
-        this.setState((prevState) => ({open: !prevState.open}));
-    };
+class FilesFolder extends React.Component<Props> {
 
     render() {
-        const { disabled, onCreateFile, classes } = this.props;
-        const { open } = this.state;
-        
+        const { open, disabled, onCreateFile, toggleFolder, classes } = this.props;
+
         return (
             <div>
                 <div className="fileItem">
                     <ListItem
                         button
-                        onClick={this.toggleFolder}
+                        onClick={toggleFolder}
                         disabled={disabled}
                     >
                         <LoadingFolderIcon loading={disabled} className={classes.listItemColor} />
