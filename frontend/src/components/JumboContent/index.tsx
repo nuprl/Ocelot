@@ -1,7 +1,7 @@
 import * as React from 'react';
 import SplitPane from 'react-split-pane';
 import CanvasOutput from 'components/CanvasOutput';
-import OutputPanel from 'components/OutputPanel';
+import OutputPanel from 'containers/OutputPanel';
 import EditorSuite from 'components/EditorSuite';
 import 'static/styles/SplitPane.css';
 
