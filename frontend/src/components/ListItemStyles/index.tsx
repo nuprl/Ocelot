@@ -5,9 +5,8 @@ export type ListItemStylesTypes =
     | 'listItemColor'
     | 'listItemSelectedColor'
     | 'textField'
-    | 'donut'
-    | 'donutDisappear'
-    | 'formControl';
+    | 'formControl'
+    | 'loadingIcon';
 
 const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
     nested: {
@@ -26,15 +25,11 @@ const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
     textField: {
         color: theme.palette.primary.contrastText,
     },
-    donut: {
-        width: '0.6em',
-        marginRight: '1em',
-    },
-    donutDisappear: {
-        visibility: 'hidden'
-    },
     formControl: {
         width: '100%'
+    },
+    loadingIcon: {
+        margin: '5px'
     }
 });
 

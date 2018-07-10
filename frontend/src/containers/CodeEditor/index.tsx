@@ -78,9 +78,8 @@ class CodeEditor extends React.PureComponent<Props> {
         // call saveCodeChanges only once 500ms after a bunch
         // of code changes fire
     }
-    
 
-    // React docs do not recommend me to prevent renderings
+    // React docs do not recommend me prevent renderings
     // with this but I have to do it because I'm using debounce
     // Would be great if someone can figure out a better way
     // than this. (Hopefully no bugs will arise from this method)
