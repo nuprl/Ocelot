@@ -11,13 +11,14 @@ export const CREATE_NEW_FILE_FIELD = 'CREATE_NEW_FILE_FIELD';
 export const DELETE_NEW_FILE_FIELD = 'DELETE_NEW_FILE_FIELD';
 export const CREATE_NEW_FILE = 'CREATE_NEW_FILE';
 // this should have a saga 
-export const EDIT_FILE = 'EDIT_FILE';
+export const EDIT_FILE_REQUEST = 'EDIT_FILE_REQUEST';
+export const EDIT_FILE_SUCCESS = 'EDIT_FILE_SUCCESS';
+export const EDIT_FILE_FAILURE = 'EDIT_FILE_FAILURE';
 // this should also have a saga
 export const SELECT_FILE = 'SELECT_FILE';
 export const DELETE_FILE = 'DELETE_FILE';
 // this should also have a saga
 export const TRIGGER_NEW_FILE_ERROR = 'TRIGGER_NEW_FILE_ERROR';
-export const CLEAR_FILES = 'CLEAR_FILES';
 export const RESET_DEFAULT_FILES = 'RESET_DEFAULT_FILES';
 
 export type UserFile = { name: string, content: string };
@@ -77,15 +78,19 @@ export interface TriggerNewFileErrorAction extends Action {
     type: 'TRIGGER_NEW_FILE_ERROR';
 }
 
-export interface EditFileAction extends Action {
-    type: 'EDIT_FILE';
-    fileIndex: number; // for reducer
-    fileName: string; // for saga post request
-    content: string; // to update code
+export interface EditFileRequestAction extends Action {
+    type: 'EDIT_FILE_REQUEST';
+    fileName: string; 
+    // not using fileIndex because fileName for saga post request
+    content: string;
 }
 
-export interface ClearFilesAction extends Action {
-    type: 'CLEAR_FILES';
+export interface EditFileSuccessAction extends Action {
+    type: 'EDIT_FILE_SUCCESS';
+}
+
+export interface EditFileFailureAction extends Action {
+    type: 'EDIT_FILE_FAILURE';
 }
 
 export interface ResetDefaultFilesAction extends Action {
@@ -105,14 +110,15 @@ export type UserFilesActions =
     | SelectFileAction
     | DeleteFileAction
     | TriggerNewFileErrorAction
-    | EditFileAction
-    | ClearFilesAction
+    | EditFileRequestAction
+    | EditFileSuccessAction
+    | EditFileFailureAction
     | ResetDefaultFilesAction;
 
 export type ChangeFileActions =
     | CreateNewFileAction
     | DeleteFileAction
-    | EditFileAction;
+    | EditFileRequestAction;
 
 // State type
 

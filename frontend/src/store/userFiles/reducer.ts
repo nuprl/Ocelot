@@ -157,45 +157,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                     newFileError: true
                 }
             };
-        case t.EDIT_FILE:
-            let fileSaved = [...state.filesInfo.fileSaved];
-            if (state.filesInfo.fileSaved[action.fileIndex]) {
-                fileSaved = state.filesInfo.fileSaved.map(
-                    function (isSaved: boolean, index: number) {
-                        if (index === action.fileIndex) {
-                            return false;
-                        }
-                        return isSaved;
-                    }
-                );
-            }
-            return {
-                ...state,
-                filesInfo: {
-                    ...state.filesInfo,
-                    files: state.filesInfo.files.map(
-                        function (elem: t.UserFile, index: number) {
-                            if (index === action.fileIndex) {
-                                return {
-                                    ...elem,
-                                    content: action.content
-                                };
-                            }
-                            return elem;
-                        }
-                    ),
-                    fileSaved: fileSaved
-                }
-            };
-
-        case t.CLEAR_FILES:
-            return {
-                ...state,
-                filesInfo: {
-                    ...state.filesInfo,
-                    files: []
-                }
-            };
         case t.RESET_DEFAULT_FILES:
             return {
                 ...initialState

@@ -9,7 +9,6 @@ import {
     getSelectedFileIndex
 } from 'store/userFiles/selectors';
 import { Dispatch } from 'redux';
-import { editFile } from 'store/userFiles/actions';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
@@ -28,9 +27,11 @@ type Props = {
 
 class CodeEditor extends React.PureComponent<Props> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
+    code: string;
     constructor(props: Props) {
         super(props);
         this.editor = undefined;
+        this.code = props.code;
     }
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
@@ -65,24 +66,25 @@ class CodeEditor extends React.PureComponent<Props> {
         }
     }
 
-    saveCodeChanges = (code: string) => {
+    saveCodeChanges = () => {
         const { fileIndex, fileName } = this.props;
-        this.props.saveCode(fileIndex, fileName, code);
+        this.props.saveCode(fileIndex, fileName, this.code);
         // tslint:disable-next-line:no-console
-        // console.log(code);
+        console.log('Saved! ', {code: this.code});
     };
 
+    debounceSave = debounce(this.saveCodeChanges, 800);
+
     onChange = (code: string) => {
-        debounce(() => this.saveCodeChanges(code), 500)();
-        // debounce - user will type a lot, this will only
-        // call saveCodeChanges only once 500ms after a bunch
-        // of code changes fire
+        this.code = code;
+
+        this.debounceSave();
     }
 
     // React docs do not recommend me prevent renderings
     // with this but I have to do it because I'm using debounce
-    // Would be great if someone can figure out a better way
-    // than this. (Hopefully no bugs will arise from this method)
+    // Hopefully, I'll figure out a better way.
+    // (Hopefully no bugs will arise from this method)
     shouldComponentUpdate(nextProps: Props) {
         if (this.props.fileIndex !== nextProps.fileIndex) {
             return true;
@@ -129,7 +131,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
         fileName: string,
         content: string
     ) => {
-        dispatch(editFile(fileIndex, fileName, content));
+        // ;
     }
 });
 

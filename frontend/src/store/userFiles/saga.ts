@@ -32,7 +32,7 @@ const isDeleteFileAction =
     (arg: t.ChangeFileActions): arg is t.DeleteFileAction => (arg.type === 'DELETE_FILE');
 
 const isEditFileAction =
-    (arg: t.ChangeFileActions): arg is t.EditFileAction => (arg.type === 'EDIT_FILE');
+    (arg: t.ChangeFileActions): arg is t.EditFileRequestAction => (arg.type === 'EDIT_FILE_REQUEST');
 
 function* makeFileChanges(action: t.ChangeFileActions) {
     let fileChangeRequest: FileChange[] = [

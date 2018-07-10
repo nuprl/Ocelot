@@ -5,7 +5,7 @@ import { GoogleLoginResponse } from 'react-google-login';
 import { logInUserRequest, logOutUser, loadingOngoing } from 'store/userLogin/actions';
 import { RootState } from 'store/';
 import { batchActions } from 'store/batchActions';
-import { clearFiles, resetDefaultFiles, closeFilesFolder, openFilesFolder } from 'store/userFiles/actions';
+import { resetDefaultFiles, closeFilesFolder, openFilesFolder } from 'store/userFiles/actions';
 
 const mapStateToProps = (state: RootState) => ({
     loggedIn: state.userLogin.loggedIn,
@@ -22,10 +22,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
                 closeFilesFolder()
             )
         ); 
-        dispatch(batchActions(
-            clearFiles(),
-            resetDefaultFiles(),
-        ));
+        dispatch(resetDefaultFiles());
         dispatch(openFilesFolder());
     },
     // surround with curly braces so that it does not return what dispatch returns

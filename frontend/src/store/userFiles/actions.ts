@@ -23,14 +23,14 @@ export const toggleFilesFolder: ActionCreator<t.ToggleFilesFolderAction>
     });
 
 export const openFilesFolder: ActionCreator<t.OpenFilesFolderAction>
-= () => ({
-    type: t.OPEN_FILES_FOLDER
-});
+    = () => ({
+        type: t.OPEN_FILES_FOLDER
+    });
 
 export const closeFilesFolder: ActionCreator<t.CloseFilesFolderAction>
-= () => ({
-    type: t.CLOSE_FILES_FOLDER
-});
+    = () => ({
+        type: t.CLOSE_FILES_FOLDER
+    });
 
 export const createNewFileField: ActionCreator<t.CreateNewFileFieldAction>
     = () => ({
@@ -66,17 +66,21 @@ export const triggerNewFileError: ActionCreator<t.TriggerNewFileErrorAction>
         type: t.TRIGGER_NEW_FILE_ERROR
     });
 
-export const editFile: ActionCreator<t.EditFileAction>
-    = (fileIndex: number, fileName: string, content: string) => ({
-        type: t.EDIT_FILE,
-        fileIndex: fileIndex,
+export const editFileRequest: ActionCreator<t.EditFileRequestAction>
+    = (fileName: string, content: string) => ({
+        type: t.EDIT_FILE_REQUEST,
         fileName: fileName,
         content: content,
     });
 
-export const clearFiles: ActionCreator<t.ClearFilesAction>
+export const editFileSuccess: ActionCreator<t.EditFileSuccessAction>
     = () => ({
-        type: t.CLEAR_FILES
+        type: t.EDIT_FILE_SUCCESS,
+    });
+
+export const editFileFailure: ActionCreator<t.EditFileFailureAction>
+    = () => ({
+        type: t.EDIT_FILE_FAILURE
     });
 
 export const resetDefaultFiles: ActionCreator<t.ResetDefaultFilesAction>
