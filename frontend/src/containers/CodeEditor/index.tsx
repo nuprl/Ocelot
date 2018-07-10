@@ -2,7 +2,12 @@ import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import { RootState } from 'store';
-import { getSelectedCode, getSelectedFileIndex, getSelectedFileName } from 'store/userFiles/selectors';
+import {
+    getSelectedCode,
+    isValidFileIndex,
+    getSelectedFileName,
+    getSelectedFileIndex
+} from 'store/userFiles/selectors';
 import { Dispatch } from 'redux';
 import { editFile } from 'store/userFiles/actions';
 import { connect } from 'react-redux';
@@ -10,6 +15,7 @@ import ReactResizeDetector from 'react-resize-detector';
 // import { debounce } from 'lodash';
 
 type Props = {
+    enabled: boolean,
     code: string,
     fileIndex: number,
     fileName: string
@@ -48,6 +54,15 @@ class CodeEditor extends React.Component<Props> {
             return;
         }
         this.editor.layout();
+    }
+
+    componentDidUpdate(prevProps: Props) {
+        if (this.editor === undefined) {
+            return;
+        }
+        if (prevProps.enabled !== this.props.enabled) {
+            this.editor.updateOptions({ readOnly: !this.props.enabled });
+        }
     }
 
     onChange = (code: string) => {
@@ -95,6 +110,7 @@ class CodeEditor extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
+    enabled: isValidFileIndex(state),
     code: getSelectedCode(state),
     fileIndex: getSelectedFileIndex(state),
     fileName: getSelectedFileName(state),

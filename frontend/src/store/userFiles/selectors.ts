@@ -1,21 +1,23 @@
 import { RootState } from 'store';
 
+export const getSelectedFileIndex = (state: RootState) => (
+    state.userFiles.filesInfo.selectedFileIndex
+);
+
 export const isValidFileIndex = (state: RootState) => {
-    const index = state.userFiles.filesInfo.selectedFileIndex;
+    const index = getSelectedFileIndex(state);
     return index >= 0 && index < state.userFiles.filesInfo.files.length;
 };
 
-export const getSelectedFileIndex
-    = (state: RootState) => {
-        if (!isValidFileIndex(state)) {
-            return 0;
-        }
-        return state.userFiles.filesInfo.selectedFileIndex;
-    };
-
 export const getSelectedFile
     = (state: RootState) => {
-        return state.userFiles.filesInfo.files[getSelectedFileIndex(state)];
+        if (isValidFileIndex(state)) {
+            return state.userFiles.filesInfo.files[state.userFiles.filesInfo.selectedFileIndex];
+        }
+        return {
+            name: '',
+            content: '',
+        };
     };
 
 export const getSelectedFileName
