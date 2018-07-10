@@ -12,7 +12,7 @@ import { Dispatch } from 'redux';
 import { editFile } from 'store/userFiles/actions';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
-// import { debounce } from 'lodash';
+import { debounce } from 'lodash';
 
 type Props = {
     enabled: boolean,
@@ -26,7 +26,7 @@ type Props = {
     ) => void
 };
 
-class CodeEditor extends React.Component<Props> {
+class CodeEditor extends React.PureComponent<Props> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
     constructor(props: Props) {
         super(props);
@@ -65,23 +65,31 @@ class CodeEditor extends React.Component<Props> {
         }
     }
 
-    onChange = (code: string) => {
-        const saveCodeChanges = () => {
-            const { fileIndex, fileName } = this.props;
-            this.props.saveCode(fileIndex, fileName, code);
-            // tslint:disable-next-line:no-console
-            // console.log(code);
-        };
-        // debounce(saveCodeChanges, 500)();
-        saveCodeChanges();
-    }
+    saveCodeChanges = (code: string) => {
+        const { fileIndex, fileName } = this.props;
+        this.props.saveCode(fileIndex, fileName, code);
+        // tslint:disable-next-line:no-console
+        // console.log(code);
+    };
 
-    // shouldComponentUpdate(nextProps: Props)  {
-    //     if (this.props.fileIndex !== nextProps.fileIndex) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
+    onChange = (code: string) => {
+        debounce(() => this.saveCodeChanges(code), 500)();
+        // debounce - user will type a lot, this will only
+        // call saveCodeChanges only once 500ms after a bunch
+        // of code changes fire
+    }
+    
+
+    // React docs do not recommend me to prevent renderings
+    // with this but I have to do it because I'm using debounce
+    // Would be great if someone can figure out a better way
+    // than this. (Hopefully no bugs will arise from this method)
+    shouldComponentUpdate(nextProps: Props) {
+        if (this.props.fileIndex !== nextProps.fileIndex) {
+            return true;
+        }
+        return false;
+    }
 
     render() {
         const { code } = this.props;
