@@ -8,6 +8,7 @@ import 'static/styles/JumboContent.css';
 import SplitPane from 'react-split-pane';
 import ErrorNotification from '../containers/Notification';
 import JumboContent from 'components/JumboContent';
+import 'static/styles/body.css';
 
 // let themio: Theme = createMuiTheme({ palette: { type: 'dark' } });
 
@@ -17,6 +18,7 @@ const styles: StyleRulesCallback = theme => {
     root: {
       flexGrow: 1,
       height: '100vh',
+      width: '100vw',
       zIndex: 1,
       overflow: 'hidden',
       position: 'relative',
@@ -235,6 +237,7 @@ class Index extends React.Component<WithStyles<string>, State> {
           split="vertical"
           defaultSize={250}
           pane1Style={transitionStyle}
+          minSize={0}
         >
           <SideDrawer />
           <main className="jumboContent">

@@ -14,7 +14,8 @@ const styles: StyleRulesCallback = theme => ({
     root: {
         flexGrow: 1,
         backgroundColor: theme.palette.primary.light,
-        height: '100%'
+        height: '100%',
+        width: '100%'
     },
 });
 
