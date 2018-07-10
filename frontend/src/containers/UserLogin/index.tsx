@@ -19,9 +19,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
         dispatch(
             batchActions(
                 logOutUser(),
+                closeFilesFolder()
             )
         ); 
-        dispatch(closeFilesFolder());
         dispatch(batchActions(
             clearFiles(),
             resetDefaultFiles(),
