@@ -88,10 +88,13 @@ const userFiles: Reducer<t.UserFilesState> = (
             };
         case t.CREATE_NEW_FILE_FIELD:
             return {
-                ...state,
                 filesInfo: {
                     ...state.filesInfo,
                     newFile: true,
+                },
+                folderInfo: {
+                    ...state.folderInfo,
+                    open: true,
                 }
             };
         case t.DELETE_NEW_FILE_FIELD:
@@ -130,15 +133,22 @@ const userFiles: Reducer<t.UserFilesState> = (
                 }
             };
         case t.DELETE_FILE:
-            return {
+            const isFileIndex
+                = (elem: boolean | t.UserFile, index: number) => index !== action.fileIndex;
+            const newFiles = state.filesInfo.files.filter(isFileIndex);
+            const newIsSaved = state.filesInfo.fileSaved.filter(isFileIndex);
+            let newState = {
                 ...state,
                 filesInfo: {
                     ...state.filesInfo,
-                    files: state.filesInfo.files.filter(
-                        (elem, index) => index !== action.fileIndex
-                    ),
+                    files: newFiles,
+                    fileSaved: newIsSaved
                 }
             };
+            if (action.fileIndex === state.filesInfo.selectedFileIndex) {
+                newState.filesInfo.selectedFileIndex = -1;
+            }
+            return newState;
         case t.TRIGGER_NEW_FILE_ERROR:
             return {
                 ...state,
