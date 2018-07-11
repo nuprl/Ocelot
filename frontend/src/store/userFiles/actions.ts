@@ -43,9 +43,10 @@ export const deleteNewFileField: ActionCreator<t.DeleteNewFileFieldAction>
     });
 
 export const createNewFile: ActionCreator<t.CreateNewFileAction>
-    = (fileName: string) => ({
+    = (fileName: string, loggedIn: boolean) => ({
         type: t.CREATE_NEW_FILE,
-        fileName: fileName
+        fileName: fileName,
+        loggedIn: loggedIn
     });
 
 export const selectFile: ActionCreator<t.SelectFileAction>
@@ -55,10 +56,11 @@ export const selectFile: ActionCreator<t.SelectFileAction>
     });
 
 export const deleteFile: ActionCreator<t.DeleteFileAction>
-    = (fileIndex: number, fileName: string) => ({
+    = (fileIndex: number, fileName: string, loggedIn: boolean) => ({
         type: t.DELETE_FILE,
         fileIndex: fileIndex,
-        fileName: fileName
+        fileName: fileName,
+        loggedIn: loggedIn
     });
 
 export const triggerNewFileError: ActionCreator<t.TriggerNewFileErrorAction>
@@ -67,10 +69,11 @@ export const triggerNewFileError: ActionCreator<t.TriggerNewFileErrorAction>
     });
 
 export const editFileRequest: ActionCreator<t.EditFileRequestAction>
-    = (fileName: string, content: string) => ({
+    = (fileName: string, content: string, loggedIn: boolean) => ({
         type: t.EDIT_FILE_REQUEST,
         fileName: fileName,
         content: content,
+        loggedIn: loggedIn,
     });
 
 export const editFileSuccess: ActionCreator<t.EditFileSuccessAction>

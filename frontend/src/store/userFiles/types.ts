@@ -62,6 +62,7 @@ export interface DeleteNewFileFieldAction extends Action {
 export interface CreateNewFileAction extends Action {
     type: 'CREATE_NEW_FILE';
     fileName: string;
+    loggedIn: boolean;
 }
 
 export interface SelectFileAction extends Action {
@@ -73,6 +74,7 @@ export interface DeleteFileAction extends Action {
     type: 'DELETE_FILE';
     fileIndex: number;
     fileName: string;
+    loggedIn: boolean;
 }
 
 export interface TriggerNewFileErrorAction extends Action {
@@ -84,6 +86,7 @@ export interface EditFileRequestAction extends Action {
     fileName: string;
     // not using fileIndex because fileName for saga post request
     content: string;
+    loggedIn: boolean;
 }
 
 export interface EditFileSuccessAction extends Action {

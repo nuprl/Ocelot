@@ -180,9 +180,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                     files: newFiles,
                 }
             };
-            if (state.filesInfo.fileSaved[editFileIndex]) {
-                newState.filesInfo.fileSaved[editFileIndex] = false;
-            }
             return newState;
         case t.EDIT_FILE_SUCCESS:
             editFileIndex = state.filesInfo.files.findIndex(

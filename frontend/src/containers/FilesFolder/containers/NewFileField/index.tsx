@@ -28,8 +28,9 @@ type Props = {
     wantNewFile: boolean,
     files: UserFiles,
     newFileError: boolean,
+    loggedIn: boolean,
     deleteFileField: () => void,
-    onCreateFile: (fileName: string) => void,
+    onCreateFile: (fileName: string, loggedIn: boolean) => void,
     notifyError: () => void,
 } & WithStyles<ListItemStylesTypes>;
 
@@ -47,7 +48,7 @@ class NewFileField extends React.Component<Props> {
                 this.props.notifyError();
                 return;
             }
-            this.props.onCreateFile(name);
+            this.props.onCreateFile(name, this.props.loggedIn);
         };
     }
 
@@ -135,13 +136,14 @@ class NewFileField extends React.Component<Props> {
 const mapStateToProps = (state: RootState) => ({
     wantNewFile: state.userFiles.filesInfo.newFile,
     files: state.userFiles.filesInfo.files,
-    newFileError: state.userFiles.filesInfo.newFileError
+    newFileError: state.userFiles.filesInfo.newFileError,
+    loggedIn: state.userLogin.loggedIn
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     deleteFileField: () => { dispatch(deleteNewFileField()); },
-    onCreateFile: (fileName: string) => {
-        dispatch(createNewFile(fileName));
+    onCreateFile: (fileName: string, loggedIn: boolean) => {
+        dispatch(createNewFile(fileName, loggedIn));
         dispatch(deleteNewFileField());
     },
     notifyError: () => {

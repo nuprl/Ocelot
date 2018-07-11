@@ -11,15 +11,16 @@ import { connect } from 'react-redux';
 type Props = {
     files: { name: string, content: string }[],
     selectedFileIndex: number,
-    fileSaved: boolean[]
+    fileSaved: boolean[],
+    loggedIn: boolean,
     makeHandleClickFile: (index: number) => () => void,
-    makeHandleDeleteFile: (index: number, name: string) => () => void,
+    makeHandleDeleteFile: (index: number, name: string, loggedIn: boolean) => () => void,
 };
 
 class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props> {
 
     render() {
-        const { files, selectedFileIndex, fileSaved } = this.props;
+        const { files, selectedFileIndex, fileSaved, loggedIn } = this.props;
         return (
             files.map((fileObj: { name: string, content: string }, index: number) => (
                 <div
@@ -29,7 +30,7 @@ class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props>
                     <FileItem
                         isSelected={selectedFileIndex === index}
                         onSelect={this.props.makeHandleClickFile(index)}
-                        onDelete={this.props.makeHandleDeleteFile(index, fileObj.name)}
+                        onDelete={this.props.makeHandleDeleteFile(index, fileObj.name, loggedIn)}
                         isSaved={fileSaved[index]}
                         name={fileObj.name}
                         key={`${fileObj.name}${index + 2}`}
@@ -44,16 +45,17 @@ const mapStateToProps = (state: RootState) => ({
     files: state.userFiles.filesInfo.files,
     selectedFileIndex: state.userFiles.filesInfo.selectedFileIndex,
     fileSaved: state.userFiles.filesInfo.fileSaved,
+    loggedIn: state.userLogin.loggedIn,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     makeHandleClickFile: (index: number) => (() => {
         dispatch(selectFile(index));
     }),
-    makeHandleDeleteFile: (index: number, name: string) => (() => {
+    makeHandleDeleteFile: (index: number, name: string, loggedIn: boolean) => (() => {
         // index is used for removing the file from store
         // the name is for removing the file from the database
-        dispatch(deleteFile(index, name));
+        dispatch(deleteFile(index, name, loggedIn));
     })
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ListItemStyles(UserFiles));

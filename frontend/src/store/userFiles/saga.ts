@@ -35,6 +35,9 @@ const isEditFileAction =
     (arg: t.ChangeFileActions): arg is t.EditFileRequestAction => (arg.type === 'EDIT_FILE_REQUEST');
 
 function* makeFileChanges(action: t.ChangeFileActions) {
+    if (!action.loggedIn) {
+        return;
+    } 
     let fileChangeRequest: FileChange[] = [
         {
             fileName: action.fileName,
