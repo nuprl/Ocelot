@@ -87,6 +87,7 @@ export interface EditFileRequestAction extends Action {
 
 export interface EditFileSuccessAction extends Action {
     type: 'EDIT_FILE_SUCCESS';
+    fileIndex: number;
 }
 
 export interface EditFileFailureAction extends Action {

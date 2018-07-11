@@ -12,6 +12,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
+import { editFileRequest } from 'store/userFiles/actions';
 
 type Props = {
     enabled: boolean,
@@ -19,13 +20,12 @@ type Props = {
     fileIndex: number,
     fileName: string
     saveCode: (
-        fileIndex: number,
         fileName: string,
         content: string
     ) => void
 };
 
-class CodeEditor extends React.PureComponent<Props> {
+class CodeEditor extends React.Component<Props> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
     code: string;
     constructor(props: Props) {
@@ -40,8 +40,8 @@ class CodeEditor extends React.PureComponent<Props> {
         editor.focus();
         this.editor = editor;
         const onCtrlSave = () => {
-            const { fileIndex, fileName, code } = this.props;
-            this.props.saveCode(fileIndex, fileName, code);
+            const { fileName, code } = this.props;
+            this.props.saveCode(fileName, code);
         };
         editor.addCommand(
             // tslint:disable-next-line:no-bitwise
@@ -67,13 +67,18 @@ class CodeEditor extends React.PureComponent<Props> {
     }
 
     saveCodeChanges = () => {
-        const { fileIndex, fileName } = this.props;
-        this.props.saveCode(fileIndex, fileName, this.code);
+        const { fileName } = this.props;
+        this.props.saveCode(fileName, this.code);
         // tslint:disable-next-line:no-console
         console.log('Saved! ', {code: this.code});
     };
-
-    debounceSave = debounce(this.saveCodeChanges, 800);
+    
+    // This debounceSave debounces the repeated firing of 
+    // code changes but the run button does not have the
+    // updated code until this debounce function runs
+    // the save function. There must be a way or the run
+    // button to have access to the immediate code.
+    debounceSave = debounce(this.saveCodeChanges, 700);
 
     onChange = (code: string) => {
         this.code = code;
@@ -99,6 +104,8 @@ class CodeEditor extends React.PureComponent<Props> {
             selectOnLineNumbers: true,
             mouseWheelZoom: true,
             fontSize: 18,
+            scrollBeyondLastLine: false,
+            language: 'javascript',
         };
 
         return (
@@ -127,11 +134,10 @@ const mapStateToProps = (state: RootState) => ({
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     saveCode: (
-        fileIndex: number,
         fileName: string,
         content: string
     ) => {
-        // ;
+        dispatch(editFileRequest(fileName, content));
     }
 });
 

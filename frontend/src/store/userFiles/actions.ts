@@ -74,8 +74,9 @@ export const editFileRequest: ActionCreator<t.EditFileRequestAction>
     });
 
 export const editFileSuccess: ActionCreator<t.EditFileSuccessAction>
-    = () => ({
+    = (fileIndex: number) => ({
         type: t.EDIT_FILE_SUCCESS,
+        fileIndex: fileIndex
     });
 
 export const editFileFailure: ActionCreator<t.EditFileFailureAction>
