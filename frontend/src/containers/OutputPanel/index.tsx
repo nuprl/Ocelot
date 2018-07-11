@@ -35,8 +35,8 @@ type State = {
  * The reason why I stored the state in the component
  * rather than redux is because when users generate lots
  * of logs, redux will slow down. It's very inefficient
- * that redux has to take on the burden to reproduce
- * hundreds/thousands of logs just to create a new state.
+ * that redux has to take on the burden to reproduce the whole
+ * state tree along with the many logs that it has.
  * That's why I have the state stored here so that redux
  * will not need to concern itself with recreating the logs.
  *
