@@ -14,6 +14,8 @@ import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
 import { editFileRequest, markFileNotSaved } from 'store/userFiles/actions';
 
+const debounceWait = 400; // milliseconds;
+
 type Props = {
     enabled: boolean,
     code: string,
@@ -53,6 +55,7 @@ class CodeEditor extends React.Component<Props> {
         if (this.editor === undefined) {
             return;
         }
+        this.editor.focus();
         if (prevProps.enabled !== this.props.enabled) {
             this.editor.updateOptions({ readOnly: !this.props.enabled });
         }
@@ -64,7 +67,7 @@ class CodeEditor extends React.Component<Props> {
     // Maybe good support for having multiple tabs for files later.
     triggerFileLoadingAnim = () => this.props.triggerFileLoading(this.props.fileIndex);
 
-    debouncedTriggerFileLoading = debounce(this.triggerFileLoadingAnim, 700, {
+    debouncedTriggerFileLoading = debounce(this.triggerFileLoadingAnim, debounceWait, {
         leading: true,
         trailing: false,
     });
@@ -73,7 +76,7 @@ class CodeEditor extends React.Component<Props> {
         const { fileName } = this.props;
         this.props.saveCode(fileName, this.code, this.props.loggedIn);
         // tslint:disable-next-line:no-console
-        console.log('Saved! ', { code: this.code });
+        // console.log('Saved! ', { code: this.code });
     };
 
     // This debounceSave debounces the repeated firing of 
@@ -81,23 +84,16 @@ class CodeEditor extends React.Component<Props> {
     // updated code until this debounce function runs
     // the save function. There must be a way or the run
     // button to have access to the immediate code.
-    debounceSave = debounce(this.saveCodeChanges, 700);
+    debounceSave = debounce(this.saveCodeChanges, debounceWait);
 
-    onChange = (() => {
+    onChange = (code: string) => {
+        this.code = code;
+
         if (this.props.loggedIn) {
-            return ((code: string) => {
-                this.code = code;
-
-                this.debouncedTriggerFileLoading();
-                this.debounceSave();
-            });
+            this.debouncedTriggerFileLoading();
         }
-        return ((code: string) => {
-            this.code = code;
-
-            this.debounceSave();
-        });
-    })();
+        this.debounceSave();
+    };
 
     // React docs do not recommend me prevent renderings
     // with this but I have to do it because I'm using debounce
@@ -117,7 +113,7 @@ class CodeEditor extends React.Component<Props> {
             selectOnLineNumbers: true,
             mouseWheelZoom: true,
             fontSize: 18,
-            scrollBeyondLastLine: false,
+            // scrollBeyondLastLine: false,
         };
 
         return (

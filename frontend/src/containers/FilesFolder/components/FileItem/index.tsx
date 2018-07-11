@@ -48,15 +48,18 @@ const FileItem: React.StatelessComponent<Props> = ({
                     className={`${classes.codeIcon} ${isSaved && classes.show}`}
                 />
             </ListItemIcon>
-            <ListItemIcon>
-                <CircularProgress
-                    size={24}
-                    color="inherit"
-                    thickness={4}
-                    style={{position: 'absolute'}}
-                    classes={{ svg: `${classes.loadingIcon} ${!isSaved && classes.show}` }}
-                />
-            </ListItemIcon>
+            {
+                !isSaved &&
+                <ListItemIcon>
+                    <CircularProgress
+                        size={24}
+                        color="inherit"
+                        thickness={4}
+                        style={{ position: 'absolute' }}
+                        classes={{ svg: `${classes.loadingIcon} ${classes.show}` }}
+                    />
+                </ListItemIcon>
+            }
 
             <CustomListItemText
                 text={name}
