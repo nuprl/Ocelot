@@ -1,8 +1,9 @@
 import * as React from 'react';
-import Snackbar from '@material-ui/core/Snackbar';
+import Snackbar, { SnackBarOrigin } from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
+import { NotificationPosition } from 'store/notification/types';
 
 // -- A presentational component
 
@@ -17,8 +18,9 @@ const styles: StyleRulesCallback = theme => ({
 
 type ErrorSnackbarProps = {
     open: boolean, // whether the notification is open
+    message: string, // the message of notification
+    position: NotificationPosition
     handleClose: () => void, // let snackbar close when it needs to
-    message: string // the message of notification
 };
 
 /**
@@ -40,13 +42,21 @@ function ErrorSnackbar(props: WithStyles<'close'> & ErrorSnackbarProps) {
     const handleClick = (event: React.MouseEvent<HTMLElement>): void => {
         props.handleClose();
     };
+    
+    let anchorOrigin: SnackBarOrigin = {
+        vertical: 'top',
+        horizontal: 'center',
+    };
+    if (props.position === 'bottom-right') {
+        anchorOrigin = {
+            vertical: 'bottom',
+            horizontal: 'right',
+        };
+    }
 
     return (
         <Snackbar
-            anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'center',
-            }}
+            anchorOrigin={anchorOrigin}
             open={props.open}
             autoHideDuration={5000}
             onClose={handleClose}

@@ -1,6 +1,6 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
 import { LogInUserRequestAction, LOG_IN_USER_REQUEST } from './types';
-import { triggerErrorNotification } from 'store/errorNotification/actions';
+import { triggerNotification } from 'store/notification/actions';
 import { loadFilesRequest } from '../userFiles/actions';
 import { logInUserSuccess, logOutUser } from './actions';
 import { batchActions } from 'store/batchActions';
@@ -12,7 +12,7 @@ function* validate(action: LogInUserRequestAction) {
     const response: validateUserResponse = yield call(validateUser, action.googleUser);
     if (isFailureResponse(response)) {
         yield put(batchActions(
-            triggerErrorNotification(response.data.message),
+            triggerNotification(response.data.message, 'top'),
             logOutUser()
         ));
         return;

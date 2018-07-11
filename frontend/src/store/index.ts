@@ -1,11 +1,11 @@
 import { combineReducers, Reducer } from 'redux';
 // -- States --
-import { ErrorNotificationState } from './errorNotification/types';
+import { NotificationState } from './notification/types';
 import { UserLoginState } from './userLogin/types';
 import { UserFilesState } from './userFiles/types';
 import { CodeEditorState } from './codeEditor/types'; 
 // -- Reducers --
-import errorNotificationReducer from './errorNotification/reducer';
+import notificationReducer from './notification/reducer';
 import userLoginReducer from './userLogin/reducer';
 import userFilesReducer from './userFiles/reducer';
 import codeEditorReducer from './codeEditor/reducer';
@@ -22,7 +22,7 @@ import { watchLoadUserFilesRequest, watchCreateNewFile, watchDeleteFile } from '
 
 // root state
 export interface RootState {
-    errorNotification: ErrorNotificationState;
+    notification: NotificationState;
     userLogin: UserLoginState;
     userFiles: UserFilesState;
     codeEditor: CodeEditorState;
@@ -30,7 +30,7 @@ export interface RootState {
 
 // combine all reducers
 const rootReducer: Reducer<RootState> = combineReducers<RootState>({
-    errorNotification: errorNotificationReducer,
+    notification: notificationReducer,
     userLogin: userLoginReducer,
     userFiles: userFilesReducer,
     codeEditor: codeEditorReducer,

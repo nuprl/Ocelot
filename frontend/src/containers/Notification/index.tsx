@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { closeErrorNotification } from 'store/errorNotification/actions';
+import { closeNotification } from 'store/notification/actions';
 import NotificationBar from './components/NotificationBar';
 import { RootState } from 'store/';
 
@@ -12,8 +12,9 @@ import { RootState } from 'store/';
  * @param {RootState} state
  */
 const mapStateToProps = (state: RootState) => ({
-    open: state.errorNotification.open,
-    message: state.errorNotification.message
+    open: state.notification.open,
+    message: state.notification.message,
+    position: state.notification.position,
 });
 /**
  * Using the dispatch function, make a handleClose function
@@ -23,7 +24,7 @@ const mapStateToProps = (state: RootState) => ({
  * @param {Dispatch} dispatch
  */
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    handleClose: () => { dispatch(closeErrorNotification()); }
+    handleClose: () => { dispatch(closeNotification()); }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotificationBar);

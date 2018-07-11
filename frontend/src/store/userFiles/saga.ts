@@ -1,6 +1,6 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
 import * as t from './types';
-import { triggerErrorNotification } from 'store/errorNotification/actions';
+import { triggerNotification } from 'store/notification/actions';
 import { logOutUser } from 'store/userLogin/actions';
 import { loadFilesSuccess, loadFilesFailure } from 'store/userFiles/actions';
 import { batchActions } from 'store/batchActions';
@@ -14,7 +14,7 @@ function* fetchFiles(action: t.LoadFilesRequestAction) {
     if (isFailureResponse(response)) {
         yield put(
             batchActions(
-                triggerErrorNotification(response.data.message),
+                triggerNotification(response.data.message, 'top'),
                 loadFilesFailure(),
                 logOutUser()
             )
@@ -61,10 +61,13 @@ function* makeFileChanges(action: t.ChangeFileActions) {
     const response: SaveFilesResponse = yield call(saveChanges, fileChangeRequest);
     if (isFailureResponse(response)) {
         yield put(
-            triggerErrorNotification(`Your session may be expired, try refreshing the page and try again`)
+            triggerNotification(`Your session may be expired, try refreshing the page and try again`, 'top')
             // A better way to handle this is best
         );
     }
+    // if (isDeleteFileAction(action)) {
+    //     yield put()
+    // }
 }
 
 export function* watchCreateNewFile() {
