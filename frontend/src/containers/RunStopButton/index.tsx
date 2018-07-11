@@ -37,20 +37,28 @@ type Props = WithStyles<'button' | 'leftIcon'> & {
 class RunStopButton extends React.Component<Props> {
 
     onRun = () => {
-        const runner = stopify.stopifyLocally(
-            this.props.code,
-            {
-                externals: ['console']
-            },
-            {
-                estimator: 'countdown',
-                yieldInterval: 1
-            }
-        );
-        this.props.createRunner(runner);
-        runner.run((result: any) => {
-            this.props.removeRunner();
-        });
+        try {
+            const runner = stopify.stopifyLocally(
+                this.props.code,
+                {
+                    externals: ['console']
+                },
+                {
+                    estimator: 'countdown',
+                    yieldInterval: 1
+                }
+            );
+            this.props.createRunner(runner);
+            runner.run((result: any) => {
+                // tslint:disable-next-line:no-console
+                console.log(result);
+                this.props.removeRunner();
+            });
+        } catch (e) {
+            // tslint:disable-next-line:no-console
+            console.error(e);
+        }
+
     }
 
     onStop = () => {
