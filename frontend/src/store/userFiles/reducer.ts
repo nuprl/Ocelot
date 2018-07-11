@@ -33,7 +33,10 @@ const initialState: t.UserFilesState = {
 const userFiles: Reducer<t.UserFilesState> = (
     state: t.UserFilesState = initialState,
     action: t.UserFilesActions): t.UserFilesState => {
-    let newFiles: t.UserFile[], newFileSaved: boolean[], newState: t.UserFilesState;
+    let newFiles: t.UserFile[],
+        newFileSaved: boolean[],
+        newState: t.UserFilesState,
+        editFileIndex: number;
     switch (action.type) {
         case t.LOAD_FILES_REQUEST:
             return {
@@ -48,10 +51,11 @@ const userFiles: Reducer<t.UserFilesState> = (
                 filesInfo: {
                     ...state.filesInfo,
                     files: action.userFiles,
-                    fileSaved: new Array(action.userFiles.length).fill(true)
+                    fileSaved: new Array(action.userFiles.length).fill(true),
+                    selectedFileIndex: -1
                 },
                 folderInfo: {
-                    ...state.folderInfo,
+                    open: true,
                     filesLoading: false,
                 }
             };
@@ -160,7 +164,7 @@ const userFiles: Reducer<t.UserFilesState> = (
             };
 
         case t.EDIT_FILE_REQUEST:
-            const editFileIndex = state.filesInfo.files.findIndex(
+            editFileIndex = state.filesInfo.files.findIndex(
                 (elem) => elem.name === action.fileName
             );
             newFiles = state.filesInfo.files.map((elem, index) => {
@@ -181,8 +185,11 @@ const userFiles: Reducer<t.UserFilesState> = (
             }
             return newState;
         case t.EDIT_FILE_SUCCESS:
+            editFileIndex = state.filesInfo.files.findIndex(
+                (elem) => elem.name === action.fileName
+            );
             newFileSaved = state.filesInfo.fileSaved.map((elem, index) => {
-                if (index === action.fileIndex) {
+                if (index === editFileIndex) {
                     return true;
                 }
                 return elem;
@@ -200,7 +207,23 @@ const userFiles: Reducer<t.UserFilesState> = (
                 ...state,
                 filesInfo: {
                     ...state.filesInfo,
+                    fileSaved: new Array(state.filesInfo.files.length).fill(true),
                     selectedFileIndex: -1
+                }
+            };
+        case t.MARK_FILE_NOT_SAVED:
+            return {
+                ...state,
+                filesInfo: {
+                    ...state.filesInfo,
+                    fileSaved: state.filesInfo.fileSaved.map(
+                        (elem, index) => {
+                            if (index === action.fileIndex) {
+                                return false;
+                            }
+                            return elem;
+                        }
+                    ),
                 }
             };
         case t.RESET_DEFAULT_FILES:

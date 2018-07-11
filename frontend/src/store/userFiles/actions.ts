@@ -74,15 +74,21 @@ export const editFileRequest: ActionCreator<t.EditFileRequestAction>
     });
 
 export const editFileSuccess: ActionCreator<t.EditFileSuccessAction>
-    = (fileIndex: number) => ({
+    = (fileName: string) => ({
         type: t.EDIT_FILE_SUCCESS,
-        fileIndex: fileIndex
+        fileName: fileName
     });
 
 export const editFileFailure: ActionCreator<t.EditFileFailureAction>
     = () => ({
-        type: t.EDIT_FILE_FAILURE
+        type: t.EDIT_FILE_FAILURE,
     });
+
+export const markFileNotSaved: ActionCreator<t.MarkFileNotSavedAction>
+= (fileIndex: number) => ({
+    type: t.MARK_FILE_NOT_SAVED,
+    fileIndex: fileIndex
+});
 
 export const resetDefaultFiles: ActionCreator<t.ResetDefaultFilesAction>
     = () => ({

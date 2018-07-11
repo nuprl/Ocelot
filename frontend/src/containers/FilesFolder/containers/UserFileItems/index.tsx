@@ -1,5 +1,5 @@
 import * as React from 'react';
-import FileItem from './components/FileItem';
+import FileItem from '../../components/FileItem';
 import ListItemStyles from 'components/ListItemStyles';
 import { ListItemStylesTypes } from 'components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';

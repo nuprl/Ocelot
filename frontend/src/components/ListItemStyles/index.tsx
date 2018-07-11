@@ -6,7 +6,9 @@ export type ListItemStylesTypes =
     | 'listItemSelectedColor'
     | 'textField'
     | 'formControl'
-    | 'loadingIcon';
+    | 'loadingIcon'
+    | 'show'
+    | 'codeIcon';
 
 const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
     nested: {
@@ -29,8 +31,34 @@ const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
         width: '100%'
     },
     loadingIcon: {
-        margin: '5px'
-    }
+        transition: theme.transitions.create('opacity', {
+            easing: 'linear',
+            duration: theme.transitions.duration.shorter,
+        }),
+        margin: '5px',
+        opacity: 0,
+    },
+    codeIcon: {
+        color: theme.palette.primary.contrastText,
+        transition: theme.transitions.create('opacity', {
+            easing: 'linear',
+            duration: theme.transitions.duration.shorter
+        }) + ', ' + theme.transitions.create('visibility', {
+            easing: 'linear',
+            duration: theme.transitions.duration.shorter
+        }),
+        visibility: 'hidden',
+        opacity: 0,
+    },
+    show: {
+        transition: theme.transitions.create('opacity', {
+            easing: 'linear',
+            duration: theme.transitions.duration.shorter
+        }),
+        opacity: 0.8,
+        visibility: 'visible'
+    },
+
 });
 
 export default withStyles(styles);

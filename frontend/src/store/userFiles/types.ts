@@ -18,6 +18,7 @@ export const EDIT_FILE_FAILURE = 'EDIT_FILE_FAILURE';
 export const SELECT_FILE = 'SELECT_FILE';
 export const DELETE_FILE = 'DELETE_FILE';
 // this should also have a saga
+export const MARK_FILE_NOT_SAVED = 'MARK_FILE_NOT_SAVED';
 export const TRIGGER_NEW_FILE_ERROR = 'TRIGGER_NEW_FILE_ERROR';
 export const RESET_DEFAULT_FILES = 'RESET_DEFAULT_FILES';
 
@@ -80,18 +81,23 @@ export interface TriggerNewFileErrorAction extends Action {
 
 export interface EditFileRequestAction extends Action {
     type: 'EDIT_FILE_REQUEST';
-    fileName: string; 
+    fileName: string;
     // not using fileIndex because fileName for saga post request
     content: string;
 }
 
 export interface EditFileSuccessAction extends Action {
     type: 'EDIT_FILE_SUCCESS';
-    fileIndex: number;
+    fileName: string;
 }
 
 export interface EditFileFailureAction extends Action {
     type: 'EDIT_FILE_FAILURE';
+}
+
+export interface MarkFileNotSavedAction extends Action {
+    type: 'MARK_FILE_NOT_SAVED';
+    fileIndex: number;
 }
 
 export interface ResetDefaultFilesAction extends Action {
@@ -114,6 +120,7 @@ export type UserFilesActions =
     | EditFileRequestAction
     | EditFileSuccessAction
     | EditFileFailureAction
+    | MarkFileNotSavedAction
     | ResetDefaultFilesAction;
 
 export type ChangeFileActions =
@@ -122,7 +129,6 @@ export type ChangeFileActions =
     | EditFileRequestAction;
 
 // State type
-
 export type UserFilesState = {
     folderInfo: {
         filesLoading: boolean

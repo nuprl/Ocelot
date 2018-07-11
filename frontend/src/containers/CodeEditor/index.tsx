@@ -12,7 +12,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
-import { editFileRequest } from 'store/userFiles/actions';
+import { editFileRequest, markFileNotSaved } from 'store/userFiles/actions';
 
 type Props = {
     enabled: boolean,
@@ -22,7 +22,8 @@ type Props = {
     saveCode: (
         fileName: string,
         content: string
-    ) => void
+    ) => void,
+    triggerFileLoading: (fileIndex: number) => void,
 };
 
 class CodeEditor extends React.Component<Props> {
@@ -35,19 +36,8 @@ class CodeEditor extends React.Component<Props> {
     }
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
-        // tslint:disable-next-line:no-console
-        console.log('editorDidMount', editor);
         editor.focus();
         this.editor = editor;
-        const onCtrlSave = () => {
-            const { fileName, code } = this.props;
-            this.props.saveCode(fileName, code);
-        };
-        editor.addCommand(
-            // tslint:disable-next-line:no-bitwise
-            monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
-            onCtrlSave,
-            '');
     }
 
     handleResize = () => {
@@ -66,6 +56,17 @@ class CodeEditor extends React.Component<Props> {
         }
     }
 
+    // The user theoretically can only edit the file associated with the selected
+    // file index so does it make sense to pass in file index when I can just get
+    // the fileIndex from state?
+    // Maybe good support for having multiple tabs for files later.
+    triggerFileLoadingAnim = () => this.props.triggerFileLoading(this.props.fileIndex);
+
+    debouncedTriggerFileLoading = debounce(this.triggerFileLoadingAnim, 700, {
+        leading: true,
+        trailing: false,
+    }); 
+
     saveCodeChanges = () => {
         const { fileName } = this.props;
         this.props.saveCode(fileName, this.code);
@@ -83,6 +84,7 @@ class CodeEditor extends React.Component<Props> {
     onChange = (code: string) => {
         this.code = code;
 
+        this.debouncedTriggerFileLoading();
         this.debounceSave();
     }
 
@@ -105,7 +107,6 @@ class CodeEditor extends React.Component<Props> {
             mouseWheelZoom: true,
             fontSize: 18,
             scrollBeyondLastLine: false,
-            language: 'javascript',
         };
 
         return (
@@ -138,7 +139,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
         content: string
     ) => {
         dispatch(editFileRequest(fileName, content));
-    }
+    },
+    triggerFileLoading: (fileIndex: number) => { dispatch(markFileNotSaved(fileIndex)); }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CodeEditor);

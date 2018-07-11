@@ -43,18 +43,19 @@ const FileItem: React.StatelessComponent<Props> = ({
             className={`${classes.nested} ${currentStyleClass}`}
             onClick={onSelect}
         >
-            <ListItemIcon>{
-                isSaved
-                    ? <CodeIcon
-                        className={currentStyleClass}
-                    />
-                    : <CircularProgress
-                        size={24}
-                        color="inherit"
-                        thickness={4}
-                        classes={{svg: classes.loadingIcon}}
-                    />
-            }
+            <ListItemIcon>
+                <CodeIcon
+                    className={`${classes.codeIcon} ${isSaved && classes.show}`}
+                />
+            </ListItemIcon>
+            <ListItemIcon>
+                <CircularProgress
+                    size={24}
+                    color="inherit"
+                    thickness={4}
+                    style={{position: 'absolute'}}
+                    classes={{ svg: `${classes.loadingIcon} ${!isSaved && classes.show}` }}
+                />
             </ListItemIcon>
 
             <CustomListItemText

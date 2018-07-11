@@ -3,7 +3,7 @@ import { combineReducers, Reducer } from 'redux';
 import { NotificationState } from './notification/types';
 import { UserLoginState } from './userLogin/types';
 import { UserFilesState } from './userFiles/types';
-import { CodeEditorState } from './codeEditor/types'; 
+import { CodeEditorState } from './codeEditor/types';
 // -- Reducers --
 import notificationReducer from './notification/reducer';
 import userLoginReducer from './userLogin/reducer';
@@ -16,7 +16,12 @@ import { enableBatching } from './batchActions';
 // -- Saga stuff -- 
 import { all } from 'redux-saga/effects';
 import { watchUserLoginRequest } from './userLogin/saga';
-import { watchLoadUserFilesRequest, watchCreateNewFile, watchDeleteFile } from './userFiles/saga';
+import {
+    watchLoadUserFilesRequest,
+    watchCreateNewFile,
+    watchDeleteFile,
+    watchEditFile
+} from './userFiles/saga';
 // -- logger --
 // import { createLogger } from 'redux-logger';
 
@@ -42,6 +47,7 @@ function* rootSaga() { // Combine all sagas
         watchLoadUserFilesRequest(),
         watchCreateNewFile(),
         watchDeleteFile(),
+        watchEditFile(),
     ]);
 }
 
