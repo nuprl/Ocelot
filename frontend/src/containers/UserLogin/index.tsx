@@ -24,6 +24,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
         ); 
         dispatch(resetDefaultFiles());
         dispatch(openFilesFolder());
+        // Not sure if I should put this here
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('sessionId');
     },
     // surround with curly braces so that it does not return what dispatch returns
     onLoading: () => { dispatch(loadingOngoing()); },
