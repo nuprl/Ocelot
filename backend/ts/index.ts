@@ -265,8 +265,14 @@ async function changeFile(req: Request) {
       if (currentFileChange.type === 'create') {
         const file = bucket.file(`${userEmail}/${currentFileChange.fileName}`);
         verbose && console.log(`\tSaving file: ${currentFileChange.fileName}`);
+        verbose && console.log(`Content: ${currentFileChange.changes!}, type: ${typeof currentFileChange.changes!}`);
         // Non-null assertion of changes can be saved
-        await timePromise(file.save(currentFileChange.changes!, { metadata: { contentType: 'text/javascript' } }));
+        await timePromise(file.save(currentFileChange.changes!, { resumable: false }));
+        // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
+        /* There is some overhead when using a resumable upload that can cause noticeable performance 
+        degradation while uploading a series of small files. When uploading files less than 10MB, 
+        it is recommended that the resumable feature is disabled. */
+        await file.setMetadata({ contentType: 'text/javascript' });
         continue;
       }
       files = await getArrayOfFiles(userEmail);
@@ -298,6 +304,7 @@ async function changeFile(req: Request) {
       }
     }
   } catch (error) {
+    console.log(error);
     return {
       statusCode: 500,
       body: {
