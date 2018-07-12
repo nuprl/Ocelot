@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Fade from '@material-ui/core/Fade';
-import { PlayStopIcon } from '../../../PlayStopIcon';
+import { PlayStopIcon } from 'components/PlayStopIcon';
 
 let appBarConstrastText: string = '#fff';
 
