@@ -80,7 +80,8 @@ export const editFileCloud: ActionCreator<t.EditFileCloudAction>
         type: t.EDIT_FILE_CLOUD,
         fileName: fileName,
         fileIndex: fileIndex,
-        content: content
+        content: content,
+        loggedIn: loggedIn,
     });
 
 export const markFileNotSaved: ActionCreator<t.MarkFileNotSavedAction>

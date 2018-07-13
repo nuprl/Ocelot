@@ -93,6 +93,7 @@ export interface EditFileCloudAction extends Action {
     fileIndex: number;
     // not using fileIndex because fileName for saga post request
     content: string;
+    loggedIn: boolean;
 }
 
 export interface MarkFileNotSavedAction extends Action {

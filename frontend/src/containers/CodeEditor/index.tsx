@@ -31,7 +31,8 @@ type Props = {
     saveCodeToCloud: (
         fileName: string,
         fileIndex: number,
-        content: string
+        content: string,
+        loggedIn: boolean,
     ) => void,
     triggerFileLoading: (fileIndex: number) => void,
 };
@@ -102,6 +103,7 @@ class CodeEditor extends React.Component<Props> {
                 fileEdit.fileName,
                 fileEdit.fileIndex,
                 fileEdit.code,
+                this.props.loggedIn
             );
         }
         if (this.props.isSaved) {
@@ -111,6 +113,7 @@ class CodeEditor extends React.Component<Props> {
             this.props.fileName,
             this.props.fileIndex,
             this.props.code,
+            this.props.loggedIn
         );
 
     };
@@ -168,8 +171,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
         fileName: string,
         fileIndex: number,
         content: string,
+        loggedIn: boolean
     ) => {
-        dispatch(editFileCloud(fileName, fileIndex, content));
+        dispatch(editFileCloud(fileName, fileIndex, content, loggedIn));
     },
     saveCode: (
         fileIndex: number,

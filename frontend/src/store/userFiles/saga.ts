@@ -35,6 +35,9 @@ const isEditFileAction =
     (arg: t.ChangeFileActions): arg is t.EditFileCloudAction => (arg.type === 'EDIT_FILE_CLOUD');
 
 function* makeFileChanges(action: t.ChangeFileActions) {
+    if (!action.loggedIn) {
+        return;
+    } 
     let fileChangeRequest: FileChange[] = [
         {
             fileName: action.fileName,
