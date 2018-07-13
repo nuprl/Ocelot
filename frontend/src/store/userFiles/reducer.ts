@@ -120,6 +120,7 @@ const userFiles: Reducer<t.UserFilesState> = (
                             content: ''
                         },
                     ],
+                    selectedFileIndex: state.filesInfo.files.length,
                     newFileError: false,
                     fileSaved: [
                         ...state.filesInfo.fileSaved,
