@@ -31,17 +31,17 @@ const FileItem: React.StatelessComponent<Props> = ({
     isSaved,
     name,
 }) => {
-
-    let currentStyleClass = classes.listItemColor;
-    if (isSelected) {
-        currentStyleClass = classes.listItemSelectedColor;
-    }
-
     return (
         <ListItem
             button
-            className={`${classes.nested} ${currentStyleClass}`}
+            disableGutters
+            className={`${classes.nested}`}
+            classes={{
+                root: `${isSelected && classes.selectedHighlight}`,
+                dense: classes.tinyPadding,
+            }}
             onClick={onSelect}
+            dense
         >
             <ListItemIcon>
                 <CodeIcon
@@ -63,7 +63,7 @@ const FileItem: React.StatelessComponent<Props> = ({
 
             <CustomListItemText
                 text={name}
-                className={currentStyleClass}
+                className={classes.listItemColor}
                 styleBody
             />
             < ListItemSecondaryAction className={`fadeIcon ${classes.listItemColor}`} >

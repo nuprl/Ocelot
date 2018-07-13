@@ -3,12 +3,13 @@ import { withStyles, StyleRulesCallback } from '@material-ui/core/styles';
 export type ListItemStylesTypes =
     | 'nested'
     | 'listItemColor'
-    | 'listItemSelectedColor'
+    | 'selectedHighlight'
     | 'textField'
     | 'formControl'
     | 'loadingIcon'
     | 'show'
-    | 'codeIcon';
+    | 'codeIcon'
+    | 'tinyPadding';
 
 const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
     nested: {
@@ -16,13 +17,13 @@ const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
     },
     listItemColor: {
         color: theme.palette.primary.contrastText,
-        opacity: 0.80,
+        opacity: 0.9,
     },
-    listItemSelectedColor: {
-        color: theme.palette.secondary.main,
-        opacity: 1,
-        // backgroundColor: 'rgba(0, 0, 0, 0.10)', 
-        // some way to avoid (without css) making the children text have background color
+    selectedHighlight: {
+        backgroundColor: `${theme.palette.secondary.main}77`,
+        '&:hover': {
+            backgroundColor: `${theme.palette.secondary.main}77`,
+        }
     },
     textField: {
         color: theme.palette.primary.contrastText,
@@ -58,6 +59,10 @@ const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
         opacity: 0.8,
         visibility: 'visible'
     },
+    tinyPadding: {
+        paddingTop: '3px',
+        paddingBottom: '3px'
+    }
 
 });
 

@@ -79,7 +79,11 @@ class NewFileField extends React.Component<Props> {
         }
 
         return (
-            <ListItem className={`${classes.nested} ${classes.listItemColor}`}>
+            <ListItem
+                className={`${classes.nested} ${classes.listItemColor}`}
+                classes={{ dense: classes.tinyPadding }}
+                dense
+            >
                 <ListItemIcon>
                     <CodeIcon className={classes.listItemColor} />
                 </ListItemIcon>

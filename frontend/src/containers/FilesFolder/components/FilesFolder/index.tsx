@@ -59,7 +59,12 @@ class FilesFolder extends React.Component<Props> {
                     </ListItem>
                 </div>
                 <Collapse in={open} timeout="auto">
-                    <List component="div" disablePadding dense>
+                    <List
+                        component="div"
+                        disablePadding
+                        dense
+                        classes={{ dense: classes.tinyPadding }}
+                    >
                         <UserFiles />
                     </List>
                 </Collapse>
