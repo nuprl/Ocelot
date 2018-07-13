@@ -11,7 +11,6 @@ const JumboContent: React.StatelessComponent = () => (
         minSize={48}
         defaultSize="30%"
         primary="second"
-        className="editorCanvas"
     >
         <SplitPane
             split="vertical"
