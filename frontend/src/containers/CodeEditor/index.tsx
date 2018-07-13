@@ -6,15 +6,16 @@ import {
     getSelectedCode,
     isValidFileIndex,
     getSelectedFileName,
-    getSelectedFileIndex
+    getSelectedFileIndex,
+    getSelectedIsSaved
 } from 'store/userFiles/selectors';
+import { editFileCloud, editFileLocal, markFileNotSaved } from 'store/userFiles/actions';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
-import { editFileRequest, markFileNotSaved } from 'store/userFiles/actions';
 
-const debounceWait = 400; // milliseconds;
+const debounceWait = 500; // milliseconds;
 
 type Props = {
     enabled: boolean,
@@ -22,26 +23,62 @@ type Props = {
     fileIndex: number,
     fileName: string,
     loggedIn: boolean,
+    isSaved: boolean,
     saveCode: (
-        fileName: string,
+        fileIndex: number,
         content: string,
-        loggedIn: boolean
+    ) => void,
+    saveCodeToCloud: (
+        fileName: string,
+        fileIndex: number,
+        content: string
     ) => void,
     triggerFileLoading: (fileIndex: number) => void,
 };
 
+type FileEdit = {
+    fileName: string,
+    fileIndex: number,
+    code: string,
+};
+
 class CodeEditor extends React.Component<Props> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
-    code: string;
+    fileEditsQueue: FileEdit[];
     constructor(props: Props) {
         super(props);
         this.editor = undefined;
-        this.code = props.code;
+        this.fileEditsQueue = [];
     }
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
+        editor.setPosition({lineNumber: 10, column: 0});
         editor.focus();
         this.editor = editor;
+    }
+
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.fileIndex === this.props.fileIndex) {
+            return;
+        }
+        if (prevProps.isSaved) {
+            return;
+        }
+        if (!prevProps.loggedIn) {
+            return;
+        }
+        if (prevProps.fileIndex === -1) {
+            return;
+        }
+        this.fileEditsQueue.push({
+            fileName: prevProps.fileName,
+            fileIndex: prevProps.fileIndex,
+            code: prevProps.code,
+        });
+        if (this.editor === undefined) {
+            return;
+        }
+        this.editor.focus();
     }
 
     handleResize = () => {
@@ -51,60 +88,44 @@ class CodeEditor extends React.Component<Props> {
         this.editor.layout();
     }
 
-    componentDidUpdate(prevProps: Props) {
-        if (this.editor === undefined) {
-            return;
-        }
-        this.editor.focus();
-        if (prevProps.enabled !== this.props.enabled) {
-            this.editor.updateOptions({ readOnly: !this.props.enabled });
-        }
-    }
-
-    // The user theoretically can only edit the file associated with the selected
-    // file index so does it make sense to pass in file index when I can just get
-    // the fileIndex from state?
-    // Maybe good support for having multiple tabs for files later.
     triggerFileLoadingAnim = () => this.props.triggerFileLoading(this.props.fileIndex);
 
-    debouncedTriggerFileLoading = debounce(this.triggerFileLoadingAnim, debounceWait, {
-        leading: true,
-        trailing: false,
-    });
-
-    saveCodeChanges = () => {
-        const { fileName } = this.props;
-        this.props.saveCode(fileName, this.code, this.props.loggedIn);
+    saveCodeCloudWrapper = () => {
         // tslint:disable-next-line:no-console
-        // console.log('Saved! ', { code: this.code });
+        let fileEdit: FileEdit;
+        while (this.fileEditsQueue.length > 0) {
+            fileEdit = this.fileEditsQueue.shift() as FileEdit;
+            if (fileEdit.fileIndex === this.props.fileIndex) {
+                continue;
+            }
+            this.props.saveCodeToCloud(
+                fileEdit.fileName,
+                fileEdit.fileIndex,
+                fileEdit.code,
+            );
+        }
+        if (this.props.isSaved) {
+            return;
+        }
+        this.props.saveCodeToCloud(
+            this.props.fileName,
+            this.props.fileIndex,
+            this.props.code,
+        );
+
     };
 
-    // This debounceSave debounces the repeated firing of 
-    // code changes but the run button does not have the
-    // updated code until this debounce function runs
-    // the save function. There must be a way or the run
-    // button to have access to the immediate code.
-    debounceSave = debounce(this.saveCodeChanges, debounceWait);
+    debouncedSaveCodeCloud = debounce(this.saveCodeCloudWrapper, debounceWait);
 
     onChange = (code: string) => {
-        this.code = code;
-
         if (this.props.loggedIn) {
-            this.debouncedTriggerFileLoading();
+            // this.debouncedFileLoading();
+            this.triggerFileLoadingAnim();
+            this.debouncedSaveCodeCloud();
         }
-        this.debounceSave();
-    };
+        this.props.saveCode(this.props.fileIndex, code);
 
-    // React docs do not recommend me prevent renderings
-    // with this but I have to do it because I'm using debounce
-    // Hopefully, I'll figure out a better way.
-    // (Hopefully no bugs will arise from this method)
-    shouldComponentUpdate(nextProps: Props) {
-        if (this.props.fileIndex !== nextProps.fileIndex) {
-            return true;
-        }
-        return false;
-    }
+    };
 
     render() {
         const { code } = this.props;
@@ -139,19 +160,24 @@ const mapStateToProps = (state: RootState) => ({
     fileIndex: getSelectedFileIndex(state),
     fileName: getSelectedFileName(state),
     loggedIn: state.userLogin.loggedIn,
+    isSaved: getSelectedIsSaved(state),
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    saveCode: (
+    saveCodeToCloud: (
         fileName: string,
+        fileIndex: number,
         content: string,
-        loggedIn: boolean
     ) => {
-        dispatch(editFileRequest(fileName, content, loggedIn));
+        dispatch(editFileCloud(fileName, fileIndex, content));
     },
-    triggerFileLoading: (fileIndex: number) => {
-        dispatch(markFileNotSaved(fileIndex));
-    }
+    saveCode: (
+        fileIndex: number,
+        content: string,
+    ) => {
+        dispatch(editFileLocal(fileIndex, content));
+    },
+    triggerFileLoading: (fileIndex: number) => { dispatch(markFileNotSaved(fileIndex)); },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CodeEditor);

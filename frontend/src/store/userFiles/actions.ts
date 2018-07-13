@@ -68,30 +68,32 @@ export const triggerNewFileError: ActionCreator<t.TriggerNewFileErrorAction>
         type: t.TRIGGER_NEW_FILE_ERROR
     });
 
-export const editFileRequest: ActionCreator<t.EditFileRequestAction>
-    = (fileName: string, content: string, loggedIn: boolean) => ({
-        type: t.EDIT_FILE_REQUEST,
-        fileName: fileName,
+export const editFileLocal: ActionCreator<t.EditFileLocalAction>
+    = (fileIndex: number, content: string) => ({
+        type: t.EDIT_FILE_LOCAL,
+        fileIndex: fileIndex,
         content: content,
-        loggedIn: loggedIn,
     });
 
-export const editFileSuccess: ActionCreator<t.EditFileSuccessAction>
-    = (fileName: string) => ({
-        type: t.EDIT_FILE_SUCCESS,
-        fileName: fileName
-    });
-
-export const editFileFailure: ActionCreator<t.EditFileFailureAction>
-    = () => ({
-        type: t.EDIT_FILE_FAILURE,
+export const editFileCloud: ActionCreator<t.EditFileCloudAction>
+    = (fileName: string, fileIndex: number, content: string, loggedIn: boolean) => ({
+        type: t.EDIT_FILE_CLOUD,
+        fileName: fileName,
+        fileIndex: fileIndex,
+        content: content
     });
 
 export const markFileNotSaved: ActionCreator<t.MarkFileNotSavedAction>
 = (fileIndex: number) => ({
     type: t.MARK_FILE_NOT_SAVED,
-    fileIndex: fileIndex
+    fileIndex: fileIndex,
 });
+
+export const markFileSaved: ActionCreator<t.MarkFileSavedAction>
+ = (fileIndex: number) => ({
+     type: t.MARK_FILE_SAVED,
+     fileIndex: fileIndex,
+ });
 
 export const resetDefaultFiles: ActionCreator<t.ResetDefaultFilesAction>
     = () => ({

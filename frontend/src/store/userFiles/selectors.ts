@@ -29,3 +29,10 @@ export const getSelectedCode
     = (state: RootState) => {
         return getSelectedFile(state).content;
     };
+
+export const getSelectedIsSaved = (state: RootState) => {
+    if (!isValidFileIndex(state)) {
+        return true;
+    }
+    return state.userFiles.filesInfo.fileSaved[getSelectedFileIndex(state)];
+};

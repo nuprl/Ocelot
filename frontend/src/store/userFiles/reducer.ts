@@ -1,8 +1,7 @@
 import { Reducer } from 'redux';
 import * as t from './types';
 
-const helloWorldCode = `
-/**
+const helloWorldCode = `/**
  * @param name to greet
  * @returns a greeting
  */
@@ -35,8 +34,7 @@ const userFiles: Reducer<t.UserFilesState> = (
     action: t.UserFilesActions): t.UserFilesState => {
     let newFiles: t.UserFile[],
         newFileSaved: boolean[],
-        newState: t.UserFilesState,
-        editFileIndex: number;
+        newState: t.UserFilesState;
     switch (action.type) {
         case t.LOAD_FILES_REQUEST:
             return {
@@ -162,35 +160,22 @@ const userFiles: Reducer<t.UserFilesState> = (
                     newFileError: true
                 }
             };
-
-        case t.EDIT_FILE_REQUEST:
-            editFileIndex = state.filesInfo.files.findIndex(
-                (elem) => elem.name === action.fileName
-            );
-            newFiles = state.filesInfo.files.map((elem, index) => {
-                if (index === editFileIndex) {
-                    return { ...elem, content: action.content };
-                }
-                return elem;
-            });
-            newState = {
+        case t.EDIT_FILE_LOCAL:
+            newFiles = [...state.filesInfo.files];
+            newFiles[action.fileIndex] = {
+                ...state.filesInfo.files[action.fileIndex],
+                content: action.content
+            };
+            return {
                 ...state,
                 filesInfo: {
                     ...state.filesInfo,
-                    files: newFiles,
+                    files: newFiles
                 }
             };
-            return newState;
-        case t.EDIT_FILE_SUCCESS:
-            editFileIndex = state.filesInfo.files.findIndex(
-                (elem) => elem.name === action.fileName
-            );
-            newFileSaved = state.filesInfo.fileSaved.map((elem, index) => {
-                if (index === editFileIndex) {
-                    return true;
-                }
-                return elem;
-            });
+        case t.EDIT_FILE_CLOUD:
+            newFileSaved = [...state.filesInfo.fileSaved];
+            newFileSaved[action.fileIndex] = false;
             return {
                 ...state,
                 filesInfo: {
@@ -199,15 +184,16 @@ const userFiles: Reducer<t.UserFilesState> = (
                 }
             };
         // Temporary solution, will plan to expand this.
-        case t.EDIT_FILE_FAILURE:
-            return {
-                ...state,
-                filesInfo: {
-                    ...state.filesInfo,
-                    fileSaved: new Array(state.filesInfo.files.length).fill(true),
-                    selectedFileIndex: -1
-                }
-            };
+        // How do we plan to handle when there's no internet?
+        // case t.EDIT_FILE_FAILURE:
+        //     return {
+        //         ...state,
+        //         filesInfo: {
+        //             ...state.filesInfo,
+        //             fileSaved: new Array(state.filesInfo.files.length).fill(true),
+        //             selectedFileIndex: -1
+        //         }
+        //     };
         case t.MARK_FILE_NOT_SAVED:
             return {
                 ...state,
@@ -217,6 +203,21 @@ const userFiles: Reducer<t.UserFilesState> = (
                         (elem, index) => {
                             if (index === action.fileIndex) {
                                 return false;
+                            }
+                            return elem;
+                        }
+                    ),
+                }
+            };
+        case t.MARK_FILE_SAVED:
+            return {
+                ...state,
+                filesInfo: {
+                    ...state.filesInfo,
+                    fileSaved: state.filesInfo.fileSaved.map(
+                        (elem, index) => {
+                            if (index === action.fileIndex) {
+                                return true;
                             }
                             return elem;
                         }

@@ -2,7 +2,7 @@ import { call, put, takeEvery } from 'redux-saga/effects';
 import * as t from './types';
 import { triggerNotification } from 'store/notification/actions';
 import { logOutUser } from 'store/userLogin/actions';
-import { loadFilesSuccess, loadFilesFailure, editFileSuccess, editFileFailure } from 'store/userFiles/actions';
+import { loadFilesSuccess, loadFilesFailure, markFileSaved, } from 'store/userFiles/actions';
 import { batchActions } from 'store/batchActions';
 
 import { UserFilesResponse, getUserFiles } from 'utils/api/getUserFiles';
@@ -32,12 +32,9 @@ const isDeleteFileAction =
     (arg: t.ChangeFileActions): arg is t.DeleteFileAction => (arg.type === 'DELETE_FILE');
 
 const isEditFileAction =
-    (arg: t.ChangeFileActions): arg is t.EditFileRequestAction => (arg.type === 'EDIT_FILE_REQUEST');
+    (arg: t.ChangeFileActions): arg is t.EditFileCloudAction => (arg.type === 'EDIT_FILE_CLOUD');
 
 function* makeFileChanges(action: t.ChangeFileActions) {
-    if (!action.loggedIn) {
-        return;
-    } 
     let fileChangeRequest: FileChange[] = [
         {
             fileName: action.fileName,
@@ -66,7 +63,7 @@ function* makeFileChanges(action: t.ChangeFileActions) {
         yield put(batchActions(
             triggerNotification('Unabled to connect to the internet, retrying...', 'bottom-right'),
             // have a loading icon of some sort.
-            editFileFailure(),
+            // editFileFailure(),
         ));
         return;
     }
@@ -82,10 +79,7 @@ function* makeFileChanges(action: t.ChangeFileActions) {
         return;
     }
     if (isEditFileAction(action)) {
-        yield put(batchActions(
-            triggerNotification(`File updated: ${action.fileName}`, 'bottom-right'),
-            editFileSuccess(action.fileName)
-        ));
+        yield put(markFileSaved(action.fileIndex));
         return;
     }
     yield put(triggerNotification(`File created: ${action.fileName}`, 'bottom-right'));
@@ -100,7 +94,7 @@ export function* watchDeleteFile() {
 }
 
 export function* watchEditFile() {
-    yield takeEvery(t.EDIT_FILE_REQUEST, makeFileChanges);
+    yield takeEvery(t.EDIT_FILE_CLOUD, makeFileChanges);
 }
 
 // watch edit file but not constantly, new action may be needed

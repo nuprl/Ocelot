@@ -11,14 +11,14 @@ export const CREATE_NEW_FILE_FIELD = 'CREATE_NEW_FILE_FIELD';
 export const DELETE_NEW_FILE_FIELD = 'DELETE_NEW_FILE_FIELD';
 export const CREATE_NEW_FILE = 'CREATE_NEW_FILE';
 // this should have a saga 
-export const EDIT_FILE_REQUEST = 'EDIT_FILE_REQUEST';
-export const EDIT_FILE_SUCCESS = 'EDIT_FILE_SUCCESS';
-export const EDIT_FILE_FAILURE = 'EDIT_FILE_FAILURE';
+export const EDIT_FILE_LOCAL = 'EDIT_FILE_LOCAL';
+export const EDIT_FILE_CLOUD = 'EDIT_FILE_CLOUD';
 // this should also have a saga
 export const SELECT_FILE = 'SELECT_FILE';
 export const DELETE_FILE = 'DELETE_FILE';
 // this should also have a saga
 export const MARK_FILE_NOT_SAVED = 'MARK_FILE_NOT_SAVED';
+export const MARK_FILE_SAVED = 'MARK_FILE_SAVED';
 export const TRIGGER_NEW_FILE_ERROR = 'TRIGGER_NEW_FILE_ERROR';
 export const RESET_DEFAULT_FILES = 'RESET_DEFAULT_FILES';
 
@@ -81,25 +81,27 @@ export interface TriggerNewFileErrorAction extends Action {
     type: 'TRIGGER_NEW_FILE_ERROR';
 }
 
-export interface EditFileRequestAction extends Action {
-    type: 'EDIT_FILE_REQUEST';
+export interface EditFileLocalAction extends Action {
+    type: 'EDIT_FILE_LOCAL';
+    fileIndex: number;
+    content: string;
+}
+
+export interface EditFileCloudAction extends Action {
+    type: 'EDIT_FILE_CLOUD';
     fileName: string;
+    fileIndex: number;
     // not using fileIndex because fileName for saga post request
     content: string;
-    loggedIn: boolean;
-}
-
-export interface EditFileSuccessAction extends Action {
-    type: 'EDIT_FILE_SUCCESS';
-    fileName: string;
-}
-
-export interface EditFileFailureAction extends Action {
-    type: 'EDIT_FILE_FAILURE';
 }
 
 export interface MarkFileNotSavedAction extends Action {
     type: 'MARK_FILE_NOT_SAVED';
+    fileIndex: number;
+}
+
+export interface MarkFileSavedAction extends Action {
+    type: 'MARK_FILE_SAVED';
     fileIndex: number;
 }
 
@@ -120,16 +122,16 @@ export type UserFilesActions =
     | SelectFileAction
     | DeleteFileAction
     | TriggerNewFileErrorAction
-    | EditFileRequestAction
-    | EditFileSuccessAction
-    | EditFileFailureAction
+    | EditFileLocalAction
+    | EditFileCloudAction
+    | MarkFileSavedAction
     | MarkFileNotSavedAction
     | ResetDefaultFilesAction;
 
 export type ChangeFileActions =
     | CreateNewFileAction
     | DeleteFileAction
-    | EditFileRequestAction;
+    | EditFileCloudAction;
 
 // State type
 export type UserFilesState = {
