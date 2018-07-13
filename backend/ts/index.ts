@@ -200,7 +200,7 @@ async function getFile(req: Request) {
       }
     }
 
-    verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val)}`)
+    verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
     miliTimes = [];
 
     return {
@@ -293,7 +293,7 @@ async function changeFile(req: Request) {
       await timePromise(filteredFiles[0].move(`${userEmail}/${currentFileChange.changes}`));
     }
 
-    verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val)}`)
+    verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
     miliTimes = [];
 
     return {
@@ -366,7 +366,7 @@ async function login(req: Request) {
     }
   }));
 
-  verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val)}`)
+  verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
   miliTimes = [];
 
   return {
