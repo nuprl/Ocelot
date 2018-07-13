@@ -4,7 +4,7 @@ import CustomTheme from '../components/CustomTheme';
 import MenuAppbar from '../components/MenuAppbar';
 import SideDrawer from '../components/SideDrawer';
 import SplitPane from 'react-split-pane';
-import ErrorNotification from '../containers/Notification';
+import Notification from '../containers/Notification';
 import JumboContent from 'components/JumboContent';
 import 'static/styles/JumboContent.css';
 import 'static/styles/body.css';
@@ -28,7 +28,7 @@ const styles: StyleRulesCallback = theme => {
 const Index: React.StatelessComponent<WithStyles<'root'>>
   = ({ classes }) => (
     <div className={classes.root}>
-      <ErrorNotification />
+      <Notification />
       <MenuAppbar title="Ocelot" />
       <SplitPane
         split="vertical"
