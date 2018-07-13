@@ -11,12 +11,13 @@ const JumboContent: React.StatelessComponent = () => (
         minSize={48}
         defaultSize="30%"
         primary="second"
+        className="editorCanvas"
     >
         <SplitPane
             split="vertical"
             defaultSize="50%"
-            primary="second"
             minSize={0}
+            pane1Style={{maxWidth: '100%'}}
         >
             <EditorSuite />
             <CanvasOutput />
