@@ -294,6 +294,9 @@ async function changeFile(req: Request) {
     }
 
     verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
+    // since it's async, miliTimes is shared so there could be different instances of 
+    // this function running, and the miliTimes could get cleared out by one function
+    // after another function made changes to it, making the array empty.
     miliTimes = [];
 
     return {
