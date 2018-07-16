@@ -12,6 +12,12 @@ import StopIcon from '@material-ui/icons/Stop';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 
+type StopifyResult = {
+    type: string,
+    value: Error,
+    stack: string[]
+};
+
 const styles: StyleRulesCallback = theme => ({
     button: {
         margin: theme.spacing.unit,
@@ -30,11 +36,18 @@ const tempTheme = createMuiTheme({
 type Props = WithStyles<'button' | 'leftIcon'> & {
     runner: any,
     code: string,
-    createRunner: (runner: any) => void,
-    removeRunner: () => void,
+    setRunnerToState: (runner: any) => void,
+    removeRunnerFromState: () => void,
 };
 
 class RunStopButton extends React.Component<Props> {
+
+    handleStopifyResult = (result: StopifyResult) => {
+        if (result.type === 'exception') {
+            // tslint:disable-next-line:no-console
+            console.error(result.value, result.stack[0]);
+        }
+    }
 
     onRun = () => {
         try {
@@ -48,11 +61,12 @@ class RunStopButton extends React.Component<Props> {
                     yieldInterval: 1
                 }
             );
-            this.props.createRunner(runner);
+            this.props.setRunnerToState(runner);
             runner.run((result: any) => {
                 // tslint:disable-next-line:no-console
                 // console.log(result);
-                this.props.removeRunner();
+                this.handleStopifyResult(result);
+                this.props.removeRunnerFromState();
             });
         } catch (e) {
             // tslint:disable-next-line:no-console
@@ -68,17 +82,18 @@ class RunStopButton extends React.Component<Props> {
         this.props.runner.pause((line?: number) => {
             // tslint:disable-next-line:no-console
             // console.log('stopped');
-            this.props.removeRunner();
+            this.props.removeRunnerFromState();
         });
 
     }
 
     render() {
         const { classes, runner, } = this.props;
+        const runnerExists = runner === undefined;
         return (
             <div>
                 <Button
-                    style={{ display: runner === undefined ? 'inline-flex' : 'none' }}
+                    style={runnerExists ? {} : {display: 'none'}}
                     color="secondary"
                     className={classes.button}
                     onClick={this.onRun}
@@ -89,7 +104,7 @@ class RunStopButton extends React.Component<Props> {
                 </Button>
                 <MuiThemeProvider theme={tempTheme}>
                     <Button
-                        style={{ display: runner === undefined ? 'none' : 'inline-flex' }}
+                        style={runnerExists ? {display: 'none'} : {}}
                         color="primary"
                         className={classes.button}
                         onClick={this.onStop}
@@ -110,8 +125,8 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    createRunner: (runner: any) => { dispatch(createCodeRunner(runner)); },
-    removeRunner: () => { dispatch(removeCodeRunner()); }
+    setRunnerToState: (runner: any) => { dispatch(createCodeRunner(runner)); },
+    removeRunnerFromState: () => { dispatch(removeCodeRunner()); }
 });
 
 const styling = withStyles(styles);
