@@ -16,3 +16,9 @@ cd ../backend/
 yarn run build && yarn run serve
 cd ..
 ```
+
+Be sure you're authenticated on Google Cloud:
+```bash
+gcloud auth login
+gcloud auth application-default login
+```
