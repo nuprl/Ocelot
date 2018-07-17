@@ -13,7 +13,7 @@ const LoadingFolderIcon: React.StatelessComponent<LoadingFolderIconProps>
                     className={`${className}`}
                     // Does classes.progress do anything? ${classes.progress} 
                     size={24}
-                    thickness={5}
+                    thickness={4}
                 />
                 : <FolderIcon className={className} />}
         </ListItemIcon>

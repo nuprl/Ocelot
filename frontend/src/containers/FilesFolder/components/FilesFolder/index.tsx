@@ -36,6 +36,8 @@ class FilesFolder extends React.Component<Props> {
                         button
                         onClick={toggleFolder}
                         disabled={disabled}
+                        dense
+                        classes={{ dense: classes.tinyPadding }}
                     >
                         <LoadingFolderIcon loading={disabled} className={classes.listItemColor} />
                         <ItemTypography text="Files" className={classes.listItemColor} />
@@ -63,7 +65,6 @@ class FilesFolder extends React.Component<Props> {
                         component="div"
                         disablePadding
                         dense
-                        classes={{ dense: classes.tinyPadding }}
                     >
                         <UserFiles />
                     </List>
