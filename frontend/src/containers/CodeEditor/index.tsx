@@ -53,12 +53,15 @@ class CodeEditor extends React.Component<Props> {
     }
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
-        editor.setPosition({lineNumber: 10, column: 0});
+        editor.setPosition({ lineNumber: 10, column: 0 });
         editor.focus();
         this.editor = editor;
     }
 
     componentDidUpdate(prevProps: Props) {
+        if (!this.props.enabled && this.editor !== undefined) {
+            this.editor.updateOptions({ readOnly: true });
+        }
         if (prevProps.fileIndex === this.props.fileIndex) {
             return;
         }
@@ -123,8 +126,8 @@ class CodeEditor extends React.Component<Props> {
     onChange = (code: string) => {
         if (this.props.loggedIn) {
             // this.debouncedFileLoading();
-            this.triggerFileLoadingAnim();
-            this.debouncedSaveCodeCloud();
+            // this.triggerFileLoadingAnim();
+            // this.debouncedSaveCodeCloud();
         }
         this.props.saveCode(this.props.fileIndex, code);
 
