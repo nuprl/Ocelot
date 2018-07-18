@@ -139,7 +139,7 @@ class CodeEditor extends React.Component<Props> {
         const options: monacoEditor.editor.IEditorConstructionOptions = {
             selectOnLineNumbers: true,
             mouseWheelZoom: true,
-            fontSize: 18,
+            // fontSize: 18,
             // scrollBeyondLastLine: false,
         };
 
