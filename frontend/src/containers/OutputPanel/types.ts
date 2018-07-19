@@ -1,5 +1,5 @@
 export type Log = {
     data: any[],
-    id: string,
+    id?: string,
     method: string,
 };

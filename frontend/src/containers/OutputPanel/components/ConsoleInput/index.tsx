@@ -13,7 +13,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     folding: false,
     selectOnLineNumbers: false,
     selectionHighlight: false,
-    cursorStyle: 'line-thin',
+    // cursorStyle: 'line-thin',
     scrollbar: {
         useShadows: false,
         horizontal: 'hidden',
@@ -27,7 +27,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     },
     contextmenu: false,
     ariaLabel: 'ConsoleInput',
-    fontFamily: 'Fira Mono, monospace',
+    fontFamily: 'Fira Mono',
     fontSize: 16,
 };
 
@@ -43,18 +43,41 @@ const styles: StyleRulesCallback = theme => ({
 
 });
 
-class ConsoleInput extends React.Component<WithStyles<string>> {
+type Props = { onOutput: (command: string, result: string, isError: boolean) => void };
 
+class ConsoleInput extends React.Component<WithStyles<string> & Props> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         window.addEventListener('resize', this.resizeEditor);
+        editor.onKeyDown(event => {
+            // tslint:disable-next-line:no-console
+            if (event.keyCode === monaco.KeyCode.Enter && editor.getValue() !== '') {
+                event.preventDefault();
+                event.stopPropagation();
+                const command = editor.getValue();
+                editor.setValue('');
+                try {
+                    // tslint:disable-next-line:no-eval
+                    const result = eval.call(command); // this is pretty bad
+                    // pretty unsafe.
+                    this.props.onOutput(command, result, false);
+                } catch (e) {
+                    this.props.onOutput(command, `${e.name}: ${e.message}` , true);
+                }
+                
+            } 
+        });
     }
 
     resizeEditor = () => {
         if (this.editor !== undefined) {
             this.editor.layout();
         }
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.resizeEditor);
     }
 
     render() {
@@ -68,6 +91,7 @@ class ConsoleInput extends React.Component<WithStyles<string>> {
                     <MonacoEditor
                         theme="vs-dark"
                         options={monacoOptions}
+                        editorDidMount={this.editorDidMount}
                     />
                 </div>
             </div>

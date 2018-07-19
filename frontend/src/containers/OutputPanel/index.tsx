@@ -39,7 +39,7 @@ type State = {
  * @extends {React.Component<Props, State>}
  */
 class OutputPanel extends React.Component<Props, State> {
-    
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -62,6 +62,15 @@ class OutputPanel extends React.Component<Props, State> {
         this.setState({ logs: [] });
     };
 
+    addNewCommandResult = (command: string, result: any, isError: boolean) => {
+        this.setState((prevState) => ({
+            logs: [...prevState.logs,
+            { method: 'command', data: [command] },
+            { method: isError ? 'error' : 'result', data: [result] }
+            ]
+        }));
+    };
+
     render() {
         const { classes } = this.props;
         return (
@@ -75,7 +84,7 @@ class OutputPanel extends React.Component<Props, State> {
                 </AppBar>
                 <div style={{ height: 'calc(100% - 48px)', flexDirection: 'column', display: 'flex' }}>
                     <ConsoleOutput logs={this.state.logs} />
-                    <ConsoleInput />
+                    <ConsoleInput onOutput={this.addNewCommandResult}/>
                 </div>
             </div>
         );

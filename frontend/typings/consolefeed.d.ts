@@ -4,7 +4,7 @@ declare module 'console-feed' {
 
     export interface Log {
         data: any[];
-        id: string;
+        id?: string;
         method: string;
     }
 
