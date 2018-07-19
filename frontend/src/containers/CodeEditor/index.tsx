@@ -137,6 +137,7 @@ class CodeEditor extends React.Component<Props> {
             selectOnLineNumbers: true,
             mouseWheelZoom: true,
             fontSize: 18,
+            fontFamily: 'Fira Mono',
             // scrollBeyondLastLine: false,
         };
 

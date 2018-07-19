@@ -27,7 +27,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     },
     contextmenu: false,
     ariaLabel: 'ConsoleInput',
-    fontFamily: 'Fira Mono',
+    fontFamily: 'Fira Mono, monospace',
     fontSize: 16,
 };
 

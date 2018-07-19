@@ -54,7 +54,13 @@ class RunStopButton extends React.Component<Props> {
             const runner = stopify.stopifyLocally(
                 this.props.code,
                 {
-                    externals: ['console']
+                    externals: [
+                        'console',
+                        'getImageFromCanvas',
+                        'setImageToCanvas',
+                        'setPixelToImage',
+                        'getPixelFromImage',
+                    ]
                 },
                 {
                     estimator: 'countdown',
@@ -93,7 +99,7 @@ class RunStopButton extends React.Component<Props> {
         return (
             <div>
                 <Button
-                    style={runnerExists ? {} : {display: 'none'}}
+                    style={runnerExists ? {} : { display: 'none' }}
                     color="secondary"
                     className={classes.button}
                     onClick={this.onRun}
@@ -104,7 +110,7 @@ class RunStopButton extends React.Component<Props> {
                 </Button>
                 <MuiThemeProvider theme={tempTheme}>
                     <Button
-                        style={runnerExists ? {display: 'none'} : {}}
+                        style={runnerExists ? { display: 'none' } : {}}
                         color="primary"
                         className={classes.button}
                         onClick={this.onStop}
