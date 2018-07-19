@@ -66,12 +66,12 @@ class CodeEditor extends React.Component<Props> {
         if (!this.props.enabled) {
             this.editor.updateOptions({ readOnly: true });
         }
-        const savingCriteria = prevProps.fileIndex === this.props.fileIndex
+        const endingCriteria = prevProps.fileIndex === this.props.fileIndex
             || prevProps.isSaved
             || !prevProps.loggedIn
             || prevProps.fileIndex === -1;
 
-        if (savingCriteria) {
+        if (endingCriteria) {
             return;
         }
         this.fileEditsQueue.push({
