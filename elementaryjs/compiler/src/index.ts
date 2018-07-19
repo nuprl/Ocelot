@@ -4,19 +4,18 @@ import { Visitor, NodePath } from 'babel-traverse';
 
 const visitor: Visitor = {
   Program: {
-    exit(path) {
-      path.get('body.0').insertBefore(
+    exit(path: NodePath<t.Program>) {
+      path.get('body')[0].insertBefore(
         t.variableDeclaration(
           'var',
           [t.variableDeclarator(
             t.identifier('rts'),
             t.callExpression(
               t.identifier('require'),
-              [t.stringLiteral('./nice-js-runtime')]
+              [t.stringLiteral('./elementaryjs-runtime')]
             )
           )]
-        )
-      );
+        ));
       path.stop();
     }
   },
@@ -29,22 +28,30 @@ const visitor: Visitor = {
     }
   },
   MemberExpression: {
-    // Turn m.x into typeof m.x === 'undefined' ? rts.raise('badd') : m.x
-    // I don't think field access lead to side effects.
     exit(path: NodePath<t.MemberExpression>) {
       path.replaceWith(
-          t.conditionalExpression(
+        t.conditionalExpression(
           t.binaryExpression(
             '===',
-            t.unaryExpression('typeof', path.node),
-            t.stringLiteral('undefined')),
+            t.unaryExpression('typeof', t.callExpression(
+              t.memberExpression(t.identifier('rts'), t.identifier('getMember')),
+              //  we can't assume object is always an identifier but will do for now
+              [path.node.object, 
+                t.stringLiteral((path.node.property as t.Identifier).name),
+              t.booleanLiteral(true)]
+            )),
+            t.stringLiteral('undefined')
+          ),
           t.callExpression(
             t.memberExpression(t.identifier('rts'), t.identifier('raise')),
             [t.stringLiteral('BADDDD')]
           ),
-          path.node
+          t.callExpression(
+            t.memberExpression(t.identifier('rts'), t.identifier('getMember')),
+            []
+          )
         )
-      )
+      );
       path.skip();
     }
   },
