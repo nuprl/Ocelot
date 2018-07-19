@@ -59,19 +59,19 @@ class CodeEditor extends React.Component<Props> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        if (!this.props.enabled && this.editor !== undefined) {
+        if (this.editor === undefined) {
+            return;
+        }
+        this.editor.updateOptions({ readOnly: false });
+        if (!this.props.enabled) {
             this.editor.updateOptions({ readOnly: true });
         }
-        if (prevProps.fileIndex === this.props.fileIndex) {
-            return;
-        }
-        if (prevProps.isSaved) {
-            return;
-        }
-        if (!prevProps.loggedIn) {
-            return;
-        }
-        if (prevProps.fileIndex === -1) {
+        const savingCriteria = prevProps.fileIndex === this.props.fileIndex
+            || prevProps.isSaved
+            || !prevProps.loggedIn
+            || prevProps.fileIndex === -1;
+
+        if (savingCriteria) {
             return;
         }
         this.fileEditsQueue.push({
@@ -79,9 +79,6 @@ class CodeEditor extends React.Component<Props> {
             fileIndex: prevProps.fileIndex,
             code: prevProps.code,
         });
-        if (this.editor === undefined) {
-            return;
-        }
         this.editor.focus();
     }
 
@@ -126,8 +123,8 @@ class CodeEditor extends React.Component<Props> {
     onChange = (code: string) => {
         if (this.props.loggedIn) {
             // this.debouncedFileLoading();
-            // this.triggerFileLoadingAnim();
-            // this.debouncedSaveCodeCloud();
+            this.triggerFileLoadingAnim();
+            this.debouncedSaveCodeCloud();
         }
         this.props.saveCode(this.props.fileIndex, code);
 
@@ -139,7 +136,7 @@ class CodeEditor extends React.Component<Props> {
         const options: monacoEditor.editor.IEditorConstructionOptions = {
             selectOnLineNumbers: true,
             mouseWheelZoom: true,
-            // fontSize: 18,
+            fontSize: 18,
             // scrollBeyondLastLine: false,
         };
 
