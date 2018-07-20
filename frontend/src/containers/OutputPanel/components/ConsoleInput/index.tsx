@@ -27,7 +27,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     },
     contextmenu: false,
     ariaLabel: 'ConsoleInput',
-    fontFamily: 'Fira Mono, monospace',
+    fontFamily: 'Fira Mono',
     fontSize: 16,
 };
 
@@ -46,6 +46,7 @@ const styles: StyleRulesCallback = theme => ({
 type Props = { onOutput: (command: string, result: string, isError: boolean) => void };
 
 class ConsoleInput extends React.Component<WithStyles<string> & Props> {
+    evalContext: (x: string) => any = eval;
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
@@ -59,7 +60,7 @@ class ConsoleInput extends React.Component<WithStyles<string> & Props> {
                 editor.setValue('');
                 try {
                     // tslint:disable-next-line:no-eval
-                    const result = eval.call(command); // this is pretty bad
+                    const result = this.evalContext(command); // this is pretty bad
                     // pretty unsafe.
                     this.props.onOutput(command, result, false);
                 } catch (e) {

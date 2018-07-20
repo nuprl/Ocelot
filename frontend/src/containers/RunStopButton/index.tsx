@@ -56,10 +56,7 @@ class RunStopButton extends React.Component<Props> {
                 {
                     externals: [
                         'console',
-                        'getImageFromCanvas',
-                        'setImageToCanvas',
-                        'setPixelToImage',
-                        'getPixelFromImage',
+                        'jdc'
                     ]
                 },
                 {

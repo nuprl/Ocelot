@@ -17,13 +17,6 @@ type State = {
     tabIndex: number,
 };
 
-interface NewWindow extends Window {
-    getImageFromCanvas: (canvasId: string) => undefined | ImageData;
-    setImageToCanvas: (canvasId: string, image: ImageData) => void;
-    setPixelToImage: (image: ImageData, x: number, y: number, color: [number, number, number]) => void;
-    getPixelFromImage: (image: ImageData, x: number, y: number) => [number, number, number];
-}
-
 class CanvasOutput extends React.Component<WithStyles<'root' | 'fillSpace'>, State> {
     constructor(props: WithStyles<'root' | 'fillSpace'>) {
         super(props);
@@ -44,50 +37,6 @@ class CanvasOutput extends React.Component<WithStyles<'root' | 'fillSpace'>, Sta
             (inputCanvas.getContext('2d') as CanvasRenderingContext2D).drawImage(img, 0, 0);
         };
         img.src = imageSrc;
-
-        const getCanvasContext
-            = (canvasId: string): Partial<{ canvas: HTMLCanvasElement, context: CanvasRenderingContext2D }> => {
-                const canvas = (document.getElementById(canvasId) as HTMLCanvasElement);
-                if (canvas === null) {
-                    return {};
-                }
-                return { canvas: canvas, context: (canvas.getContext('2d') as CanvasRenderingContext2D) };
-            };
-
-        (window as NewWindow).getImageFromCanvas = (canvasId) => {
-            const { canvas, context } = getCanvasContext(canvasId);
-            if (canvas === undefined || context === undefined) {
-                return undefined;
-            }
-            const width = canvas.width;
-            const height = canvas.height;
-            return context.getImageData(0, 0, width, height);
-        };
-
-        (window as NewWindow).setImageToCanvas = (canvasId, image) => {
-            const { context } = getCanvasContext(canvasId);
-            if (context === undefined) {
-                return;
-            }
-            context.putImageData(image, 0, 0);
-        };
-
-        (window as NewWindow).setPixelToImage = (image, x, y, color) => {
-            const index = 4 * (y * image.width + x);
-            image.data[index] = color[0];
-            image.data[index + 1] = color[1];
-            image.data[index + 2] = color[2];
-            image.data[index + 3] = 255;
-        };
-
-        (window as NewWindow).getPixelFromImage = (image, x, y) => {
-            const index = 4 * (y * image.width + x);
-            return [
-                image.data[index],
-                image.data[index + 1],
-                image.data[index + 2]
-            ];
-        };
 
     }
 
