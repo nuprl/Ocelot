@@ -63,8 +63,8 @@ class RunStopButton extends React.Component<Props> {
                     ]
                 },
                 {
-                    estimator: 'countdown',
-                    yieldInterval: 1
+                    // estimator: 'countdown',
+                    // yieldInterval: 1
                 }
             );
             this.props.setRunnerToState(runner);
