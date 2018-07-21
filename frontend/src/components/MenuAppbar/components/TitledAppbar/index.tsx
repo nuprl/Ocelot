@@ -26,11 +26,11 @@ const styles: StyleRulesCallback = theme => {
     };
 };
 
-type AppbarLoginProps = {
+type TitledAppbarProps = {
     title: string, // the title of the appbar
 };
 
-const AppbarLogin: React.StatelessComponent<WithStyles<string> & AppbarLoginProps> = (props) => {
+const TitledAppbar: React.StatelessComponent<WithStyles<string> & TitledAppbarProps> = (props) => {
     const { classes, children, title } = props;
     return (
         <AppBar position="absolute">
@@ -56,4 +56,4 @@ const AppbarLogin: React.StatelessComponent<WithStyles<string> & AppbarLoginProp
     );
 };
 
-export default withStyles(styles)(AppbarLogin);
+export default withStyles(styles)(TitledAppbar);

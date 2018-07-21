@@ -25,7 +25,7 @@ class ConsoleIO extends React.Component<Props> {
     return (
       <div
         className="scrollbars"
-        style={{ backgroundColor: '#242424', overflowY: 'auto', flexGrow: 1 }}
+        style={{ backgroundColor: '#242424', overflowY: 'auto', overflowX: 'hidden', flexGrow: 1 }}
         ref={(divElem) => this.logRef = divElem}
       >
         {/* <button onClick={this.switch}>Show only logs</button> */}

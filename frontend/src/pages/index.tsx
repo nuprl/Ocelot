@@ -10,7 +10,6 @@ import 'static/styles/JumboContent.css';
 import 'static/styles/body.css';
 
 const styles: StyleRulesCallback = theme => {
-  // themio = theme;
   return {
     root: {
       flexGrow: 1,
@@ -22,15 +21,30 @@ const styles: StyleRulesCallback = theme => {
       display: 'flex',
       backgroundColor: theme.palette.primary.main,
     },
+    jumboContainer: {
+      display: 'flex',
+      flexFlow: 'column',
+      height: '100%',
+    },
     jumboContent: {
       position: 'relative',
       height: '100%',
+      flex: '1 1 auto',
     },
-    toolbar: theme.mixins.toolbar,
+    toolbar: {
+      ...theme.mixins.toolbar,
+      flex: '0 1 auto',
+    },
   };
 };
 
-const Index: React.StatelessComponent<WithStyles<'root' | 'jumboContent' | 'toolbar'>>
+type WithStylesClasses =
+  | 'root'
+  | 'jumboContent'
+  | 'toolbar'
+  | 'jumboContainer';
+
+const Index: React.StatelessComponent<WithStyles<WithStylesClasses>>
   = ({ classes }) => (
     <div className={classes.root}>
       <Notification />
@@ -41,7 +55,7 @@ const Index: React.StatelessComponent<WithStyles<'root' | 'jumboContent' | 'tool
         minSize={0}
       >
         <SideDrawer />
-        <div style={{height: '100%'}}>
+        <div className={classes.jumboContainer}>
           <div className={classes.toolbar} />
           <div className={classes.jumboContent}>
             <JumboContent />
