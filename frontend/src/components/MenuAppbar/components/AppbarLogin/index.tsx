@@ -14,9 +14,6 @@ const styles: StyleRulesCallback = theme => {
         flex: {
             flex: 1,
         },
-        appBar: {
-            zIndex: theme.zIndex.drawer + 1,
-        },
         playIcon: {
             margin: theme.spacing.unit,
             height: theme.typography.display1.fontSize,
@@ -36,7 +33,7 @@ type AppbarLoginProps = {
 const AppbarLogin: React.StatelessComponent<WithStyles<string> & AppbarLoginProps> = (props) => {
     const { classes, children, title } = props;
     return (
-        <AppBar position="absolute" className={classes.appBar}>
+        <AppBar position="absolute">
             <Toolbar>
                 {/* Todo: Do not use PlayStopIcon, use some other icon */}
                 <PlayStopIcon className={classes.playIcon} color={appBarConstrastText} />

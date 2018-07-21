@@ -14,7 +14,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
-import JDCanvas from './joydeepcanvas';
+import JDCanvas, { jdcDeclareStr } from './joydeepcanvas';
 
 const debounceWait = 500; // milliseconds;
 
@@ -44,7 +44,7 @@ type FileEdit = {
     code: string,
 };
 
-type NewWindow = Window & {jdc: JDCanvas};
+type NewWindow = Window & { jdc: JDCanvas };
 
 class CodeEditor extends React.Component<Props> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
@@ -106,14 +106,7 @@ class CodeEditor extends React.Component<Props> {
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         editor.setPosition({ lineNumber: 10, column: 0 });
         editor.focus();
-        monaco.languages.typescript.javascriptDefaults.addExtraLib(`
-        declare const jdc: {
-            getImageFromCanvas: (canvasId: 'inputCanvas' | 'outputCanvas') => undefined | ImageData;
-            setImageToCanvas: (canvasId: 'inputCanvas' | 'outputCanvas', image: ImageData) => void;
-            setPixelToImage: (image: ImageData, x: number, y: number, color: [number, number, number]) => void;
-            getPixelFromImage: (image: ImageData, x: number, y: number) => [number, number, number];
-        };        
-        `); // kind of janky that I have to write code in a string
+        monaco.languages.typescript.javascriptDefaults.addExtraLib(jdcDeclareStr);
         this.editor = editor;
     }
 

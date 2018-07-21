@@ -22,10 +22,15 @@ const styles: StyleRulesCallback = theme => {
       display: 'flex',
       backgroundColor: theme.palette.primary.main,
     },
+    jumboContent: {
+      position: 'relative',
+      height: '100%',
+    },
+    toolbar: theme.mixins.toolbar,
   };
 };
 
-const Index: React.StatelessComponent<WithStyles<'root'>>
+const Index: React.StatelessComponent<WithStyles<'root' | 'jumboContent' | 'toolbar'>>
   = ({ classes }) => (
     <div className={classes.root}>
       <Notification />
@@ -36,9 +41,12 @@ const Index: React.StatelessComponent<WithStyles<'root'>>
         minSize={0}
       >
         <SideDrawer />
-        <main className="jumboContent">
-          <JumboContent />
-        </main>
+        <div style={{height: '100%'}}>
+          <div className={classes.toolbar} />
+          <div className={classes.jumboContent}>
+            <JumboContent />
+          </div>
+        </div>
       </SplitPane>
     </div>
   );

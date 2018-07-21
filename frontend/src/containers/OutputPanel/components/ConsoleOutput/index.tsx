@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Console } from 'console-feed';
 import { inspectorTheme } from 'static/styles/consoleStyle';
 import { Log } from 'containers/OutputPanel/types';
-import 'static/styles/ConsoleScrollbar.css';
+import 'static/styles/Scrollbar.css';
 // NOTE TO SELF, Filtering of logs are possible, maybe nice to include
 // There's a difference between code input and output, so use that for the repl
 // Current bug: Console feed 'remembers' it's console method 
