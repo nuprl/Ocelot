@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Snackbar, { SnackBarOrigin } from '@material-ui/core/Snackbar';
+import Snackbar, { SnackbarOrigin } from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
@@ -43,7 +43,7 @@ function ErrorSnackbar(props: WithStyles<'close'> & ErrorSnackbarProps) {
         props.handleClose();
     };
     
-    let anchorOrigin: SnackBarOrigin = {
+    let anchorOrigin: SnackbarOrigin = {
         vertical: 'top',
         horizontal: 'center',
     };

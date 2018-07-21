@@ -16,9 +16,13 @@ const theme = createMuiTheme({
       light: '#80d6ff',
       main: '#42a5f5',
       dark: '#0077c2',
-      contrastText: '#000',
+      contrastText: '#fff',
     },
     type: 'dark'
+  },
+  zIndex: { // lets monaco editor hover/context info cover over appbar and drawer
+    drawer: -2,
+    appBar: -1,
   }
 });
 
