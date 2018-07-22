@@ -28,9 +28,10 @@ cd ..
 The `frontend/` directory's yarn commands (bootstrapped with create-react-app):
 - `yarn run start` to run the server
 - `yarn run build` to create production build for deployment
+- `yarn run deploy` to deploy to Google Cloud Storage
 
 ### Backend
 The `backend/` directory's yarn commands:
 - `yarn run build` to compile TypeScript to JavaScript
-- `yarn run serve` to run the server the JavaScript code
+- `yarn run serve` to run the server with compiled JavaScript code
 So the recommended usage is `yarn run build && yarn run serve`
