@@ -1,6 +1,7 @@
 import * as React from 'react';
 import UserLogin from '../../containers/UserLogin';
-import AppbarLogin from './components/AppbarLogin';
+import TitledAppbar from './components/TitledAppbar';
+import AppbarButtons from '../AppbarButtons';
 
 type MenuAppbarProps = {
     title: string,
@@ -8,8 +9,9 @@ type MenuAppbarProps = {
 
 export default function MenuAppbar(props: MenuAppbarProps) {
     return (
-        <AppbarLogin title={props.title}>
+        <TitledAppbar title={props.title}>
+            <AppbarButtons />
             <UserLogin />
-        </AppbarLogin>
+        </TitledAppbar>
     );
 }

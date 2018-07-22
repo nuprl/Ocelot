@@ -9,7 +9,7 @@ const JumboContent: React.StatelessComponent = () => (
     <SplitPane
         split="horizontal"
         minSize={48}
-        defaultSize="30%"
+        defaultSize="25%"
         primary="second"
     >
         <SplitPane

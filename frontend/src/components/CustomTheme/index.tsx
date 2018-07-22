@@ -21,8 +21,8 @@ const theme = createMuiTheme({
     type: 'dark'
   },
   zIndex: { // lets monaco editor hover/context info cover over appbar and drawer
-    drawer: -2,
-    appBar: -1,
+    drawer: 1,
+    appBar: 2,
   }
 });
 
