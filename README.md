@@ -1,4 +1,5 @@
 # Ocelot
+
 An online IDE that integrates [Stopify](https://github.com/plasma-umass/Stopify), a compiler that enables users to stop long-running programs with arbitrarily deep recursion and infinite loops. It also integrates an academic sublanguage of JavaScript, _ElementaryJS_.
 
 ### Setting up
@@ -22,3 +23,14 @@ cd ../backend/
 yarn run build && yarn run serve
 cd ..
 ```
+
+### Frontend
+The `frontend/` directory's yarn commands (bootstrapped with create-react-app):
+- `yarn run start` to run the server
+- `yarn run build` to create production build for deployment
+
+### Backend
+The `backend/` directory's yarn commands:
+- `yarn run build` to compile TypeScript to JavaScript
+- `yarn run serve` to run the server the JavaScript code
+So the recommended usage is `yarn run build && yarn run serve`
