@@ -2,6 +2,48 @@
 
 An online IDE that integrates [Stopify](https://github.com/plasma-umass/Stopify), a compiler that enables users to stop long-running programs with arbitrarily deep recursion and infinite loops. It also integrates an academic sublanguage of JavaScript, _ElementaryJS_.
 
+# Build Instructions
+
+Follow these instructions to use the bleeding-edge versions of Stopify, and ElementaryJS with Ocelot.
+
+To install Stopify:
+
+```
+cd Stopify
+yarn install
+(cd stopify-estimators && yarn run build)
+(cd stopify-continuations && yarn run build)
+(cd stopify && yarn run build && yarn link)
+
+```
+
+To install ElementaryJS:
+
+```
+cd ElementaryJS
+yarn install
+yarn run build
+yarn run test
+```
+
+To setup Ocelot frontend:
+
+```
+cd paws
+cd frontend
+yarn link stopify
+yarn link elementary-js
+yarn run build
+```
+
+To run Ocelot locally:
+
+
+```
+(cd build && python -m SimpleHTTPServer)
+```
+
+
 ### Setting up
 You'll need the following:
 - [Node](https://nodejs.org/en/)

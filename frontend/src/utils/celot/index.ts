@@ -1,5 +1,5 @@
 import * as t from 'babel-types';
-// import * as babel from 'babel-core';
+import * as babel from 'babel-core';
 import { Visitor, NodePath } from 'babel-traverse';
 // import * as Babel from '@babel/standalone';
 import celotSymposium from './runtime';
@@ -48,13 +48,13 @@ function plugin() {
 
 function compile(code: string): string {
   plugin();
-  // const result = Babel.transform(code, {
-  //   plugins: [plugin],
-  //   ast: false,
-  //   code: true
-  // });
-  // return result.code!;
-  throw new Error('disabled');
+  const result = babel.transform(code, {
+    plugins: [plugin],
+    ast: false,
+    code: true
+  });
+  return result.code!;
+
 }
 
 export { compile, celotSymposium };

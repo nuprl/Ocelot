@@ -6,6 +6,7 @@
     "@babel/standalone": "^7.0.0-beta.54",
     "@material-ui/core": "^1.4.1",
     "@material-ui/icons": "^2.0.0",
+    "@types/babel-core": "^6.25.5",
     "@types/react": "^16.4.6",
     "@types/react-dom": "^16.0.6",
     "babel-traverse": "^6.26.0",
@@ -45,7 +46,7 @@
     "typescript": "^2.9.2"
   },
   "scripts": {
-    "build": "tsc && webpack",
+    "build": "tsc && webpack && rsync -avd public/ build/",
     "deploy": "gsutil -h Cache-Control:private -m rsync -d -r build gs://paws",
     "test": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"

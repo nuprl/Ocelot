@@ -18,7 +18,6 @@ const config = {
   },
   devtool: 'source-map',
   node: {
-    // Commander has these as dependencies
     'fs': 'empty',
     'child_process': 'empty',
     'net': 'empty',
