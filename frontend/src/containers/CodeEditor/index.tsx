@@ -1,15 +1,15 @@
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
-import { RootState } from 'store';
+import { RootState } from '../../store';
 import {
     getSelectedCode,
     isValidFileIndex,
     getSelectedFileName,
     getSelectedFileIndex,
     getSelectedIsSaved
-} from 'store/userFiles/selectors';
-import { editFileCloud, editFileLocal, markFileNotSaved } from 'store/userFiles/actions';
+} from '../../store/userFiles/selectors';
+import { editFileCloud, editFileLocal, markFileNotSaved } from '../../store/userFiles/actions';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';

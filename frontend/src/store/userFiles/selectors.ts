@@ -1,4 +1,6 @@
-import { RootState } from 'store';
+ // TODO(arjun): I think it is odd to depend on the main module of the parent
+ // directory. This was not obvious when using multiple roots.
+import { RootState } from '../index';
 
 export const getSelectedFileIndex = (state: RootState) => (
     state.userFiles.filesInfo.selectedFileIndex

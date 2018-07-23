@@ -3,13 +3,13 @@ import { withStyles, StyleRulesCallback, WithStyles } from '@material-ui/core/st
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import defaultImage from 'static/img/defaultCanvasImage.jpg';
+// import defaultImage from '../../static/img/defaultCanvasImage.jpg';
 import ReactResizeDetector from 'react-resize-detector';
 import 'static/styles/Scrollbar.css';
 // import Typography from '@material-ui/core/Typography';
 import UploadIcon from '@material-ui/icons/CloudUpload';
 import Button from '@material-ui/core/Button';
-import GetUrlDialog from 'components/GetUrlDialog';
+import GetUrlDialog from '../../components/GetUrlDialog';
 import Zoom from '@material-ui/core/Zoom';
 
 const styles: StyleRulesCallback = theme => ({
@@ -64,7 +64,7 @@ class CanvasOutput extends React.Component<Props, State> {
     componentDidMount() { // temp testing
         this.inputCanvas = document.getElementById('inputCanvas') as HTMLCanvasElement;
         this.outputCanvas = document.getElementById('outputCanvas') as HTMLCanvasElement;
-        this.loadImageToCanvas(defaultImage);
+        // this.loadImageToCanvas(defaultImage);
     }
 
     openDialog = () => {

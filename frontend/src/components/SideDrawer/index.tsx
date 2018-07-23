@@ -4,7 +4,7 @@ import List from '@material-ui/core/List';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
 import ListButton from '../ListButton';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
-import FilesFolder from 'containers/FilesFolder';
+import FilesFolder from '../../containers/FilesFolder';
 
 const styles: StyleRulesCallback = theme => ({
     drawerPaper: {

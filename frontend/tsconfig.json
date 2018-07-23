@@ -2,17 +2,15 @@
   "extends": "../tsconfig.shared.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "paths" : {
-      "*": ["./src/*"]
-    },
     "outDir": "build/dist",
-    "module": "esnext",
+    "module": "commonjs",
     "target": "es5",
     "lib": ["es6", "dom"],
-    "jsx": "react",
-    "moduleResolution": "node",
-    "rootDir": "./src"
+    "jsx": "react"
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules",
     "build",

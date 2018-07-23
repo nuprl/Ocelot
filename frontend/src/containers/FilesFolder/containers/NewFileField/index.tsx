@@ -10,13 +10,13 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
 import Input from '@material-ui/core/Input';
 import FormControl from '@material-ui/core/FormControl';
-import ListItemStyles from 'components/ListItemStyles';
-import { ListItemStylesTypes } from 'components/ListItemStyles';
+import ListItemStyles from '../../../../components/ListItemStyles';
+import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';
-import { RootState } from 'store';
+import { RootState } from '../../../../store';
 import { Dispatch } from 'redux';
-import { deleteNewFileField, createNewFile, triggerNewFileError } from 'store/userFiles/actions';
-import { UserFiles } from 'store/userFiles/types';
+import { deleteNewFileField, createNewFile, triggerNewFileError } from '../../../../store/userFiles/actions';
+import { UserFiles } from '../../../../store/userFiles/types';
 import FormHelperText from '@material-ui/core/FormHelperText';
 
 // this is copied from backend

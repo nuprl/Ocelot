@@ -1,11 +1,11 @@
 import * as React from 'react';
 import FileItem from '../../components/FileItem';
-import ListItemStyles from 'components/ListItemStyles';
-import { ListItemStylesTypes } from 'components/ListItemStyles';
+import ListItemStyles from '../../../../components/ListItemStyles';
+import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';
-import { RootState } from 'store';
+import { RootState } from '../../../../store';
 import { Dispatch } from 'redux';
-import { selectFile, deleteFile } from 'store/userFiles/actions';
+import { selectFile, deleteFile } from '../../../../store/userFiles/actions';
 import { connect } from 'react-redux';
 
 type Props = {

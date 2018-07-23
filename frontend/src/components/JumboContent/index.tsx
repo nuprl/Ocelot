@@ -1,8 +1,8 @@
 import * as React from 'react';
 import SplitPane from 'react-split-pane';
-import CanvasOutput from 'components/CanvasOutput';
-import OutputPanel from 'containers/OutputPanel';
-import EditorSuite from 'components/EditorSuite';
+import CanvasOutput from '../CanvasOutput';
+import OutputPanel from '../../containers/OutputPanel';
+import EditorSuite from '../EditorSuite';
 import 'static/styles/SplitPane.css';
 
 const JumboContent: React.StatelessComponent = () => (

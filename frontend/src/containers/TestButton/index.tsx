@@ -1,13 +1,13 @@
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { WithStyles, withStyles, StyleRulesCallback, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { RootState } from 'store';
+import { RootState } from '../../store';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { setTestRunner, removeTestRunner } from 'store/codeEditor/actions';
-import { getSelectedCode } from 'store/userFiles/selectors';
+import { setTestRunner, removeTestRunner } from '../../store/codeEditor/actions';
+import { getSelectedCode } from '../../store/userFiles/selectors';
 import ExploreIcon from '@material-ui/icons/Explore';
-import { celotSymposium, compile } from 'utils/celot';
+import { celotSymposium, compile } from '../../utils/celot';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 

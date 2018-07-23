@@ -7,8 +7,8 @@ import ConsoleInput from './components/ConsoleInput';
 import ConsoleOutput from './components/ConsoleOutput';
 import { Hook, Decode } from 'console-feed';
 import 'static/styles/ConsoleTabs.css';
-import { Log } from 'containers/OutputPanel/types';
-import ClearButton from 'containers/OutputPanel/components/ClearButton';
+import { Log } from './types';
+import ClearButton from './components/ClearButton';
 
 const styles: StyleRulesCallback = theme => ({
     root: {

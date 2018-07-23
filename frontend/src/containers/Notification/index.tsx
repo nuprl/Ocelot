@@ -1,8 +1,8 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { closeNotification } from 'store/notification/actions';
+import { closeNotification } from '../../store/notification/actions';
 import NotificationBar from './components/NotificationBar';
-import { RootState } from 'store/';
+import { RootState } from '../../store/';
 
 /**
  * Get the current state of the error notification

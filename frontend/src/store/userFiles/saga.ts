@@ -1,13 +1,13 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
 import * as t from './types';
-import { triggerNotification } from 'store/notification/actions';
-import { logOutUser } from 'store/userLogin/actions';
-import { loadFilesSuccess, loadFilesFailure, markFileSaved, } from 'store/userFiles/actions';
-import { batchActions } from 'store/batchActions';
+import { triggerNotification } from '../../store/notification/actions';
+import { logOutUser } from '../../store/userLogin/actions';
+import { loadFilesSuccess, loadFilesFailure, markFileSaved, } from '../../store/userFiles/actions';
+import { batchActions } from '../../store/batchActions';
 
-import { UserFilesResponse, getUserFiles } from 'utils/api/getUserFiles';
-import { SaveFilesResponse, saveChanges } from 'utils/api/saveFileChanges';
-import { isFailureResponse, FileChange } from 'utils/api/apiHelpers';
+import { UserFilesResponse, getUserFiles } from '../../utils/api/getUserFiles';
+import { SaveFilesResponse, saveChanges } from '../../utils/api/saveFileChanges';
+import { isFailureResponse, FileChange } from '../../utils/api/apiHelpers';
 
 function* fetchFiles(action: t.LoadFilesRequestAction) {
     const response: UserFilesResponse = yield call(getUserFiles);

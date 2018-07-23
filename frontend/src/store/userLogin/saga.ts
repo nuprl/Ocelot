@@ -1,12 +1,12 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
 import { LogInUserRequestAction, LOG_IN_USER_REQUEST } from './types';
-import { triggerNotification } from 'store/notification/actions';
+import { triggerNotification } from '../notification/actions';
 import { loadFilesRequest } from '../userFiles/actions';
 import { logInUserSuccess, logOutUser } from './actions';
-import { batchActions } from 'store/batchActions';
+import { batchActions } from '../../store/batchActions';
 
-import { validateUserResponse, validateUser } from 'utils/api/validateUser';
-import { isFailureResponse } from 'utils/api/apiHelpers';
+import { validateUserResponse, validateUser } from '../../utils/api/validateUser';
+import { isFailureResponse } from '../../utils/api/apiHelpers';
 
 function* validate(action: LogInUserRequestAction) {
     const response: validateUserResponse = yield call(validateUser, action.googleUser);

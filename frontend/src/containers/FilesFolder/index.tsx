@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { createNewFileField, toggleFilesFolder } from 'store/userFiles/actions';
-import { RootState } from 'store/';
+import { createNewFileField, toggleFilesFolder } from '../../store/userFiles/actions';
+import { RootState } from '../../store/';
 import FilesFolder from './components/FilesFolder';
 
 const mapStateToProps = (state: RootState) => ({

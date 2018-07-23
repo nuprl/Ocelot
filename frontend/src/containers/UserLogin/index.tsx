@@ -2,10 +2,10 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import LoginLogout from './components/LoginLogout';
 import { GoogleLoginResponse } from 'react-google-login';
-import { logInUserRequest, logOutUser, loadingOngoing } from 'store/userLogin/actions';
-import { RootState } from 'store/';
-import { batchActions } from 'store/batchActions';
-import { resetDefaultFiles, closeFilesFolder, openFilesFolder } from 'store/userFiles/actions';
+import { logInUserRequest, logOutUser, loadingOngoing } from '../../store/userLogin/actions';
+import { RootState } from '../../store/';
+import { batchActions } from '../../store/batchActions';
+import { resetDefaultFiles, closeFilesFolder, openFilesFolder } from '../../store/userFiles/actions';
 
 const mapStateToProps = (state: RootState) => ({
     loggedIn: state.userLogin.loggedIn,

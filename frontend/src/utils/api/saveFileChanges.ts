@@ -6,7 +6,7 @@ import {
     failureResponse,
     FileChange,
     successResponse
-} from 'utils/api/apiHelpers';
+} from './apiHelpers';
 
 export type SaveFilesResponse = SuccessResponse<{ message: string }> | FailureResponse;
 
