@@ -11,6 +11,7 @@ import 'static/styles/JumboContent.css';
 import 'static/styles/body.css';
 import Typography from '@material-ui/core/Typography';
 
+
 const styles: StyleRulesCallback = theme => {
   return {
     root: {

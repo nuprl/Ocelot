@@ -54,7 +54,7 @@ class OutputPanel extends React.Component<Props, State> {
                 this.addNewLog({ data: ['Console was cleared'], method: 'info' });
                 return;
             }
-            this.addNewLog(decodedLog);
+            this.addNewLog(decodedLog as any);
         });
     }
 

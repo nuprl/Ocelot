@@ -25,7 +25,8 @@
     "react-split-pane": "^0.1.82",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
-    "redux-saga": "^0.16.0"
+    "redux-saga": "^0.16.0",
+    "webpack-cli": "^3.1.0"
   },
   "devDependencies": {
     "@types/babel-traverse": "^6.25.4",
@@ -38,12 +39,13 @@
     "@types/react-redux": "^6.0.4",
     "@types/react-resize-detector": "^2.2.0",
     "@types/redux-logger": "^3.0.6",
+    "css-loader": "^1.0.0",
+    "react-scripts-webpack-config-editor": "^1.0.1",
     "stopify": "^0.5.0",
     "typescript": "^2.9.2"
   },
   "scripts": {
-    "start": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts start",
-    "build": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts build",
+    "build": "tsc && webpack",
     "deploy": "gsutil -h Cache-Control:private -m rsync -d -r build gs://paws",
     "test": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"

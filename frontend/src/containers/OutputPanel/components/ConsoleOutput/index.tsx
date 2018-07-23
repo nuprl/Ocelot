@@ -30,7 +30,7 @@ class ConsoleIO extends React.Component<Props> {
       >
         {/* <button onClick={this.switch}>Show only logs</button> */}
         <Console
-          logs={logs}
+          logs={logs as any}
           variant="dark"
           styles={inspectorTheme}
         />

@@ -2,21 +2,23 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
 import { WithStyles, withStyles, StyleRulesCallback, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { RootState } from 'store';
+import { RootState } from '../../store';
 import { Dispatch } from 'redux';
-import { setCodeRunner, removeCodeRunner } from 'store/codeEditor/actions';
+import { setCodeRunner, removeCodeRunner } from '../../store/codeEditor/actions';
 import { connect } from 'react-redux';
-import { getSelectedCode } from 'store/userFiles/selectors';
+import { getSelectedCode } from '../../store/userFiles/selectors';
 import PlayIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
 
-declare const stopify: any; // TODO(arjun): we need to fix this
+import * as elementaryJS from 'elementary-js';
+import * as stopify from 'stopify';
 
-type StopifyResult = {
-    type: string,
-    value: Error,
-    stack: string[]
-};
+// TODO(arjun): I think these hacks are necessary for eval to work. We either 
+// do them here or we do them within the implementation of Stopify. I want 
+// them here for now until I'm certain there isn't a cleaner way.
+import * as elementaryRTS from 'elementary-js/dist/runtime';
+(window as any).stopify = stopify;
+(window as any).elementaryjs = elementaryRTS;
 
 const styles: StyleRulesCallback = theme => ({
     button: {
@@ -43,7 +45,7 @@ type Props = WithStyles<'button' | 'leftIcon'> & {
 
 class RunStopButton extends React.Component<Props> {
 
-    handleStopifyResult = (result: StopifyResult) => {
+    handleStopifyResult = (result: stopify.Result) => {
         if (result.type === 'exception') {
             // tslint:disable-next-line:no-console
             console.error(result.value, result.stack[0]);
@@ -51,11 +53,20 @@ class RunStopButton extends React.Component<Props> {
     }
 
     onRun = () => {
+        const compiled = elementaryJS.compile(this.props.code, true);
+        if (compiled.kind === 'error') {
+            for (const err of compiled.errors) {
+              console.error(`Line ${err.location.start.line}: ${err.message}`);
+            }
+            return;
+        }
         try {
-            const runner = stopify.stopifyLocally(
-                this.props.code,
+            const runner = stopify.stopifyLocallyFromAst(
+                compiled.node,
+                undefined, // TODO(arjun): will need to specify for error locs.
                 {
                     externals: [
+                        'elementaryjs',
                         'console',
                         'lib220'
                     ]
