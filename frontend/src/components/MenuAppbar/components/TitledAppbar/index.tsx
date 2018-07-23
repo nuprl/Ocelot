@@ -4,20 +4,19 @@ import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Fade from '@material-ui/core/Fade';
-import { PlayStopIcon } from 'components/PlayStopIcon';
+import PawIcon from '@material-ui/icons/Pets';
 
-let appBarConstrastText: string = '#fff';
+// let appBarConstrastText: string = '#fff';
 
 const styles: StyleRulesCallback = theme => {
-    appBarConstrastText = theme.palette.primary.contrastText;
+    // appBarConstrastText = theme.palette.primary.contrastText;
     return {
         flex: {
             flex: 1,
         },
-        playIcon: {
-            margin: theme.spacing.unit,
-            height: theme.typography.display1.fontSize,
-            width: theme.typography.display1.fontSize,
+        icon: {
+            marginBottom: '0.25em',
+            marginRight: theme.spacing.unit * 1.5,
         },
         title: {
             fontFamily: 'Fira Mono, Roboto, Arial, sans-serif',
@@ -36,7 +35,7 @@ const TitledAppbar: React.StatelessComponent<WithStyles<string> & TitledAppbarPr
         <AppBar position="absolute">
             <Toolbar>
                 {/* Todo: Do not use PlayStopIcon, use some other icon */}
-                <PlayStopIcon className={classes.playIcon} color={appBarConstrastText} />
+                <PawIcon className={classes.icon}/>
                 <Fade in={true} timeout={700} >
                     <Typography
                         variant="subheading"

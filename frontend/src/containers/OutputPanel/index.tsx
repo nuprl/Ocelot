@@ -50,6 +50,10 @@ class OutputPanel extends React.Component<Props, State> {
     componentDidMount() {
         Hook(window.console, (log: any) => {
             const decodedLog = Decode(log);
+            if (typeof decodedLog.data !== 'object') {
+                this.addNewLog({ data: ['Console was cleared'], method: 'info' });
+                return;
+            }
             this.addNewLog(decodedLog);
         });
     }
@@ -60,6 +64,7 @@ class OutputPanel extends React.Component<Props, State> {
 
     clearLogs = () => {
         this.setState({ logs: [] });
+        console.clear();
     };
 
     addNewCommandResult = (command: string, result: any, isError: boolean) => {

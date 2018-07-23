@@ -14,7 +14,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
-import JDCanvas, { jdcDeclareStr } from './joydeepcanvas';
+import elemjshighlight from './elemjsHighlighter';
 
 const debounceWait = 500; // milliseconds;
 
@@ -44,8 +44,6 @@ type FileEdit = {
     code: string,
 };
 
-type NewWindow = Window & { jdc: JDCanvas };
-
 class CodeEditor extends React.Component<Props> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
     fileEditsQueue: FileEdit[];
@@ -55,58 +53,34 @@ class CodeEditor extends React.Component<Props> {
         this.fileEditsQueue = [];
     }
 
-    componentDidMount() {
-
-        const getCanvasContext
-            = (canvasId: string): Partial<{ canvas: HTMLCanvasElement, context: CanvasRenderingContext2D }> => {
-                const canvas = (document.getElementById(canvasId) as HTMLCanvasElement);
-                if (canvas === null) {
-                    return {};
-                }
-                return { canvas: canvas, context: (canvas.getContext('2d') as CanvasRenderingContext2D) };
-            };
-
-        const jdc: JDCanvas = {
-            getImageFromCanvas(canvasId: 'inputCanvas' | 'outputCanvas') {
-                const { canvas, context } = getCanvasContext(canvasId);
-                if (canvas === undefined || context === undefined) {
-                    return undefined;
-                }
-                const width = canvas.width;
-                const height = canvas.height;
-                return context.getImageData(0, 0, width, height);
+    editorWillMount = (monaco: typeof monacoEditor) => {
+        // monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+        //     noLib: true,
+        //     allowNonTsExtensions: true
+        // });
+        // monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+        //     noSemanticValidation: true,
+        //     noSyntaxValidation: false,
+        // });
+        monaco.languages.register({ id: 'elementaryjs' });
+        monaco.languages.setMonarchTokensProvider('elementaryjs', elemjshighlight());
+        monaco.languages.setLanguageConfiguration('elementaryjs', {
+            comments: {
+                lineComment: '//',
+                blockComment: ['/*', '*/']
             },
-            setImageToCanvas(canvasId: 'inputCanvas' | 'outputCanvas', image: ImageData) {
-                const { context } = getCanvasContext(canvasId);
-                if (context === undefined) {
-                    return;
-                }
-                context.putImageData(image, 0, 0);
-            },
-            setPixelToImage(image: ImageData, x: number, y: number, color: [number, number, number]) {
-                const index = 4 * (y * image.width + x);
-                image.data[index] = color[0];
-                image.data[index + 1] = color[1];
-                image.data[index + 2] = color[2];
-                image.data[index + 3] = 255;
-            },
-            getPixelFromImage(image: ImageData, x: number, y: number) {
-                const index = 4 * (y * image.width + x);
-                return [
-                    image.data[index],
-                    image.data[index + 1],
-                    image.data[index + 2]
-                ];
-            }
-        };
-
-        (window as NewWindow).jdc = jdc;
-    }
+            brackets: [
+                ['(', ')'],
+                ['{', '}'],
+                ['[', ']'],
+            ]
+        });
+    };
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         editor.setPosition({ lineNumber: 10, column: 0 });
         editor.focus();
-        monaco.languages.typescript.javascriptDefaults.addExtraLib(jdcDeclareStr);
+        editor.getModel().updateOptions({tabSize: 2}); // what if there are different models?
         this.editor = editor;
     }
 
@@ -197,13 +171,14 @@ class CodeEditor extends React.Component<Props> {
             <div style={{ height: '100%', width: '100%' }}>
                 <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
                 <MonacoEditor
-                    language="javascript"
+                    language="elementaryjs"
                     theme="vs-dark"
                     value={code}
                     options={options}
                     onChange={this.onChange}
                     editorDidMount={this.editorDidMount}
-                    height="calc(100% - 52px)"
+                    editorWillMount={this.editorWillMount}
+                    height="calc(100% - 48px)"
                 />
             </div >
         );

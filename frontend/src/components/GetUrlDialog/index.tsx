@@ -17,7 +17,14 @@ type State = {
     error: boolean,
     text: string,
 };
-
+/**
+ * This React component displays an empty state for the canvas section
+ * We didn't need this but I wrote it already and I didn't want to throw
+ * it away.
+ *
+ * @class GetUrlDialog
+ * @extends {React.Component<Props, State>}
+ */
 class GetUrlDialog extends React.Component<Props, State> {
 
     constructor(props: Props) {

@@ -7,7 +7,7 @@ import defaultImage from 'static/img/defaultCanvasImage.jpg';
 import ReactResizeDetector from 'react-resize-detector';
 import 'static/styles/Scrollbar.css';
 // import Typography from '@material-ui/core/Typography';
-import UploadIcon from '@material-ui/icons/FileUpload';
+import UploadIcon from '@material-ui/icons/CloudUpload';
 import Button from '@material-ui/core/Button';
 import GetUrlDialog from 'components/GetUrlDialog';
 import Zoom from '@material-ui/core/Zoom';
