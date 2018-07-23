@@ -22,17 +22,21 @@ const visitor: Visitor = {
     exit(path: NodePath<t.Program>) {
       const functionIdentifiers = getTestFunctionId(path.get('body'));
       const numStatements = path.get('body').length;
-      path.get('body')[numStatements - 1].insertAfter(
-          t.expressionStatement(
-            t.callExpression(
-                t.memberExpression(
-                    t.identifier('celotSymposium'),
-                    t.identifier('celot')
-                ),
-                [t.arrayExpression(functionIdentifiers)]
-              )
+      const testCallStatement = t.expressionStatement(
+        t.callExpression(
+            t.memberExpression(
+                t.identifier('celotSymposium'),
+                t.identifier('celot')
+            ),
+            [t.arrayExpression(functionIdentifiers)]
           )
       );
+      if (numStatements === 0) {
+        path.replaceWith(t.program([testCallStatement]));
+        path.stop();
+        return;
+      }
+      path.get('body')[numStatements - 1].insertAfter(testCallStatement);
       path.stop();
     }
   },
