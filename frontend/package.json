@@ -41,12 +41,14 @@
     "@types/react-resize-detector": "^2.2.0",
     "@types/redux-logger": "^3.0.6",
     "css-loader": "^1.0.0",
+    "http-server": "^0.11.1",
     "stopify": "^0.5.0",
     "typescript": "^2.9.2"
   },
   "scripts": {
     "build": "tsc && webpack && rsync -avd public/ build/",
     "deploy": "gsutil -h Cache-Control:private -m rsync -d -r build gs://paws",
+    "serve-local": "http-server build -p 8080",
     "test": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },

@@ -1,8 +1,0 @@
-{
-  "private": true,
-  "workspaces": [
-      "nice-js-sublang",
-      "nice-js-sublang-runtime",
-      "frontend"
-  ]
-}

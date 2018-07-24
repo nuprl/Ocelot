@@ -30,17 +30,45 @@ yarn link
 To setup Ocelot frontend:
 
 ```
-cd Ocelot
-cd frontend
-yarn install && yarn link stopify && yarn link elementary-js && yarn run build
+cd Ocelot/frontend && yarn install && yarn link stopify && yarn link elementary-js && yarn run build
 ```
 
 To run Ocelot locally:
 
+```
+cd Ocelot/frontend
+yarn run serve-local
+```
+
+## To hack on the 220 library locally
 
 ```
-(cd build && python -m SimpleHTTPServer)
+cd Ocelot/frontend/build
+ln -s <path-to-local-220-library> lib220.js
 ```
+
+## Issues you will have
+
+- Delete this directory: `rm -rf Ocelot/node_modules`
+
+- There is a bug in the latest Yarn (1.7) that gives a stupid error when you
+  use `yarn install` or `yarn add` after running `yarn link`:
+
+  https://github.com/yarnpkg/yarn/issues/5876
+
+  So, first run:
+
+  ```
+  yarn unlink stopify && yarn unlink elementary-js
+  ```
+
+  Then run `yarn install` or `yarn add ...`:
+
+  then run:
+
+  ```
+  yarn link stopify && yarn link elementary-js
+  ```
 
 
 ### Setting up
