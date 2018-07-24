@@ -24,16 +24,15 @@ cd ElementaryJS
 yarn install
 yarn run build
 yarn run test
+yarn link
 ```
 
 To setup Ocelot frontend:
 
 ```
-cd paws
+cd Ocelot
 cd frontend
-yarn link stopify
-yarn link elementary-js
-yarn run build
+yarn install && yarn link stopify && yarn link elementary-js && yarn run build
 ```
 
 To run Ocelot locally:
