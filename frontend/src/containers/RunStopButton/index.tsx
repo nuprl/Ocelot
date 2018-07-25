@@ -77,6 +77,7 @@ class RunStopButton extends React.Component<Props> {
                 }
             );
             this.props.setRunnerToState(runner);
+            (window as any).lib220.setRunner(runner);
             runner.run((result: any) => {
                 // tslint:disable-next-line:no-console
                 // console.log(result);
