@@ -65,9 +65,9 @@ class RunStopButton extends React.Component<Props> {
         }
 
         try {
-            const runner = stopify.stopifyLocallyFromAst(
-                compiled.node,
-                undefined, // TODO(arjun): will need to specify for error locs.
+            const runner = stopify.stopifyLocally(
+                this.props.code,
+                // undefined, // TODO(arjun): will need to specify for error locs.
                 {
                     externals: [
                         'elementaryjs',
