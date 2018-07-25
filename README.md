@@ -51,6 +51,14 @@ cd Ocelot/frontend
 yarn run serve-local
 ```
 
+To setup and run backend locally
+
+```bash
+cd Ocelot/backend
+yarn install
+yarn run build && yarn run serve
+```
+
 ## To hack on the 220 library locally
 
 ```bash
@@ -80,11 +88,3 @@ ln -s <path-to-local-220-library> lib220.js
   ```
   yarn link stopify && yarn link elementary-js
   ```
-
-Setting up backend and running backend locally:
-
-```bash
-cd Ocelot/backend
-yarn install
-yarn run build && yarn run serve
-```
