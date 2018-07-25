@@ -60,6 +60,10 @@ class RunStopButton extends React.Component<Props> {
             }
             return;
         }
+        if (window.location.hostname === 'localhost') {
+            window.localStorage.setItem('code', this.props.code);
+        }
+
         try {
             const runner = stopify.stopifyLocallyFromAst(
                 compiled.node,

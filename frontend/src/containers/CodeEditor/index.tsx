@@ -81,6 +81,12 @@ class CodeEditor extends React.Component<Props> {
         editor.setPosition({ lineNumber: 10, column: 0 });
         editor.focus();
         editor.getModel().updateOptions({tabSize: 2}); // what if there are different models?
+        if (window.location.hostname === 'localhost') {
+            const code = window.localStorage.getItem('code');
+            if (code !== null) {
+                editor.setValue(code);
+            }
+        }
         this.editor = editor;
     }
 
