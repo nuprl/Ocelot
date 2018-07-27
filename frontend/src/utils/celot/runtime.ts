@@ -27,7 +27,7 @@ const celotSymposium = {
             try {
                 test();
                 console.log(
-                    `%c CLEAR %c ${test.name}`,
+                    `%c OK %c ${test.name}`,
                     'background-color: #2ac093; color: #212121;',
                     'color: #2ac093;'
                 );
