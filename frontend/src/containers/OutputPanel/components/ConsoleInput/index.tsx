@@ -91,6 +91,7 @@ class ConsoleInput extends React.Component<WithStyles<string> & Props> {
                 <div style={{ verticalAlign: 'middle', width: '100%', height: '20px' }}>
                     <MonacoEditor
                         theme="vs-dark"
+                        language="elementaryjs"
                         options={monacoOptions}
                         editorDidMount={this.editorDidMount}
                     />

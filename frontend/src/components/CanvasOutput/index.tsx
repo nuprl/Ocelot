@@ -64,7 +64,6 @@ class CanvasOutput extends React.Component<Props, State> {
     componentDidMount() { // temp testing
         this.inputCanvas = document.getElementById('inputCanvas') as HTMLCanvasElement;
         this.outputCanvas = document.getElementById('outputCanvas') as HTMLCanvasElement;
-        // this.loadImageToCanvas(defaultImage);
     }
 
     openDialog = () => {
@@ -90,7 +89,6 @@ class CanvasOutput extends React.Component<Props, State> {
                 return;
             }
             // tslint:disable-next-line:no-console
-            console.log('Loaded!');
             this.inputCanvas.height = img.naturalHeight;
             this.inputCanvas.width = img.naturalWidth;
             this.outputCanvas.height = img.naturalHeight;

@@ -16,7 +16,7 @@
 }
 
  .Resizer.horizontal {
-    height: 11px;
+    height: 20px;
     margin: -5px 0;
     border-top: 5px solid rgba(255, 255, 255, 0);
     border-bottom: 5px solid rgba(255, 255, 255, 0);
@@ -30,7 +30,7 @@
 }
 
 .Resizer.vertical {
-    width: 11px;
+    width: 20px;
     margin: 0 -5px;
     border-left: 5px solid rgba(255, 255, 255, 0);
     border-right: 5px solid rgba(255, 255, 255, 0);

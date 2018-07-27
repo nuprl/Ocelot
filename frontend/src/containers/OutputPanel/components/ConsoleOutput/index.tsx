@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { Console } from 'console-feed';
 import { inspectorTheme } from '../../../../static/styles/consoleStyle';
-import { Log } from '../../types';
 import 'static/styles/Scrollbar.css';
+import { Message } from 'console-feed/lib/definitions/Component';
 // NOTE TO SELF, Filtering of logs are possible, maybe nice to include
 // There's a difference between code input and output, so use that for the repl
 // Current bug: Console feed 'remembers' it's console method 
 type Props = {
-  logs: Log[],
+  logs: Message[]
 };
 
-class ConsoleIO extends React.Component<Props> {
+class ConsoleOutput extends React.Component<Props> {
   logRef: HTMLDivElement | null = null;
 
   componentDidUpdate() {
@@ -30,7 +30,7 @@ class ConsoleIO extends React.Component<Props> {
       >
         {/* <button onClick={this.switch}>Show only logs</button> */}
         <Console
-          logs={logs as any}
+          logs={logs}
           variant="dark"
           styles={inspectorTheme}
         />
@@ -41,4 +41,4 @@ class ConsoleIO extends React.Component<Props> {
 
 }
 
-export default ConsoleIO;
+export default ConsoleOutput;

@@ -7,8 +7,9 @@ import ConsoleInput from './components/ConsoleInput';
 import ConsoleOutput from './components/ConsoleOutput';
 import { Hook, Decode } from 'console-feed';
 import 'static/styles/ConsoleTabs.css';
-import { Log } from './types';
 import ClearButton from './components/ClearButton';
+import { Message } from 'console-feed/lib/definitions/Console';
+import { Message as FullMessage } from 'console-feed/lib/definitions/Component';
 
 const styles: StyleRulesCallback = theme => ({
     root: {
@@ -26,7 +27,7 @@ const EmptyDiv: React.StatelessComponent = () => (
 type Props = WithStyles<'root'>;
 
 type State = {
-    logs: Log[],
+    logs: Message[],
 };
 /**
  * OutputPanel component responsible for
@@ -54,11 +55,14 @@ class OutputPanel extends React.Component<Props, State> {
                 this.addNewLog({ data: ['Console was cleared'], method: 'info' });
                 return;
             }
-            this.addNewLog(decodedLog as any);
+            if (decodedLog.data.length === 0) { // prevent console.log() from logging
+                return;
+            }
+            this.addNewLog(decodedLog);
         });
     }
 
-    addNewLog = (decodedLog: Log) => {
+    addNewLog = (decodedLog: Message) => {
         this.setState((prevState) => ({ logs: [...prevState.logs, decodedLog] }));
     };
 
@@ -68,11 +72,10 @@ class OutputPanel extends React.Component<Props, State> {
     };
 
     addNewCommandResult = (command: string, result: any, isError: boolean) => {
+        const commandLog = {method: 'command', data: [command]};
+        const resultLog = {method: isError ? 'error': 'result', data: [result]};
         this.setState((prevState) => ({
-            logs: [...prevState.logs,
-            { method: 'command', data: [command] },
-            { method: isError ? 'error' : 'result', data: [result] }
-            ]
+            logs: [...prevState.logs, (commandLog as Message), (resultLog as Message)]
         }));
     };
 
@@ -88,7 +91,7 @@ class OutputPanel extends React.Component<Props, State> {
                     </Tabs>
                 </AppBar>
                 <div style={{ height: 'calc(100% - 48px)', flexDirection: 'column', display: 'flex' }}>
-                    <ConsoleOutput logs={this.state.logs} />
+                    <ConsoleOutput logs={this.state.logs as FullMessage[]} />
                     <ConsoleInput onOutput={this.addNewCommandResult}/>
                 </div>
             </div>

@@ -99,5 +99,3 @@ export function* watchDeleteFile() {
 export function* watchEditFile() {
     yield takeEvery(t.EDIT_FILE_CLOUD, makeFileChanges);
 }
-
-// watch edit file but not constantly, new action may be needed
