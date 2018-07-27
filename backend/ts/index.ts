@@ -411,6 +411,9 @@ async function getFileHistory(req: Request) {
   if (valid.isFailure) {
     return failureResponse(valid.message);
   }
+  if (req.body.fileName.length === 0) {
+    return failureResponse('Empty fileName is not valid');
+  }
 
   try {
     const options = {
