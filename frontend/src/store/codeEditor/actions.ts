@@ -1,5 +1,6 @@
 import * as t from './types';
 import { ActionCreator } from 'redux';
+import * as monacoEditor from 'monaco-editor';
 
 export const setCodeRunner: ActionCreator<t.SetCodeRunnerAction>
     = (runner: any) => ({
@@ -21,4 +22,10 @@ export const setTestRunner: ActionCreator<t.SetTestRunnerAction>
 export const removeTestRunner: ActionCreator<t.RemoveTestRunnerAction>
 = () => ({
     type: t.REMOVE_TEST_RUNNER
+});
+
+export const setMonacoEditor: ActionCreator<t.SetMonacoEditorAction>
+= (monacoEditor: monacoEditor.editor.IStandaloneCodeEditor) => ({
+    type: t.SET_MONACO_EDITOR,
+    monacoEditor: monacoEditor
 });

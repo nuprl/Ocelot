@@ -1,13 +1,17 @@
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
+import red from '@material-ui/core/colors/red';
 import { WithStyles, withStyles, StyleRulesCallback, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import { RootState } from '../../store';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { setTestRunner, removeTestRunner } from '../../store/codeEditor/actions';
-import { getSelectedCode } from '../../store/userFiles/selectors';
+import { getSelectedCode, getSelectedFileName } from '../../store/userFiles/selectors';
 import ExploreIcon from '@material-ui/icons/Explore';
+import ExploreOffIcon from '@material-ui/icons/ExploreOff';
+import { saveHistory } from '../../utils/api/saveHistory'
 import { celotSymposium, compile } from '../../utils/celot';
+import { isFailureResponse } from '../../utils/api/apiHelpers';
 
 declare const stopify: any; // TODO(arjun): we need to fix this
 
@@ -27,7 +31,7 @@ const styles: StyleRulesCallback = theme => ({
     }
 });
 
-const tempTheme = createMuiTheme({
+const greenTheme = createMuiTheme({
     palette: {
         type: 'dark',
         primary: {
@@ -36,14 +40,24 @@ const tempTheme = createMuiTheme({
     }
 });
 
+const redTheme = createMuiTheme({
+    palette: {
+        type: 'dark',
+        primary: red
+    }
+});
+
 type Props = WithStyles<'button' | 'leftIcon'> & {
     testRunner: any,
     code: string,
     enabled: boolean,
+    fileName: string,
+    loggedIn: boolean,
     setRunnerToState: (runner: any) => void,
     removeRunnerFromState: () => void,
 };
-
+// Test button and run button is very copypasta code
+// we need a more general component to wrap TestButton and RunStopButton
 class TestButton extends React.Component<Props> {
 
     handleStopifyResult = (result: StopifyResult) => {
@@ -55,8 +69,24 @@ class TestButton extends React.Component<Props> {
 
     onRun = () => {
         try {
+            if (this.props.loggedIn) {
+                saveHistory(this.props.fileName, this.props.code).then((res) => {
+                    // tslint:disable-next-line:no-console
+                    if (isFailureResponse(res)) {
+                        // tslint:disable-next-line:no-console
+                        console.log('Something went wrong');
+                        // tslint:disable-next-line:no-console
+                        console.log(res.data.message);
+                        return;
+                    }
+                    // tslint:disable-next-line:no-console
+                    console.log('History saved');
+                }).catch(err => console.log(err)); // will do for now
+            }
             // tslint:disable-next-line:no-console
             (window as any).celotSymposium = celotSymposium;
+            // tslint:disable-next-line:no-console
+            console.log(compile(this.props.code));
 
             const runner = stopify.stopifyLocally(
                 compile(this.props.code),
@@ -99,22 +129,39 @@ class TestButton extends React.Component<Props> {
 
     render() {
         const { classes, testRunner, enabled } = this.props;
-        const runnerExists = testRunner === undefined;
-        return (
-            <div style={{ display: 'inline-block' }}>
-                <MuiThemeProvider theme={tempTheme}>
+        const runnerExists = testRunner !== undefined;
+        let currentButton = (
+            <MuiThemeProvider theme={greenTheme}>
+                <Button
+                    color="primary"
+                    className={classes.button}
+                    onClick={this.onRun}
+                    disabled={!enabled}
+                >
+
+                    <ExploreIcon color="inherit" className={classes.leftIcon} />
+                    Test
+                    </Button>
+            </MuiThemeProvider>
+        );
+        if (runnerExists) {
+            currentButton = (
+                <MuiThemeProvider theme={redTheme}>
                     <Button
-                        style={runnerExists ? {} : { display: 'none' }}
                         color="primary"
                         className={classes.button}
-                        onClick={this.onRun}
-                        disabled={!enabled}
+                        onClick={this.onStop}
                     >
 
-                        <ExploreIcon color="inherit" className={classes.leftIcon} />
+                        <ExploreOffIcon color="inherit" className={classes.leftIcon} />
                         Test
                     </Button>
                 </MuiThemeProvider>
+            );
+        }
+        return (
+            <div style={{ display: 'inline-block' }}>
+                {currentButton}
             </div>
         );
     }
@@ -123,7 +170,9 @@ class TestButton extends React.Component<Props> {
 const mapStateToProps = (state: RootState) => ({
     testRunner: state.codeEditor.testRunner,
     code: getSelectedCode(state),
-    enabled: typeof state.codeEditor.codeRunner === 'undefined'
+    enabled: typeof state.codeEditor.codeRunner === 'undefined',
+    fileName: getSelectedFileName(state),
+    loggedIn: state.userLogin.loggedIn
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

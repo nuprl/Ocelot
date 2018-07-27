@@ -67,7 +67,8 @@ class Index extends React.Component<WithStyles<WithStylesClasses>> {
             >
               <SideDrawer />
               <div className={classes.jumboContainer}>
-                <div className={classes.toolbar} />
+                <div className={classes.toolbar} style={{minHeight: '48px'}}/>
+                {/* Gotta figure out a way to not override css with inline-style */}
                 <div className={classes.jumboContent}>
                   <JumboContent />
                 </div>

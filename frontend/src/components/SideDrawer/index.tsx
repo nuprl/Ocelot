@@ -14,9 +14,12 @@ const styles: StyleRulesCallback = theme => ({
         overflow: 'hidden'
     },
     toolbar: theme.mixins.toolbar,
+    noBorder: {
+        borderRight: 'none'
+    }
 });
 
-type Styles = 'drawerPaper' | 'toolbar';
+type Styles = 'drawerPaper' | 'toolbar' | 'noBorder';
 
 const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
     { classes }
@@ -26,9 +29,11 @@ const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
             anchor="left"
             classes={{
                 paper: classes.drawerPaper,
+                paperAnchorDockedLeft: classes.noBorder
             }}
         >
-            <div className={classes.toolbar} />
+            <div className={classes.toolbar} style={{minHeight: '48px'}}/>
+            {/* Setting toolbar is so hacky, I don't know how to override it */}
             <List dense>
                 <FilesFolder />
             </List>

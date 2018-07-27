@@ -6,10 +6,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Fade from '@material-ui/core/Fade';
 import PawIcon from '@material-ui/icons/Pets';
 
-// let appBarConstrastText: string = '#fff';
-
 const styles: StyleRulesCallback = theme => {
-    // appBarConstrastText = theme.palette.primary.contrastText;
     return {
         flex: {
             flex: 1,
@@ -33,8 +30,7 @@ const TitledAppbar: React.StatelessComponent<WithStyles<string> & TitledAppbarPr
     const { classes, children, title } = props;
     return (
         <AppBar position="absolute">
-            <Toolbar>
-                {/* Todo: Do not use PlayStopIcon, use some other icon */}
+            <Toolbar variant="dense">
                 <PawIcon className={classes.icon}/>
                 <Fade in={true} timeout={700} >
                     <Typography

@@ -15,6 +15,7 @@ import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
 import elemjshighlight from './elemjsHighlighter';
+import { setMonacoEditor } from '../../store/codeEditor/actions';
 
 const debounceWait = 500; // milliseconds;
 
@@ -35,6 +36,7 @@ type Props = {
         content: string,
         loggedIn: boolean,
     ) => void,
+    setEditor: (editor: monacoEditor.editor.IStandaloneCodeEditor) => void,
     triggerFileLoading: (fileIndex: number) => void,
 };
 
@@ -78,7 +80,6 @@ class CodeEditor extends React.Component<Props> {
     };
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
-        editor.setPosition({ lineNumber: 10, column: 0 });
         editor.focus();
         editor.getModel().updateOptions({tabSize: 2}); // what if there are different models?
         if (window.location.hostname === 'localhost') {
@@ -87,6 +88,7 @@ class CodeEditor extends React.Component<Props> {
                 editor.setValue(code);
             }
         }
+        this.props.setEditor(editor);
         this.editor = editor;
     }
 
@@ -170,6 +172,9 @@ class CodeEditor extends React.Component<Props> {
             mouseWheelZoom: true,
             fontSize: 18,
             fontFamily: 'Fira Mono',
+            minimap: {
+                enabled: false,
+            },
             // scrollBeyondLastLine: false,
         };
 
@@ -214,6 +219,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
         content: string,
     ) => {
         dispatch(editFileLocal(fileIndex, content));
+    },
+    setEditor: (editor: monacoEditor.editor.IStandaloneCodeEditor) => {
+        dispatch(setMonacoEditor(editor))
     },
     triggerFileLoading: (fileIndex: number) => { dispatch(markFileNotSaved(fileIndex)); },
 });

@@ -7,29 +7,27 @@ import {
     SuccessResponse
 } from './apiHelpers';
 
-export type FileHistory = {
-    generation: number,
-    dateCreated: string,
-    timeCreated: string,
-    code: string,
-};
+export type SaveHistoryResponse = SuccessResponse<{ message: string }> | FailureResponse;
 
-export type FileHistoryResponse = SuccessResponse<{ history: FileHistory[] }> | FailureResponse;
-
-export const getFileHistory = async (fileName: string): Promise<FileHistoryResponse> => {
-    // This function should be called in a SAGA right after logging in
-    // BE SURE TO SET LOADING BEFORE CALLING THIS FUNCTION
+export const saveHistory = async (fileName: string, code: string): Promise<SaveHistoryResponse> => {
 
     if (!validEmailSession()) {
         return failureResponse('Seems like your session expired, try logging in again');
     }
 
-    const url = getUrl('gethistory');
+    const url = getUrl('savehistory');
 
     const userEmail = localStorage.getItem('userEmail');
     const sessionId = localStorage.getItem('sessionId');
 
-    const data = { userEmail: userEmail, sessionId: sessionId, fileName: fileName };
+    const data = {
+        userEmail: userEmail,
+        sessionId: sessionId,
+        snapshot: {
+            fileName: fileName,
+            code: code,
+        }
+    };
 
     try {
         const response = await fetch(url, { // send json data to specified URL
@@ -40,7 +38,9 @@ export const getFileHistory = async (fileName: string): Promise<FileHistoryRespo
             }
         });
 
-        const jsonResponse = await response.json(); // get json response
+        const jsonResponse = await response.json(); // get json response\
+        // tslint:disable-next-line:no-console
+        console.log(jsonResponse);
 
         if (jsonResponse.status === 'error') {
             return failureResponse('Something went wrong, try refreshing the page');
@@ -51,18 +51,14 @@ export const getFileHistory = async (fileName: string): Promise<FileHistoryRespo
             // I have message as its own field in the response but for my response
             // for the frontend, I always have a data field that contains either message, or...data
         }
-        const history: FileHistory[] = jsonResponse.data.history;
-
-        const reversedHistory = history.map((elem, index) => history[history.length - 1 - index]);
 
         // be sure to open this list (set state to open)
-        return successResponse<{ history: FileHistory[] }>({
-            history: reversedHistory
+        return successResponse<{ message: string }>({
+            message: 'History saved'
         });
 
     } catch (error) {
         // Stop loading the file (set state to not loading)
-        // tslint:disable-next-line:no-console
         return failureResponse(
             'Couldn\'t connect to the server at the moment, try again later'
         );

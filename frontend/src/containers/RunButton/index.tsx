@@ -6,9 +6,11 @@ import { RootState } from '../../store';
 import { Dispatch } from 'redux';
 import { setCodeRunner, removeCodeRunner } from '../../store/codeEditor/actions';
 import { connect } from 'react-redux';
-import { getSelectedCode } from '../../store/userFiles/selectors';
+import { getSelectedCode, getSelectedFileName } from '../../store/userFiles/selectors';
 import PlayIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
+import { isFailureResponse } from '../../utils/api/apiHelpers';
+import { saveHistory } from '../../utils/api/saveHistory'
 
 import * as elementaryJS from 'elementary-js';
 import * as stopify from 'stopify';
@@ -39,11 +41,13 @@ type Props = WithStyles<'button' | 'leftIcon'> & {
     codeRunner: any,
     code: string,
     enabled: boolean,
+    fileName: string,
+    loggedIn: boolean,
     setRunnerToState: (runner: any) => void,
     removeRunnerFromState: () => void,
 };
 
-class RunStopButton extends React.Component<Props> {
+class RunButton extends React.Component<Props> {
 
     handleStopifyResult = (result: stopify.Result) => {
         if (result.type === 'exception') {
@@ -53,10 +57,24 @@ class RunStopButton extends React.Component<Props> {
     }
 
     onRun = () => {
+        if (this.props.loggedIn) {
+            saveHistory(this.props.fileName, this.props.code).then((res) => {
+                // tslint:disable-next-line:no-console
+                if (isFailureResponse(res)) {
+                    // tslint:disable-next-line:no-console
+                    console.log('Something went wrong');
+                    // tslint:disable-next-line:no-console
+                    console.log(res.data.message);
+                    return;
+                }
+                // tslint:disable-next-line:no-console
+                console.log('History saved');
+            }).catch(err => console.log(err)); // will do for now
+        }
         const compiled = elementaryJS.compile(this.props.code, true);
         if (compiled.kind === 'error') {
             for (const err of compiled.errors) {
-              console.error(`Line ${err.location.start.line}: ${err.message}`);
+                console.error(`Line ${err.location.start.line}: ${err.message}`);
             }
             return;
         }
@@ -109,23 +127,22 @@ class RunStopButton extends React.Component<Props> {
 
     render() {
         const { classes, codeRunner, enabled } = this.props;
-        const runnerExists = codeRunner === undefined;
-        return (
-            <div style={{display: 'inline-block', width: '108px'}}>
-                <Button
-                    style={runnerExists ? {} : { display: 'none' }}
-                    color="secondary"
-                    className={classes.button}
-                    onClick={this.onRun}
-                    disabled={!enabled}
-                >
-
-                    <PlayIcon color="inherit" className={classes.leftIcon} />
-                    Run
-                </Button>
+        const runnerExists = codeRunner !== undefined;
+        let currentButton = (
+            <Button
+                color="secondary"
+                className={classes.button}
+                onClick={this.onRun}
+                disabled={!enabled}
+            >
+                <PlayIcon color="inherit" className={classes.leftIcon} />
+                Run
+            </Button>
+        );
+        if (runnerExists) {
+            currentButton = (
                 <MuiThemeProvider theme={tempTheme}>
                     <Button
-                        style={runnerExists ? { display: 'none' } : {}}
                         color="primary"
                         className={classes.button}
                         onClick={this.onStop}
@@ -135,6 +152,11 @@ class RunStopButton extends React.Component<Props> {
                         Stop
                     </Button>
                 </MuiThemeProvider>
+            );
+        }
+        return (
+            <div style={{ display: 'inline-block', width: '108px' }}>
+                {currentButton}
             </div>
         );
     }
@@ -143,7 +165,10 @@ class RunStopButton extends React.Component<Props> {
 const mapStateToProps = (state: RootState) => ({
     codeRunner: state.codeEditor.codeRunner,
     code: getSelectedCode(state),
-    enabled: typeof state.codeEditor.testRunner === 'undefined'
+    enabled: typeof state.codeEditor.testRunner === 'undefined',
+    fileName: getSelectedFileName(state),
+    loggedIn: state.userLogin.loggedIn
+    
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
@@ -153,4 +178,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 
 const styling = withStyles(styles);
 
-export default connect(mapStateToProps, mapDispatchToProps)(styling(RunStopButton));
+export default connect(mapStateToProps, mapDispatchToProps)(styling(RunButton));

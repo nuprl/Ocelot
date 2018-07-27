@@ -362,11 +362,22 @@ async function saveToHistory(req: Request) {
     if (!fileExists) { // checks if file exists in paws-student-files
       return failureResponse('History not updated, file does not exist');
     }
-    const newestFile = (await historyBucket.file(fullFileName).download())[0]
-    if (snapshot.code.length === 0 || newestFile.toString() === snapshot.code) {
+    if (snapshot.code.length === 0) {
       return {
         statusCode: 200,
-        body: { status: 'success', message: 'Same code, update not necessary'}
+        body: { status: 'success', message: 'No code, update not necessary'}
+      };
+    }
+    const newestHistoryExists = (await historyBucket.file(fullFileName).exists())[0];
+    let newestFile: Buffer | undefined = undefined;
+    if (newestHistoryExists) {
+      newestFile = (await historyBucket.file(fullFileName).download())[0];
+    }
+    if (newestHistoryExists && newestFile !== undefined && newestFile.toString() === snapshot.code) {
+      // why can't typescript figure this out? I need to put in newestFile !== undefined...
+      return {
+        statusCode: 200,
+        body: { status: 'success', message: 'Code is the same, update not necessary'}
       };
     }
     const file = historyBucket.file(`${req.body.userEmail}/${snapshot.fileName}`);
@@ -411,8 +422,8 @@ async function getFileHistory(req: Request) {
   if (valid.isFailure) {
     return failureResponse(valid.message);
   }
-  if (req.body.fileName.length === 0) {
-    return failureResponse('Empty fileName is not valid');
+  if (!isSimpleValidFileName(req.body.fileName)) {
+    return failureResponse(`${req.body.fileName} is not a valid file name`);
   }
 
   try {
@@ -432,7 +443,7 @@ async function getFileHistory(req: Request) {
       return {
         generation: metadata.generation!,
         dateCreated: date.toLocaleDateString(),
-        timeCreated: date.toLocaleTimeString(),
+        timeCreated: date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         code: (await elem.download()).toString(),
       }
     });
