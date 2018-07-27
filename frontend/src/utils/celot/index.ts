@@ -19,7 +19,7 @@ const getTestFunctionId = (statements: NodePath<t.Statement>[]): t.Identifier[] 
 
 const visitor: Visitor = {
   Program: {
-    exit(path: NodePath<t.Program>) {
+    enter(path: NodePath<t.Program>) {
       const functionIdentifiers = getTestFunctionId(path.get('body'));
       const numStatements = path.get('body').length;
       const testCallStatement = t.expressionStatement(
