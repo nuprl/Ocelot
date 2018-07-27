@@ -40,16 +40,16 @@ export const getFileHistory = async (fileName: string): Promise<FileHistoryRespo
             }
         });
 
-        const jsonResponse = await response.json(); // get json response
-        // tslint:disable-next-line:no-console
-        console.log(jsonResponse);
+        const jsonResponse = await response.json(); // get json response\
 
         if (jsonResponse.status === 'error') {
             return failureResponse('Something went wrong, try refreshing the page');
         }
 
         if (jsonResponse.status === 'failure') {
-            return failureResponse('Your session expired, try refreshing the page');
+            return failureResponse(jsonResponse.message); // quite inconsistent actually
+            // I have message as its own field in the response but for my response
+            // for the frontend, I always have a data field that contains either message, or...data
         }
 
         // be sure to open this list (set state to open)

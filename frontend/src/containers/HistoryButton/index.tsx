@@ -9,6 +9,7 @@ import Popper from '@material-ui/core/Popper';
 import Tooltip from '@material-ui/core/Tooltip';
 import ListItem from '@material-ui/core/ListItem';
 import HistoryIcon from '@material-ui/icons/Storage';
+import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import BubbleIcon from '@material-ui/icons/BubbleChart';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -17,7 +18,7 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import { isFailureResponse } from '../../utils/api/apiHelpers';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import { getSelectedFileName} from '../../store/userFiles/selectors';
+import { getSelectedFileName } from '../../store/userFiles/selectors';
 import { getFileHistory, FileHistory } from '../../utils/api/getHistory';
 import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 
@@ -31,8 +32,8 @@ const styles: StyleRulesCallback = theme => ({
         height: '100%',
         width: '100%',
         overflowY: 'auto',
-        maxHeight: '350px',
-        maxWidth: '350px',
+        minHeight: '350px', // subject to change
+        minWidth: '400px',
     },
     newDense: {
         paddingBottom: '0px',
@@ -78,9 +79,7 @@ class HistoryButton extends React.Component<Props, State> {
         this.openHistory();
         this.setState({ loading: true });
         getFileHistory(this.props.fileName).then(response => {
-            this.setState({ loading: false });
-            // tslint:disable-next-line:no-console
-            console.log(response);
+            this.setState({ loading: false, history: [] });
             if (isFailureResponse(response)) {
                 // tslint:disable-next-line:no-console
                 console.log(response.data.message);
@@ -105,7 +104,12 @@ class HistoryButton extends React.Component<Props, State> {
     render() {
         const { classes } = this.props;
         const { open, tooltipOpen, loading, history } = this.state;
-        let content: JSX.Element | JSX.Element[] = <CircularProgress size={50} />
+        let content: JSX.Element | JSX.Element[] = <CircularProgress
+            size={50}
+            style={{ marginTop: '150px', marginLeft: '175px' }}
+            color="inherit"
+
+        />
         if (!loading) {
             content = history.map((elem, index) => (
                 <ListItem button key={`${index}${index + index - 1}`}>
@@ -118,6 +122,16 @@ class HistoryButton extends React.Component<Props, State> {
                     />
                 </ListItem>
             ));
+        }
+        if (!loading && history.length === 0) {
+            content = <Typography
+                variant="headline"
+                align="center"
+                color="inherit"
+                style={{marginTop: '150px'}}
+            >
+            No history saved :)
+            </Typography>
         }
         return (
             <div>
