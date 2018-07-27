@@ -47,29 +47,7 @@ type WithStylesClasses =
   | 'toolbar'
   | 'jumboContainer';
 
-
-function load220Library() {
-  // NOTE(arjun): I tried to create a <script> in the render block
-  // but it did not work. If someone can do that, it would be slightly
-  // cleaner than this.
-  // Note that writing an unmount handler is pointless since removing
-  // a script tag does not "un-execute" its code.
-  const script = document.createElement('script');
-  if (window.location.hostname === 'localhost') {
-    console.info('Loading 220 library from build/lib220.js');
-    script.src = 'lib220.js';
-  }
-  else {
-    console.error('Missing path for lib220.js in production'); // TODO
-    return;
-  }
-  document.body.appendChild(script);
-}
-
 class Index extends React.Component<WithStyles<WithStylesClasses>> {
-  componentDidMount() {
-    load220Library();
-  }
 
   render() {
     const browser = detect();
