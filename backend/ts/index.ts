@@ -11,8 +11,9 @@ import * as uid from 'uid-safe';
 import * as morgan from 'morgan'; // for logging in all http traffic on console.
 
 const storage = Storage();
-const bucket = storage.bucket('paws-student-files');
+const fileBucket = storage.bucket('paws-student-files');
 const settingsBucket = storage.bucket('paws-settings');
+const historyBucket = storage.bucket('paws-student-history');
 
 const datastore = new Datastore({});
 const datastoreKind = 'CS220AllowedAccounts';
@@ -146,7 +147,7 @@ async function getArrayOfFiles(userEmail: string): Promise<Storage.File[]> {
     prefix: userEmail + '/'
   }; // delimiter makes it so that we get only the direct child of prefix
   verbose && console.log('\tQuerying list of files');
-  const [files] = await timePromise(bucket.getFiles(prefixAndDelimiter));
+  const [files] = await timePromise(fileBucket.getFiles(prefixAndDelimiter));
   // get files for folder
 
   return files;
@@ -161,6 +162,32 @@ function isSimpleValidFileName(fileName: string) { // still incomplete but will 
 }
 
 /**
+ * Check if objects of a file request is valid
+ * Expects first argument to be useremail and second argument to be sessionid
+ * returns a Failure Response if it's not, otherwise
+ * it returns an object with a body and its status 'ok'
+ *
+ * @param {...any[]} args
+ * @returns a failure restponse or an object with a body with status okay.
+ */
+async function checkValidFileRequest(userEmail: string, sessionId: string, ...args: any[]) {
+
+  if (undefinedExists(userEmail, sessionId, ...args)) {
+    return { isFailure: true, message: 'Incomplete request' };
+  }
+  // check against database for sessionId
+  const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
+  if (!isValidSession) {
+    return { isFailure: true, message: 'Invalid session' };
+  }
+  if (!isSimpleValidEmail(userEmail)) {
+    return { isFailure: true, message: 'Invalid email' };
+  }
+
+  return { isFailure: false, message: 'ok' };
+}
+
+/**
  * Given the userEmail in req, get files of user accordingly
  * Otherwise, return unauthorized message if user is not authorized.
  * 
@@ -168,37 +195,28 @@ function isSimpleValidFileName(fileName: string) { // still incomplete but will 
  * @returns statusCode and contents in body
  */
 async function getFile(req: Request) {
-  // Get sessionId from JSON
-  const sessionId = req.body.sessionId;
-  // Get user attribute 
-  const userEmail = req.body.userEmail;
-  // check against database for sessionId
-  if (undefinedExists(sessionId, userEmail)) {
-    return failureResponse('Incomplete request');
-  }
-  const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
-  if (!isValidSession) {
-    return failureResponse('Invalid session');
+  const valid = await checkValidFileRequest(req.body.userEmail, req.body.sessionId);
+  if (valid.isFailure) {
+    return failureResponse(valid.message);
   }
 
   try {
-    const files = await getArrayOfFiles(userEmail);
+    const files = await getArrayOfFiles(req.body.userEmail);
 
-    let userFiles: { name: string, content: string }[];
-    userFiles = [];
-
-    for (let i = 0; i < files.length; i++) { // loop through all files
-      verbose && console.log(`\tDownloading file: ${files[i].name}`);
-      const [fileContents] = await timePromise(files[i].download());
-      const fileName: string = files[i].name;
-
-      if (fileName.substr(fileName.length - 1, 1) !== '/') { // if it's not directory directory
-        userFiles.push({
-          name: path.basename(files[i].name), // get the filename instead of whole path
-          content: fileContents.toString()
-        });
+    const filteredFiles = files.filter(({name}) => name.substr(name.length - 1, 1) !== '/');
+    // get only files and not directories
+    const userFilesPromises = filteredFiles.map(async (file) => { 
+      // downloading files asynchronously all at the same time is
+      // few hundred miliseconds faster
+      verbose && console.log(`\tDownloading file: ${file.name}`);
+      const [fileContents] = await timePromise(file.download());
+      return {
+        name: path.basename(file.name),
+        content: fileContents.toString(),
       }
-    }
+    });
+
+    const userFiles = await Promise.all(userFilesPromises);
 
     verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
     miliTimes = [];
@@ -238,59 +256,48 @@ interface FileChange {
  */
 
 async function changeFile(req: Request) {
-  const sessionId = req.body.sessionId;
-  const userEmail = req.body.userEmail;
-  const fileChanges: FileChange[] = req.body.fileChanges;
-
-  if (undefinedExists(sessionId, userEmail, fileChanges)) {
-    return failureResponse('Incomplete request');
-  }
-  // check against database for sessionId
-  const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
-  if (!isValidSession) {
-    return failureResponse('Invalid session');
-  }
-  if (!isSimpleValidEmail(userEmail)) {
-    return failureResponse('Invalid email');
+  const valid = await checkValidFileRequest(
+    req.body.userEmail,
+    req.body.sessionId,
+    req.body.fileChanges
+  );
+  if (valid.isFailure) {
+    return failureResponse(valid.message);
   }
 
   try {
-    let files, filteredFiles, fileExists;
-    for (let currentFileChange of fileChanges) {
-      // verbose && console.log('Looking at: ', currentFileChange.fileName);
+    let fileExists, currentFile, currentFileChange: FileChange;
+    for (currentFileChange of req.body.fileChanges) {
       if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid filename
-        verbose && console.log('No simple filename');
+        verbose && console.log('No simple filename'); // this will make saving file fail silently (bad)
         continue;
       }
+      currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
       if (currentFileChange.type === 'create') {
-        const file = bucket.file(`${userEmail}/${currentFileChange.fileName}`);
         verbose && console.log(`\tSaving file: ${currentFileChange.fileName}`);
         verbose && console.log(`Content: ${currentFileChange.changes!}, type: ${typeof currentFileChange.changes!}`);
         // Non-null assertion of changes can be saved
-        await timePromise(file.save(currentFileChange.changes!, { resumable: false }));
+        await timePromise(currentFile.save(currentFileChange.changes!, { resumable: false }));
         // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
         /* There is some overhead when using a resumable upload that can cause noticeable performance 
         degradation while uploading a series of small files. When uploading files less than 10MB, 
         it is recommended that the resumable feature is disabled. */
-        await file.setMetadata({ contentType: 'text/javascript' });
+        await currentFile.setMetadata({ contentType: 'text/javascript' });
         continue;
       }
-      files = await getArrayOfFiles(userEmail);
-      filteredFiles = files.filter((file: Storage.File) =>
-        path.basename(file.name) === currentFileChange.fileName);
-      fileExists = filteredFiles.length === 1;
-      if (!fileExists) {
+      fileExists = await currentFile.exists();
+      if (!fileExists[0]) {
         verbose && console.log('File does not exist');
         continue;
       }
       if (currentFileChange.type === 'delete') {
         verbose && console.log(`\tDeleting file: ${currentFileChange.fileName}`)
-        await timePromise(filteredFiles[0].delete());
+        await timePromise(currentFile.delete());
         continue
       }
       // guaranteed it's a rename
       verbose && console.log(`\tRenaming file: ${currentFileChange.fileName}`)
-      await timePromise(filteredFiles[0].move(`${userEmail}/${currentFileChange.changes}`));
+      await timePromise(currentFile.move(`${req.body.userEmail}/${currentFileChange.changes}`));
     }
 
     verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
@@ -315,6 +322,138 @@ async function changeFile(req: Request) {
         message: error
       }
     }
+  }
+}
+/**
+ * Given:
+ * userEmail: string
+ * body: string
+ * snapshot: {
+ *  fileName: string,
+ *  code: string
+ * }
+ * 
+ * It will save the given code to its respective
+ * directory in the history bucket.
+ *
+ * @param {Request} req
+ * @returns statusCode and body in object
+ */
+async function saveToHistory(req: Request) {
+  const valid = await checkValidFileRequest(
+    req.body.userEmail,
+    req.body.sessionId,
+    req.body.snapshot
+  );
+  if (valid.isFailure) {
+    return failureResponse(valid.message);
+  }
+
+  const snapshot: { fileName: string, code: string } = req.body.snapshot;
+
+  if (!isSimpleValidFileName(snapshot.fileName)) {
+    return failureResponse(`${snapshot.fileName} is not a valid file name`);
+  }
+
+  try {
+    const fullFileName = `${req.body.userEmail}/${snapshot.fileName}`;
+    verbose && console.log('Checking if file exists...');
+    const fileExists = (await fileBucket.file(fullFileName).exists())[0]
+    if (!fileExists) { // checks if file exists in paws-student-files
+      return failureResponse('History not updated, file does not exist');
+    }
+    const newestFile = (await historyBucket.file(fullFileName).download())[0]
+    if (snapshot.code.length === 0 || newestFile.toString() === snapshot.code) {
+      return {
+        statusCode: 200,
+        body: { status: 'success', message: 'Same code, update not necessary'}
+      };
+    }
+    const file = historyBucket.file(`${req.body.userEmail}/${snapshot.fileName}`);
+    verbose && console.log('Saving snapshot to history...')
+    await file.save(snapshot.code, { resumable: false });
+    await file.setMetadata({ contentType: 'text/javascript' });
+    return {
+      statusCode: 200,
+      body: {
+        status: 'success',
+        message: 'History updated'
+      }
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      statusCode: 500,
+      body: {
+        status: 'error',
+        message: error.message
+      }
+    };
+  }
+}
+
+/**
+ * Given:
+ * userEmail
+ * sessionId
+ * fileName
+ * It retrieves the history of fileName
+ *
+ * @param {Request} req
+ * @returns statusCode and body with history
+ */
+async function getFileHistory(req: Request) {
+  const valid = await checkValidFileRequest(
+    req.body.userEmail,
+    req.body.sessionId,
+    req.body.fileName
+  );
+  if (valid.isFailure) {
+    return failureResponse(valid.message);
+  }
+
+  try {
+    const options = {
+      delimiter: '/',
+      prefix: req.body.userEmail + '/' + req.body.fileName,
+      versions: true
+    };
+
+    const [files] = await historyBucket.getFiles(options);
+    const filteredFiles = files.filter(
+      (elem) => (elem.name.substr(elem.name.length - 1, 1) !== '/')
+    );
+    const promises = filteredFiles.map(async (elem, index) => {
+      const metadata = (await elem.getMetadata())[0]
+      const date = new Date(metadata.timeCreated!);
+      return {
+        generation: metadata.generation!,
+        dateCreated: date.toLocaleDateString(),
+        timeCreated: date.toLocaleTimeString(),
+        code: (await elem.download()).toString(),
+      }
+    });
+    const historyArray = await Promise.all(promises);
+
+    return {
+      statusCode: 200,
+      body: {
+        status: 'success',
+        data: {
+          history: historyArray
+        }
+      }
+    };
+
+  } catch (error) {
+    console.log(error);
+    return {
+      statusCode: 500,
+      body: {
+        status: 'error',
+        message: error.message
+      }
+    };
   }
 }
 
@@ -407,7 +546,7 @@ async function testDatastore(req: Request) {
   //   }
   // }
 
-  const file = bucket.file('chunghinlee@umass.edu/lolDude.txt');
+  const file = fileBucket.file('chunghinlee@umass.edu/lolDude.txt');
   const contents = `LOL WHAT THIS IS? ${s++}`;
 
 
@@ -463,5 +602,7 @@ paws.get('/', (req: Request, res: Response) => { // simple get request
 
 paws.post('/getfile', wrapHandler(getFile));
 paws.post('/login', wrapHandler(login));
-paws.post('/changefile', wrapHandler(changeFile))
+paws.post('/changefile', wrapHandler(changeFile));
+paws.post('/savehistory', wrapHandler(saveToHistory));
+paws.post('/gethistory', wrapHandler(getFileHistory));
 paws.get('/testo', wrapHandler(testDatastore));
