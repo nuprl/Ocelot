@@ -83,9 +83,9 @@ class RunButton extends React.Component<Props> {
         }
 
         try {
-            const runner = stopify.stopifyLocally(
-                this.props.code,
-                // undefined, // TODO(arjun): will need to specify for error locs.
+            const runner = stopify.stopifyLocallyFromAst(
+                compiled.node,
+                undefined, // TODO(arjun): will need to specify for error locs.
                 {
                     externals: [
                         'elementaryjs',
@@ -107,8 +107,15 @@ class RunButton extends React.Component<Props> {
                 this.props.removeRunnerFromState();
             });
         } catch (e) {
-            // tslint:disable-next-line:no-console
-            console.error(e);
+            if (e instanceof elementaryRTS.ElementaryRuntimeError) {
+                // Don't report stack traces. Count on ElementaryJS to report
+                // line numbers.
+                console.error(e.message);
+            }
+            else {
+                // tslint:disable-next-line:no-console
+                console.error(e);
+            }
         }
 
     }
