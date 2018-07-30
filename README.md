@@ -21,6 +21,7 @@ To install Stopify:
 
 ```bash
 cd Stopify
+git checkout 220
 yarn install
 (cd stopify-estimators && yarn run build)
 (cd stopify-continuations && yarn run build)
