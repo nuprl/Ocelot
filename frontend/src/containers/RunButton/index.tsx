@@ -31,7 +31,7 @@ const styles: StyleRulesCallback = theme => ({
     }
 });
 
-const tempTheme = createMuiTheme({
+const redTheme = createMuiTheme({
     palette: {
         primary: red,
     }
@@ -68,7 +68,7 @@ class RunButton extends React.Component<Props> {
                     return;
                 }
                 // tslint:disable-next-line:no-console
-                console.log('History saved');
+                // console.log('History saved');
             }).catch(err => console.log(err)); // will do for now
         }
         const compiled = elementaryJS.compile(this.props.code, true);
@@ -141,7 +141,7 @@ class RunButton extends React.Component<Props> {
         );
         if (runnerExists) {
             currentButton = (
-                <MuiThemeProvider theme={tempTheme}>
+                <MuiThemeProvider theme={redTheme}>
                     <Button
                         color="primary"
                         className={classes.button}

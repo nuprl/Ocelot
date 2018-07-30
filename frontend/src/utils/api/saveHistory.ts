@@ -9,7 +9,7 @@ import {
 
 export type SaveHistoryResponse = SuccessResponse<{ message: string }> | FailureResponse;
 
-export const saveHistory = async (fileName: string, code: string): Promise<SaveHistoryResponse> => {
+export const saveHistory = async (fileName: string, code: string, generation?: number): Promise<SaveHistoryResponse> => {
 
     if (!validEmailSession()) {
         return failureResponse('Seems like your session expired, try logging in again');
@@ -26,6 +26,7 @@ export const saveHistory = async (fileName: string, code: string): Promise<SaveH
         snapshot: {
             fileName: fileName,
             code: code,
+            generation: generation
         }
     };
 
@@ -40,7 +41,7 @@ export const saveHistory = async (fileName: string, code: string): Promise<SaveH
 
         const jsonResponse = await response.json(); // get json response\
         // tslint:disable-next-line:no-console
-        console.log(jsonResponse);
+        // console.log(jsonResponse);
 
         if (jsonResponse.status === 'error') {
             return failureResponse('Something went wrong, try refreshing the page');

@@ -25,6 +25,7 @@ import { getFileHistory, FileHistory } from '../../utils/api/getHistory';
 import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import { MonacoDiffEditor } from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
+import { saveHistory } from '../../utils/api/saveHistory';
 
 const styles: StyleRulesCallback = theme => ({
     list: {
@@ -33,13 +34,9 @@ const styles: StyleRulesCallback = theme => ({
         backgroundColor: theme.palette.primary.main,
     },
     listItems: {
-        height: '100%',
-        width: '100%',
         overflowY: 'auto',
-        minHeight: '350px', // subject to change
-        minWidth: '400px',
-        maxHeight: '350px', // subject to change
-        maxWidth: '400px',
+        height: '324px', // subject to change
+        width: '400px',
     },
     newDense: {
         paddingBottom: '0px',
@@ -117,6 +114,17 @@ class HistoryButton extends React.Component<Props, State> {
         };
     }
 
+    shouldComponentUpdate(prevProps: Props) {
+        // this is not recommended, preventing component updates
+        // but I can't figure out how to prevent/delay the component
+        // from updating when the user selects a different file while
+        // the history list is still opened.
+        if (prevProps.code !== this.props.code) {
+            return false;
+        }
+        return true;
+    }
+
     onClick = () => {
         this.openHistory();
         this.setState({ loading: true });
@@ -151,29 +159,38 @@ class HistoryButton extends React.Component<Props, State> {
         this.setState({ codeOpenIndex: index });
     };
 
-    onRestore = (index: number) => {
+    onRestore = (index: number, generation: number) => {
         return () => {
-            this.setState({open: false});
-            const { editor } = this.props;
-            const { history } = this.state;
-            if (editor === undefined || history.length - 1 < index) {
-                return;
-            }
-            const numLines = editor.getModel().getLineCount();
-            const finalColumn = editor.getModel().getLineMaxColumn(numLines);
-            editor.executeEdits(
-                'restore',
-                [{
-                    range: new monacoEditor.Range(
-                        1,
-                        1,
-                        numLines,
-                        finalColumn
-                    ),
-                    text: this.state.history[index].code,
-                    forceMoveMarkers: true
-                }]
-            );
+            this.setState({ open: false, codeOpenIndex: -1 });
+            saveHistory(this.props.fileName, this.state.history[index].code, generation)
+                .then(() => {
+                    console.log('Saved!');
+                }).catch((err) => {
+                    console.log('not saved', err);
+                });
+            setTimeout(() => { // immediate state change causes the UI to update immediately
+                // The UI looks 'buggy' if I were to not setTimeout
+                const { editor } = this.props;
+                const { history } = this.state;
+                if (editor === undefined || history.length - 1 < index) {
+                    return;
+                }
+                const numLines = editor.getModel().getLineCount();
+                const finalColumn = editor.getModel().getLineMaxColumn(numLines);
+                editor.executeEdits(
+                    'restore_from_revision', // just a made up name
+                    [{
+                        range: new monacoEditor.Range(
+                            1,
+                            1,
+                            numLines,
+                            finalColumn
+                        ),
+                        text: this.state.history[index].code,
+                        forceMoveMarkers: true
+                    }]
+                );
+            }, 30);
         };
     }
 
@@ -225,7 +242,7 @@ class HistoryButton extends React.Component<Props, State> {
                                             color="secondary"
                                             fullWidth
                                             style={{ marginTop: '1em', alignSelf: 'right' }}
-                                            onClick={this.onRestore(index)}
+                                            onClick={this.onRestore(index, elem.generation)}
 
                                         >
                                             Restore

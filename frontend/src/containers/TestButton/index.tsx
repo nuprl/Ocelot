@@ -80,13 +80,13 @@ class TestButton extends React.Component<Props> {
                         return;
                     }
                     // tslint:disable-next-line:no-console
-                    console.log('History saved');
+                    // console.log('History saved');
                 }).catch(err => console.log(err)); // will do for now
             }
             // tslint:disable-next-line:no-console
             (window as any).celotSymposium = celotSymposium;
             // tslint:disable-next-line:no-console
-            console.log(compile(this.props.code));
+            // console.log(compile(this.props.code));
 
             const runner = stopify.stopifyLocally(
                 compile(this.props.code),

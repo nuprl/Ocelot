@@ -250,6 +250,7 @@ interface FileChange {
  * sessionId: string
  * userEmail: string
  * fileChanges: {fileName: string, type: 'delete' | 'create' | 'rename' , changes?: string}[]
+ * create can create a file or modify a file
  * It parses the request and delete/change files accordingly on data storage accordingly
  * @param {Request} req
  * @returns object with statusCode and body
@@ -331,6 +332,8 @@ async function changeFile(req: Request) {
  * snapshot: {
  *  fileName: string,
  *  code: string
+ *  generation?: number // if there's a generation number, it's a restore
+ *  // operation
  * }
  * 
  * It will save the given code to its respective
@@ -349,7 +352,7 @@ async function saveToHistory(req: Request) {
     return failureResponse(valid.message);
   }
 
-  const snapshot: { fileName: string, code: string } = req.body.snapshot;
+  const snapshot: { fileName: string, code: string, generation?: number } = req.body.snapshot;
 
   if (!isSimpleValidFileName(snapshot.fileName)) {
     return failureResponse(`${snapshot.fileName} is not a valid file name`);
@@ -367,6 +370,13 @@ async function saveToHistory(req: Request) {
         statusCode: 200,
         body: { status: 'success', message: 'No code, update not necessary'}
       };
+    }
+    if (snapshot.generation !== undefined) {
+      const restoreFile = historyBucket.file(
+        `${req.body.userEmail}/${snapshot.fileName}`,
+        { generation: snapshot.generation }
+      );
+      await restoreFile.delete();
     }
     const newestHistoryExists = (await historyBucket.file(fullFileName).exists())[0];
     let newestFile: Buffer | undefined = undefined;

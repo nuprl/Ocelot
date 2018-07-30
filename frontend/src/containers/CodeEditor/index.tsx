@@ -81,7 +81,7 @@ class CodeEditor extends React.Component<Props> {
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         editor.focus();
-        editor.getModel().updateOptions({tabSize: 2}); // what if there are different models?
+        editor.getModel().updateOptions({ tabSize: 2 }); // what if there are different models?
         if (window.location.hostname === 'localhost') {
             const code = window.localStorage.getItem('code');
             if (code !== null) {
