@@ -9,7 +9,6 @@ import 'static/styles/Scrollbar.css';
 // import Typography from '@material-ui/core/Typography';
 import UploadIcon from '@material-ui/icons/CloudUpload';
 import Button from '@material-ui/core/Button';
-import GetUrlDialog from '../../components/GetUrlDialog';
 import Zoom from '@material-ui/core/Zoom';
 
 const styles: StyleRulesCallback = theme => ({
@@ -40,8 +39,7 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 type State = {
-    tabIndex: number,
-    uploadDialogOpen: boolean
+    tabIndex: number
 };
 
 type Props = WithStyles<'icon' | 'root' | 'canvasArea' | 'fab'>;
@@ -53,7 +51,6 @@ class CanvasOutput extends React.Component<Props, State> {
         super(props);
         this.state = {
             tabIndex: 0,
-            uploadDialogOpen: false,
         };
     }
 
@@ -66,10 +63,6 @@ class CanvasOutput extends React.Component<Props, State> {
         this.outputCanvas = document.getElementById('outputCanvas') as HTMLCanvasElement;
     }
 
-    openDialog = () => {
-        this.setState({ uploadDialogOpen: true });
-    };
-
     onResize = () => {
         if (this.inputCanvas === null || this.outputCanvas === null) {
             return;
@@ -78,34 +71,9 @@ class CanvasOutput extends React.Component<Props, State> {
         this.outputCanvas.style.width = '100%';
     };
 
-    closeDialog = () => {
-        this.setState({ uploadDialogOpen: false });
-    };
-
-    loadImageToCanvas = (url: string) => {
-        let img = new Image;
-        img.onload = () => {
-            if (this.inputCanvas === null || this.outputCanvas === null) {
-                return;
-            }
-            // tslint:disable-next-line:no-console
-            this.inputCanvas.height = img.naturalHeight;
-            this.inputCanvas.width = img.naturalWidth;
-            this.outputCanvas.height = img.naturalHeight;
-            this.outputCanvas.width = img.naturalWidth;
-            (this.inputCanvas.getContext('2d') as CanvasRenderingContext2D).drawImage(img, 0, 0);
-        };
-        img.onerror = (a) => {
-            // tslint:disable-next-line:no-console
-            console.error('Error! image', a);
-        };
-        img.setAttribute('crossOrigin', 'anonymous');
-        img.src = url + '?' + new Date().getTime();
-    };
-
     render() {
         const { classes } = this.props;
-        const { tabIndex, uploadDialogOpen } = this.state;
+        const { tabIndex } = this.state;
         return (
             <div
                 className={classes.root}
@@ -136,7 +104,6 @@ class CanvasOutput extends React.Component<Props, State> {
                             color="secondary"
                             aria-label="Upload"
                             className={classes.fab}
-                            onClick={this.openDialog}
                         >
                             <UploadIcon />
                         </Button>
@@ -148,7 +115,6 @@ class CanvasOutput extends React.Component<Props, State> {
                     <Button color="secondary" variant="outlined" size="large" onClick={this.openDialog}>
                         Upload
                     </Button> */}
-                    <GetUrlDialog open={uploadDialogOpen} onClose={this.closeDialog} hasUrl={this.loadImageToCanvas} />
                 </div>
             </div>
         );
