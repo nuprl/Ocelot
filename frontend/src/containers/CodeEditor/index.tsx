@@ -77,6 +77,17 @@ class CodeEditor extends React.Component<Props> {
                 ['[', ']'],
             ]
         });
+        monaco.languages.registerCompletionItemProvider('elementaryjs', {
+            // A hacky way to get rid of autocomplete completely.
+            // returning an empty array will not 'override' the autocomplete
+            // but giving my own autocomplete items can override it it seems.
+            provideCompletionItems(model, position) {
+                return [{
+                    label: '',
+                    kind: monaco.languages.CompletionItemKind.Text
+                }];
+            }
+        });
     };
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
