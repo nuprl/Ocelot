@@ -71,14 +71,13 @@ class CodeEditor extends React.Component<Props> {
                 lineComment: '//',
                 blockComment: ['/*', '*/']
             },
-            brackets: [
-                ['(', ')'],
-                ['{', '}'],
-                ['[', ']'],
-            ]
+            indentationRules: {
+                increaseIndentPattern: /.*(\{|\[|\()/, // indent on brackets...etc
+                decreaseIndentPattern: /.*(\}|\]|\))/ //unindent on closing brackets...etc
+            },
         });
         monaco.languages.registerCompletionItemProvider('elementaryjs', {
-            // A hacky way to get rid of autocomplete completely.
+            // A hacky way to get rid of autocomplete suggestions completely.
             // returning an empty array will not 'override' the autocomplete
             // but giving my own autocomplete items can override it it seems.
             provideCompletionItems(model, position) {

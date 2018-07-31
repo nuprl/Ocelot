@@ -7,7 +7,7 @@ const crap = (): any => ({
         'finally', 'for', 'function', 'if', 'implements', 'import',
         'instanceof', 'interface', 'new', 'package', 'private',
         'public', 'return', 'short', 'static', 'super', 'switch', 'this',
-        'throw', 'throws', 'true', 'try', 'typeof', 'void', 'while', 'let'
+        'true', 'try', 'typeof', 'void', 'while', 'let'
     ],
     
     builtins: [],
