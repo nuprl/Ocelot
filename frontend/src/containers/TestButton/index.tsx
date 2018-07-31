@@ -10,11 +10,15 @@ import { getSelectedCode, getSelectedFileName } from '../../store/userFiles/sele
 import ExploreIcon from '@material-ui/icons/Explore';
 import ExploreOffIcon from '@material-ui/icons/ExploreOff';
 import { saveHistory } from '../../utils/api/saveHistory'
-import { celotSymposium } from '../../utils/celot';
 import { isFailureResponse } from '../../utils/api/apiHelpers';
 
 import * as elementaryJS from 'elementary-js';
+import * as elementaryRTS from 'elementary-js/dist/runtime';
+import * as celotTestingRuntime from 'elementary-js/dist/runtime-testing'
 import * as stopify from 'stopify';
+
+(window as any).elementaryjs = elementaryRTS;
+(window as any).celot = celotTestingRuntime;
 
 type StopifyResult = {
     type: string,
@@ -70,6 +74,9 @@ class TestButton extends React.Component<Props> {
 
     onRun = () => {
         try {
+            if (window.location.hostname === 'localhost') {
+                window.localStorage.setItem('code', this.props.code);
+            }
             if (this.props.loggedIn) {
                 saveHistory(this.props.fileName, this.props.code).then((res) => {
                     // tslint:disable-next-line:no-console
@@ -84,8 +91,6 @@ class TestButton extends React.Component<Props> {
                     // console.log('History saved');
                 }).catch(err => console.log(err)); // will do for now
             }
-            // tslint:disable-next-line:no-console
-            (window as any).celotSymposium = celotSymposium;
             const compiled = elementaryJS.compile(this.props.code, {
                 isOnline: true,
                 runTests: true,
@@ -104,9 +109,8 @@ class TestButton extends React.Component<Props> {
                 {
                     externals: [
                         'console',
-                        'celotSymposium',
-                        'contendEqual',
-                        'contendNotEqual'
+                        'celot',
+                        'elementaryjs'
                     ]
                 },
                 {
@@ -120,8 +124,15 @@ class TestButton extends React.Component<Props> {
                 this.props.removeRunnerFromState();
             });
         } catch (e) {
-            // tslint:disable-next-line:no-console
-            console.error(e);
+            if (e instanceof elementaryRTS.ElementaryRuntimeError) {
+                // Don't report stack traces. Count on ElementaryJS to report
+                // line numbers.
+                console.error(e.message);
+            }
+            else {
+                // tslint:disable-next-line:no-console
+                console.error(e);
+            }
         }
 
     }
