@@ -71,7 +71,10 @@ class RunButton extends React.Component<Props> {
                 // console.log('History saved');
             }).catch(err => console.log(err)); // will do for now
         }
-        const compiled = elementaryJS.compile(this.props.code, true);
+        const compiled = elementaryJS.compile(this.props.code, {
+            isOnline: true,
+            runTests: false,
+        });
         if (compiled.kind === 'error') {
             for (const err of compiled.errors) {
                 console.error(`Line ${err.location.start.line}: ${err.message}`);

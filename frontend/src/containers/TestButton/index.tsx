@@ -10,10 +10,11 @@ import { getSelectedCode, getSelectedFileName } from '../../store/userFiles/sele
 import ExploreIcon from '@material-ui/icons/Explore';
 import ExploreOffIcon from '@material-ui/icons/ExploreOff';
 import { saveHistory } from '../../utils/api/saveHistory'
-import { celotSymposium, compile } from '../../utils/celot';
+import { celotSymposium } from '../../utils/celot';
 import { isFailureResponse } from '../../utils/api/apiHelpers';
 
-declare const stopify: any; // TODO(arjun): we need to fix this
+import * as elementaryJS from 'elementary-js';
+import * as stopify from 'stopify';
 
 type StopifyResult = {
     type: string,
@@ -85,11 +86,21 @@ class TestButton extends React.Component<Props> {
             }
             // tslint:disable-next-line:no-console
             (window as any).celotSymposium = celotSymposium;
+            const compiled = elementaryJS.compile(this.props.code, {
+                isOnline: true,
+                runTests: true,
+            });
+            if (compiled.kind === 'error') {
+                for (const err of compiled.errors) {
+                    console.error(`Line ${err.location.start.line}: ${err.message}`);
+                }
+                return;
+            }
             // tslint:disable-next-line:no-console
             // console.log(compile(this.props.code));
-
-            const runner = stopify.stopifyLocally(
-                compile(this.props.code),
+            const runner = stopify.stopifyLocallyFromAst(
+                compiled.node,
+                undefined, // TODO(arjun): will need to specify for error locs.
                 {
                     externals: [
                         'console',
