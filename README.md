@@ -84,7 +84,7 @@ ln -s <path-to-local-220-library> lib220.js
 
   Then run `yarn install` or `yarn add ...`:
 
-  then run:
+  then in `Ocelot/frontend`, run:
 
   ```
   yarn link stopify && yarn link elementary-js
