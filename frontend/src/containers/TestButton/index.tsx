@@ -11,14 +11,13 @@ import ExploreIcon from '@material-ui/icons/Explore';
 import ExploreOffIcon from '@material-ui/icons/ExploreOff';
 import { saveHistory } from '../../utils/api/saveHistory'
 import { isFailureResponse } from '../../utils/api/apiHelpers';
+import { setGlobals } from '../runner';
 
 import * as elementaryJS from 'elementary-js';
 import * as elementaryRTS from 'elementary-js/dist/runtime';
-import * as celotTestingRuntime from 'elementary-js/dist/runtime-testing'
 import * as stopify from 'stopify';
 
 (window as any).elementaryjs = elementaryRTS;
-(window as any).celot = celotTestingRuntime;
 
 type StopifyResult = {
     type: string,
@@ -95,6 +94,7 @@ class TestButton extends React.Component<Props> {
                 isOnline: true,
                 runTests: true,
             });
+
             if (compiled.kind === 'error') {
                 for (const err of compiled.errors) {
                     console.error(`Line ${err.location.start.line}: ${err.message}`);
@@ -105,6 +105,7 @@ class TestButton extends React.Component<Props> {
             // console.log(compile(this.props.code));
             const runner = stopify.stopifyLocallyFromAst(
                 compiled.node);
+            setGlobals((runner as any).g);
             this.props.setRunnerToState(runner);
             runner.run((result: any) => {
                 this.handleStopifyResult(result);

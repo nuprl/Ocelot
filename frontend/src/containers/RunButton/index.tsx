@@ -14,6 +14,7 @@ import { saveHistory } from '../../utils/api/saveHistory'
 
 import * as elementaryJS from 'elementary-js';
 import * as stopify from 'stopify';
+import { setGlobals } from '../runner';
 
 // TODO(arjun): I think these hacks are necessary for eval to work. We either 
 // do them here or we do them within the implementation of Stopify. I want 
@@ -46,11 +47,6 @@ type Props = WithStyles<'button' | 'leftIcon'> & {
     setRunnerToState: (runner: any) => void,
     removeRunnerFromState: () => void,
 };
-
-function setGlobals(g: any) {
-    g.elementaryjs = elementaryRTS;
-    g.console = window.console;
-}
 
 class RunButton extends React.Component<Props> {
 
