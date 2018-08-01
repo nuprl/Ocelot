@@ -2,16 +2,16 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
 import { WithStyles, withStyles, StyleRulesCallback, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { RootState } from '../../store';
+import { RootState } from './store';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { setTestRunner, removeTestRunner } from '../../store/codeEditor/actions';
-import { getSelectedCode, getSelectedFileName } from '../../store/userFiles/selectors';
+import { setTestRunner, removeTestRunner } from './store/codeEditor/actions';
+import { getSelectedCode, getSelectedFileName } from './store/userFiles/selectors';
 import ExploreIcon from '@material-ui/icons/Explore';
 import ExploreOffIcon from '@material-ui/icons/ExploreOff';
-import { saveHistory } from '../../utils/api/saveHistory'
-import { isFailureResponse } from '../../utils/api/apiHelpers';
-import { setGlobals } from '../runner';
+import { saveHistory } from './utils/api/saveHistory'
+import { isFailureResponse } from './utils/api/apiHelpers';
+import { setGlobals } from './runner';
 
 import * as elementaryJS from 'elementary-js';
 import * as elementaryRTS from 'elementary-js/dist/runtime';

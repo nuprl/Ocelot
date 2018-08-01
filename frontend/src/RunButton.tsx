@@ -2,19 +2,20 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import red from '@material-ui/core/colors/red';
 import { WithStyles, withStyles, StyleRulesCallback, createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import { RootState } from '../../store';
+import { RootState } from './store';
 import { Dispatch } from 'redux';
-import { setCodeRunner, removeCodeRunner } from '../../store/codeEditor/actions';
+import { setCodeRunner, removeCodeRunner } from './store/codeEditor/actions';
 import { connect } from 'react-redux';
-import { getSelectedCode, getSelectedFileName } from '../../store/userFiles/selectors';
+import { getSelectedCode, getSelectedFileName } from './store/userFiles/selectors';
 import PlayIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
-import { isFailureResponse } from '../../utils/api/apiHelpers';
-import { saveHistory } from '../../utils/api/saveHistory'
+import { isFailureResponse } from './utils/api/apiHelpers';
+import { saveHistory } from './utils/api/saveHistory'
+import { AsyncRun } from 'stopify';
 
 import * as elementaryJS from 'elementary-js';
 import * as stopify from 'stopify';
-import { setGlobals } from '../runner';
+import { setGlobals } from './runner';
 
 // TODO(arjun): I think these hacks are necessary for eval to work. We either 
 // do them here or we do them within the implementation of Stopify. I want 
@@ -46,6 +47,7 @@ type Props = WithStyles<'button' | 'leftIcon'> & {
     loggedIn: boolean,
     setRunnerToState: (runner: any) => void,
     removeRunnerFromState: () => void,
+    setRunner: (runner: AsyncRun) => void
 };
 
 class RunButton extends React.Component<Props> {
@@ -89,6 +91,7 @@ class RunButton extends React.Component<Props> {
         try {
             const runner = stopify.stopifyLocallyFromAst(compiled.node);
             setGlobals((runner as any).g);
+            this.props.setRunner(runner);
             this.props.setRunnerToState(runner);
             (window as any).lib220.setRunner(runner);
             runner.run((result: any) => {

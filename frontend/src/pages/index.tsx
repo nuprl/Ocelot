@@ -5,7 +5,7 @@ import MenuAppbar from '../components/MenuAppbar';
 import SideDrawer from '../components/SideDrawer';
 import SplitPane from 'react-split-pane';
 import Notification from '../containers/Notification';
-import JumboContent from '../components/JumboContent';
+import JumboContent from '../JumboContent';
 import { detect } from 'detect-browser';
 import 'static/styles/JumboContent.css';
 import 'static/styles/body.css';
