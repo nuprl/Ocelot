@@ -23,9 +23,9 @@ To install Stopify:
 cd Stopify
 git checkout 220
 yarn install
-(cd stopify-estimators && yarn run build)
-(cd stopify-continuations && yarn run build)
-(cd stopify && yarn run build && yarn link)
+cd stopify-estimators && yarn run build && cd ..
+cd stopify-continuations && yarn run build && cd ..
+cd stopify && yarn run build && yarn link && cd ..
 
 ```
 
