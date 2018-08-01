@@ -104,20 +104,7 @@ class TestButton extends React.Component<Props> {
             // tslint:disable-next-line:no-console
             // console.log(compile(this.props.code));
             const runner = stopify.stopifyLocallyFromAst(
-                compiled.node,
-                undefined, // TODO(arjun): will need to specify for error locs.
-                {
-                    externals: [
-                        'console',
-                        'celot',
-                        'elementaryjs'
-                    ]
-                },
-                {
-                    // estimator: 'countdown',
-                    // yieldInterval: 1
-                }
-            );
+                compiled.node);
             this.props.setRunnerToState(runner);
             runner.run((result: any) => {
                 this.handleStopifyResult(result);

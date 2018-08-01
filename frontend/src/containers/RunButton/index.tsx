@@ -47,6 +47,11 @@ type Props = WithStyles<'button' | 'leftIcon'> & {
     removeRunnerFromState: () => void,
 };
 
+function setGlobals(g: any) {
+    g.elementaryjs = elementaryRTS;
+    g.console = window.console;
+}
+
 class RunButton extends React.Component<Props> {
 
     handleStopifyResult = (result: stopify.Result) => {
@@ -86,21 +91,8 @@ class RunButton extends React.Component<Props> {
         }
 
         try {
-            const runner = stopify.stopifyLocallyFromAst(
-                compiled.node,
-                undefined, // TODO(arjun): will need to specify for error locs.
-                {
-                    externals: [
-                        'elementaryjs',
-                        'console',
-                        'lib220'
-                    ]
-                },
-                {
-                    // estimator: 'countdown',
-                    // yieldInterval: 1
-                }
-            );
+            const runner = stopify.stopifyLocallyFromAst(compiled.node);
+            setGlobals((runner as any).g);
             this.props.setRunnerToState(runner);
             (window as any).lib220.setRunner(runner);
             runner.run((result: any) => {
