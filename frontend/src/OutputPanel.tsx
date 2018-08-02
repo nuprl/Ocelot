@@ -73,19 +73,14 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     fontSize: 16,
 };
 
-// const consoleStyles: StyleRulesCallback = theme => ({
-//     container: {
-//         width: '100%',
-//         padding: '8px',
-//         display: 'flex',
-//         flexShrink: 0,
-//         alignItems: 'center',
-//         backgroundColor: '#1e1e1e',
-//     }
-
-// });
-
-// const ConsoleInput =  withStyles(consoleStyles)(RawConsoleInput);
+const s1 = {
+    width: '100%',
+    padding: '8px',
+    display: 'flex',
+    flexShrink: 0,
+    alignItems: 'center',
+    backgroundColor: '#1e1e1e'
+};
 
 const styles: StyleRulesCallback = theme => ({
     root: {
@@ -196,7 +191,7 @@ class OutputPanel extends React.Component<Props, State> {
             <div className={classes.root}>
                 <div style={{ height: '100%', flexDirection: 'column', display: 'flex' }}>
                     <ConsoleOutput logs={this.state.logs as FullMessage[]} />
-                    <div>
+                    <div style={s1}>
                     <div style={{ color: 'white', height: '24px' }}>
                         <RightArrowIcon color="inherit" />
                     </div>
