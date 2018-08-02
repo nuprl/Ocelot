@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
-import { Hook, Decode } from 'console-feed';
 import 'static/styles/ConsoleTabs.css';
 import { Message } from 'console-feed/lib/definitions/Console';
 import { Message as FullMessage } from 'console-feed/lib/definitions/Component';
@@ -14,6 +13,7 @@ import { inspectorTheme } from './static/styles/consoleStyle';
 import 'static/styles/Scrollbar.css';
 import { AsyncRun } from 'stopify';
 import * as stopify from 'stopify';
+import * as runner from './runner';
 
 class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
   logRef: HTMLDivElement | null = null;
@@ -122,17 +122,7 @@ class OutputPanel extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        Hook(window.console, (log: any) => {
-            const decodedLog = Decode(log);
-            if (typeof decodedLog.data !== 'object') {
-                return;
-            }
-
-            if (decodedLog.data.length === 0) { // prevent console.log() from logging
-                return;
-            }
-            this.appendLogMessage(decodedLog);
-        });
+        runner.setConsole(this);
     }
 
     addNewCommandResult = (command: string, result: any, isError: boolean) => {
