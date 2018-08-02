@@ -26,6 +26,7 @@ type Props = {
     fileName: string,
     loggedIn: boolean,
     isSaved: boolean,
+    updateCode: (code: string) => void,
     saveCode: (
         fileIndex: number,
         content: string,
@@ -170,6 +171,7 @@ class CodeEditor extends React.Component<Props> {
             this.triggerFileLoadingAnim();
             this.debouncedSaveCodeCloud();
         }
+        this.props.updateCode(code);
         this.props.saveCode(this.props.fileIndex, code);
 
     };

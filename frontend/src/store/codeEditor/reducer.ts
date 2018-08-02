@@ -11,26 +11,6 @@ const codeEditor: Reducer<t.CodeEditorState> = (
     state: t.CodeEditorState = initialState,
     action: t.CodeEditorActions): t.CodeEditorState => {
     switch (action.type) {
-        case t.SET_CODE_RUNNER:
-            return {
-                ...state,
-                codeRunner: action.runner
-            };
-        case t.REMOVE_CODE_RUNNER:
-            return {
-                ...state,
-                codeRunner: undefined
-            };
-        case t.SET_TEST_RUNNER:
-            return {
-                ...state, 
-                testRunner: action.runner
-            };
-        case t.REMOVE_TEST_RUNNER:
-            return {
-                ...state,
-                testRunner: undefined,
-            };
         case t.SET_MONACO_EDITOR:
             return {
                 ...state,
@@ -40,5 +20,6 @@ const codeEditor: Reducer<t.CodeEditorState> = (
             return state;
     }
 };
+
 
 export default codeEditor;
