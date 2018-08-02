@@ -28,18 +28,14 @@ class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
     const { logs } = this.props;
 
     return (
-      <div
-        className="scrollbars"
-        style={{ backgroundColor: '#242424', overflowY: 'auto', overflowX: 'hidden', flexGrow: 1 }}
-        ref={(divElem) => this.logRef = divElem}
-      >
-        {/* <button onClick={this.switch}>Show only logs</button> */}
-        <Console
-          logs={logs}
-          variant="dark"
-          styles={inspectorTheme}
-        />
-
+      <div className="scrollbars"
+           style={{ 
+               backgroundColor: '#242424', 
+               overflowY: 'auto', 
+               overflowX: 'hidden', 
+               flexGrow: 1 }}
+           ref={(divElem) => this.logRef = divElem}>
+         <Console logs={logs} variant="dark" styles={inspectorTheme}/>
       </div>
     );
   }
@@ -93,22 +89,13 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 type Props = WithStyles<'root'> & {
-    getRunner: () => AsyncRun | undefined
+    runner: AsyncRun | undefined
 }
 
 type State = {
     logs: Message[],
 };
-/**
- * OutputPanel component responsible for
- * console output and console input
- * It also has a clear logs button
- * The state is stored here. Maybe I'll 
- * move the state to redux.
- *
- * @class OutputPanel
- * @extends {React.Component<Props, State>}
- */
+
 class OutputPanel extends React.Component<Props, State> {
 
     constructor(props: Props) {
@@ -118,30 +105,39 @@ class OutputPanel extends React.Component<Props, State> {
         };
     }
 
+    componentWillReceiveProps(nextProps: Props) {
+        // Clear console when program reloads.
+        if (nextProps.runner !== this.props.runner) {
+            this.setState({ logs: [] });
+        }
+    }
+
+    /** Appends a message to the log. Bounds scrollback to 100 items. */
+    appendLogMessage(message: Message | { method: 'command' | 'result' | 'error', data: any }) {
+        let newLog = [...this.state.logs, message as Message];
+        if (newLog.length > 100) {
+            newLog = newLog.slice(newLog.length - 100);
+        }
+        this.setState({ logs: newLog });
+    }
+
     componentDidMount() {
         Hook(window.console, (log: any) => {
             const decodedLog = Decode(log);
             if (typeof decodedLog.data !== 'object') {
-                this.addNewLog({ data: ['Console was cleared'], method: 'info' });
                 return;
             }
+
             if (decodedLog.data.length === 0) { // prevent console.log() from logging
                 return;
             }
-            this.addNewLog(decodedLog);
+            this.appendLogMessage(decodedLog);
         });
     }
 
-    addNewLog = (decodedLog: Message) => {
-        this.setState((prevState) => ({ logs: [...prevState.logs, decodedLog] }));
-    };
-
     addNewCommandResult = (command: string, result: any, isError: boolean) => {
-        const commandLog = {method: 'command', data: [command]};
-        const resultLog = {method: isError ? 'error': 'result', data: [result]};
-        this.setState((prevState) => ({
-            logs: [...prevState.logs, (commandLog as Message), (resultLog as Message)]
-        }));
+        this.appendLogMessage({ method: 'command', data: [command] });
+        this.appendLogMessage({method: isError ? 'error': 'result', data: [result]});
     };
 
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
@@ -157,7 +153,7 @@ class OutputPanel extends React.Component<Props, State> {
             const command = editor.getValue();
             editor.setValue('');
 
-            const runner = this.props.getRunner();
+            const runner = this.props.runner;
             if (runner === undefined) {
                 console.error('Need to click run (TODO)');
                 return;
@@ -189,7 +185,10 @@ class OutputPanel extends React.Component<Props, State> {
         const { classes } = this.props;
         return (
             <div className={classes.root}>
-                <div style={{ height: '100%', flexDirection: 'column', display: 'flex' }}>
+                <div style={{ 
+                    height: '100%', 
+                    flexDirection: 'column', 
+                    display: 'flex' }}>
                     <ConsoleOutput logs={this.state.logs as FullMessage[]} />
                     <div style={s1}>
                     <div style={{ color: 'white', height: '24px' }}>

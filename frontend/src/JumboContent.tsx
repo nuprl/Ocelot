@@ -13,7 +13,9 @@ class JumboContent extends React.Component<{}, { asyncRunner: AsyncRun | undefin
 
     constructor(props: {}) {
         super(props);
-        this.setState({ asyncRunner: undefined });
+        this.state = { 
+            asyncRunner: undefined 
+        };
     }
 
     setRunner(asyncRunner: AsyncRun) {
@@ -22,6 +24,12 @@ class JumboContent extends React.Component<{}, { asyncRunner: AsyncRun | undefin
 
     getRunner(): AsyncRun | undefined {
         return this.state.asyncRunner;
+    }
+
+    clearRunner() {
+        if (this.state.asyncRunner !== undefined) {
+            this.setState({ asyncRunner: undefined });
+        }
     }
 
     render() {
@@ -40,7 +48,7 @@ class JumboContent extends React.Component<{}, { asyncRunner: AsyncRun | undefin
 
                     <CanvasOutput />
                 </SplitPane>
-                <OutputPanel getRunner={() => this.getRunner()} />
+                <OutputPanel runner={this.state.asyncRunner} />
             </SplitPane>;
     }
 

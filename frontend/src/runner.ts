@@ -8,3 +8,4 @@ export function setGlobals(g: any) {
   g.lib220 = (window as any).lib220;
   g.Math = Math;
 }
+
