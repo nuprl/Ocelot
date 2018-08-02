@@ -10,6 +10,7 @@ import CodeEditor from './containers/CodeEditor';
 import ExploreIcon from '@material-ui/icons/Explore';
 import Button from '@material-ui/core/Button';
 import StopIcon from '@material-ui/icons/Stop';
+import * as types from './types';
 import { RootState } from './store';
 import { getSelectedFileName } from './store/userFiles/selectors';
 import { AsyncRun } from 'stopify';
@@ -46,6 +47,8 @@ type Props = {
 
 class JumboContent extends React.Component<Props, State> {
 
+    private hasConsole: types.HasConsole | undefined;
+
     constructor(props: Props) {
         super(props);
         this.state = { 
@@ -55,10 +58,25 @@ class JumboContent extends React.Component<Props, State> {
         };
     }
 
+    recvHasConsole(c: types.HasConsole) {
+        this.hasConsole = c;
+    }
+
     handleStopifyResult = (result: stopify.Result) => {
         if (result.type === 'exception') {
-            // tslint:disable-next-line:no-console
-            console.error(result.value, result.stack[0]);
+            console.error(result);
+            if (this.hasConsole) {
+                this.hasConsole.appendLogMessage({ 
+                    method: 'error',
+                    data: [result.value.message]
+                });
+                for (let line of result.stack) {
+                    this.hasConsole.appendLogMessage({ 
+                        method: 'error',
+                        data: [line]
+                    });    
+                }
+            }
         }
     }
 
@@ -119,19 +137,20 @@ class JumboContent extends React.Component<Props, State> {
         try {
             const runner = stopify.stopifyLocallyFromAst(compiled.node);
             setGlobals((runner as any).g);
-            this.setState({ asyncRunner: runner, status: mode });
-            (window as any).lib220.setRunner(runner);
-            runner.run((result: any) => {
-                // tslint:disable-next-line:no-console
-                // console.log(result);
-                this.handleStopifyResult(result);
-                this.setState({ asyncRunner: undefined, status: 'stopped' });
+            this.setState({ asyncRunner: runner, status: mode }, () => {
+                (window as any).lib220.setRunner(runner);
+                runner.run((result: any) => {
+                    // tslint:disable-next-line:no-console
+                    // console.log(result);
+                    this.handleStopifyResult(result);
+                    this.setState({ status: 'stopped' });
+                });
             });
         } catch (e) {
             if (e instanceof elementaryRTS.ElementaryRuntimeError) {
                 // Don't report stack traces. Count on ElementaryJS to report
                 // line numbers.
-                console.error(e.message);this.state
+                console.error(e.message);
             }
             else {
                 // tslint:disable-next-line:no-console
@@ -164,7 +183,7 @@ class JumboContent extends React.Component<Props, State> {
                 minSize={0}
                 pane1Style={{maxWidth: '100%'}}>
                 <div style={{ width: '100%', height: '100%' }}>
-                    <Button color="secondary" 
+                    <Button color="secondary"
                             onClick={() => this.onRun('running')}
                             disabled={this.state.status !== 'stopped'}>
                       <PlayIcon color="inherit" />
@@ -190,7 +209,8 @@ class JumboContent extends React.Component<Props, State> {
 
                 <CanvasOutput />
             </SplitPane>
-            <OutputPanel runner={this.state.asyncRunner} />
+            <OutputPanel runner={this.state.asyncRunner} 
+                         recvHasConsole={(c) => this.recvHasConsole(c)} />
       </SplitPane>);
     }
 

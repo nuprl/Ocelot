@@ -3,7 +3,6 @@ import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import 'static/styles/ConsoleTabs.css';
 import { Message } from 'console-feed/lib/definitions/Console';
 import { Message as FullMessage } from 'console-feed/lib/definitions/Component';
-
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import RightArrowIcon from '@material-ui/icons/KeyboardArrowRight';
@@ -14,6 +13,7 @@ import 'static/styles/Scrollbar.css';
 import { AsyncRun } from 'stopify';
 import * as stopify from 'stopify';
 import * as runner from './runner';
+import * as types from './types';
 
 class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
   logRef: HTMLDivElement | null = null;
@@ -89,7 +89,8 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 type Props = WithStyles<'root'> & {
-    runner: AsyncRun | undefined
+    runner: AsyncRun | undefined,
+    recvHasConsole: (hasConsole: types.HasConsole) => void;
 }
 
 type State = {
@@ -114,14 +115,17 @@ class OutputPanel extends React.Component<Props, State> {
 
     /** Appends a message to the log. Bounds scrollback to 100 items. */
     appendLogMessage(message: Message | { method: 'command' | 'result' | 'error', data: any }) {
-        let newLog = [...this.state.logs, message as Message];
-        if (newLog.length > 100) {
-            newLog = newLog.slice(newLog.length - 100);
-        }
-        this.setState({ logs: newLog });
+        this.setState((prevState) => {
+            let newLog = [...prevState.logs, message as Message];
+            if (newLog.length > 100) {
+                newLog = newLog.slice(newLog.length - 100);
+            }
+            return { logs: newLog };
+        });
     }
 
     componentDidMount() {
+        this.props.recvHasConsole(this);
         runner.setConsole(this);
     }
 
