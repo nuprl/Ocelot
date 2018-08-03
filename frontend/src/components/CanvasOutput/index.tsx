@@ -17,7 +17,7 @@ const styles: StyleRulesCallback = theme => ({
         // flexDirection: 'column',
         // alignItems: 'center', /* Vertical center alignment */
         // justifyContent: 'center', /* Horizontal center alignment */
-        height: 'calc(100% - 48px)',
+        height: '100%',
         overflowY: 'auto',
     },
     fab: {

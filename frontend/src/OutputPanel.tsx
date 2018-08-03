@@ -16,31 +16,35 @@ import * as runner from './runner';
 import * as types from './types';
 
 class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
-  logRef: HTMLDivElement | null = null;
+    logRef: HTMLDivElement | null = null;
 
-  componentDidUpdate() {
-    if (this.logRef !== null) {
-      this.logRef.scrollTop = this.logRef.scrollHeight;
+    componentDidUpdate() {
+        if (this.logRef !== null) {
+            this.logRef.scrollTop = this.logRef.scrollHeight;
+        }
     }
-  }
 
-  render() {
-    const { logs } = this.props;
+    render() {
+        const { logs } = this.props;
 
-    return (
-      <div className="scrollbars"
-           style={{ 
-               backgroundColor: '#242424', 
-               overflowY: 'auto', 
-               overflowX: 'hidden', 
-               flexGrow: 1 }}
-           ref={(divElem) => this.logRef = divElem}>
-         <Console logs={logs} variant="dark" styles={inspectorTheme}/>
-      </div>
-    );
-  }
+        return (
+            <div className="scrollbars"
+                style={{
+                    backgroundColor: '#242424',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    flexGrow: 1
+                }}
+                ref={(divElem) => this.logRef = divElem}>
+                <Console logs={logs} variant="dark" styles={inspectorTheme} />
+            </div>
+        );
+    }
 
 }
+
+const lineHeight = 22; // pixels
+const maxHeight = 126;
 
 const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     wordWrap: 'on',
@@ -73,7 +77,6 @@ const s1 = {
     padding: '8px',
     display: 'flex',
     flexShrink: 0,
-    alignItems: 'center',
     backgroundColor: '#1e1e1e'
 };
 
@@ -94,6 +97,9 @@ type Props = WithStyles<'root'> & {
 
 type State = {
     logs: Message[],
+    editorHeight: number,
+    commandHistory: string[];
+    historyLocation: number,
 };
 
 class OutputPanel extends React.Component<Props, State> {
@@ -101,7 +107,10 @@ class OutputPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            logs: []
+            logs: [],
+            commandHistory: [],
+            historyLocation: -1, // keep track of where in history one is in
+            editorHeight: lineHeight,
         };
     }
 
@@ -130,36 +139,67 @@ class OutputPanel extends React.Component<Props, State> {
 
     addNewCommandResult = (command: string, result: any, isError: boolean) => {
         this.appendLogMessage({ method: 'command', data: [command] });
-        this.appendLogMessage({method: isError ? 'error': 'result', data: [result]});
+        this.appendLogMessage({ method: isError ? 'error' : 'result', data: [result] });
     };
 
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         window.addEventListener('resize', this.resizeEditor);
+        let currentLineCount = 1;
+        editor.onDidChangeModelContent(() => { // when code changes
+            const totalLineCount = editor.getModel().getLineCount();
+            if (totalLineCount !== currentLineCount) {
+                this.setState({
+                    editorHeight: Math.min(maxHeight, totalLineCount * lineHeight)
+                });
+                editor.layout();
+                currentLineCount = totalLineCount;
+            }
+        });
         editor.onKeyDown(event => {
-            if (!(event.keyCode === monaco.KeyCode.Enter && editor.getValue() !== '')) {
+            const currentCursorLineNum = editor.getPosition().lineNumber;
+            const totalNumLines = editor.getModel().getLineCount();
+            if (event.keyCode === monaco.KeyCode.UpArrow && currentCursorLineNum === 1) { // if topmost line
+                const newHistoryLocation = Math.min(this.state.historyLocation + 1, this.state.commandHistory.length - 1);
+                editor.setValue(this.state.commandHistory[newHistoryLocation] || '');
+                this.setState({ historyLocation: newHistoryLocation });
                 return;
             }
-            event.preventDefault();
-            event.stopPropagation();
-            const command = editor.getValue();
-            editor.setValue('');
-
-            const runner = this.props.runner;
-            if (runner === undefined) {
-                console.error('Need to click run (TODO)');
+            if (event.keyCode === monaco.KeyCode.DownArrow && currentCursorLineNum === totalNumLines) { // if last line
+                const newHistoryLocation = Math.max(this.state.historyLocation - 1, -1);
+                editor.setValue(this.state.commandHistory[newHistoryLocation] || '');
+                this.setState({ historyLocation: newHistoryLocation });
                 return;
             }
+            if (event.keyCode === monaco.KeyCode.Enter && event.shiftKey) {
+                return;
+            }
+            if (event.keyCode === monaco.KeyCode.Enter && !event.shiftKey) {
+                event.preventDefault();
+                event.stopPropagation();
+                const command = editor.getValue();
+                editor.setValue('');
 
-            (runner as any).evalAsync(command, (result: stopify.Result) => {
-                if (result.type === 'normal') {
-                    this.addNewCommandResult(command, result.value, false);
+                const runner = this.props.runner;
+                if (runner === undefined) {
+                    console.error('Need to click run (TODO)');
+                    return;
                 }
-                else {
-                    this.addNewCommandResult(command, result.value, true);
-                }
-            });
+                this.setState({
+                    historyLocation: -1,
+                    commandHistory: [command, ...this.state.commandHistory]
+                });
+
+                (runner as any).evalAsync(command, (result: stopify.Result) => {
+                    if (result.type === 'normal') {
+                        this.addNewCommandResult(command, result.value, false);
+                    }
+                    else {
+                        this.addNewCommandResult(command, result.value, true);
+                    }
+                });
+            }
         });
     }
 
@@ -178,24 +218,25 @@ class OutputPanel extends React.Component<Props, State> {
         const { classes } = this.props;
         return (
             <div className={classes.root}>
-                <div style={{ 
-                    height: '100%', 
-                    flexDirection: 'column', 
-                    display: 'flex' }}>
+                <div style={{
+                    height: '100%',
+                    flexDirection: 'column',
+                    display: 'flex'
+                }}>
                     <ConsoleOutput logs={this.state.logs as FullMessage[]} />
                     <div style={s1}>
-                    <div style={{ color: 'white', height: '24px' }}>
-                        <RightArrowIcon color="inherit" />
+                        <div style={{ color: 'white', height: '24px' }}>
+                            <RightArrowIcon color="inherit" />
+                        </div>
+                        <div style={{ verticalAlign: 'middle', width: '100%', height: `${this.state.editorHeight}px` }}>
+                            <MonacoEditor
+                                theme="vs-dark"
+                                language="elementaryjs"
+                                options={monacoOptions}
+                                editorDidMount={this.editorDidMount}
+                            />
+                        </div>
                     </div>
-                    <div style={{ verticalAlign: 'middle', width: '100%', height: '20px' }}>
-                        <MonacoEditor
-                            theme="vs-dark"
-                            language="elementaryjs"
-                            options={monacoOptions}
-                            editorDidMount={this.editorDidMount}
-                        />
-                    </div>
-                </div>
 
                 </div>
             </div>
