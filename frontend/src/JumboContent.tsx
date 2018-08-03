@@ -152,18 +152,19 @@ class JumboContent extends React.Component<Props, State> {
                 runner.externalHOF(complete => {
                     return (runner.runStopifiedCode(
                         () => {
+                            if (!elementaryRTS.getEnableTests()){
+                                return;
+                            }
                             try {
                                 testFunc();
                                 elementaryRTS.newTestResult({
                                     failed: false,
                                     description: description,
-                                    miliElapsed: 0,
                                 });
                             } catch (error) {
                                 elementaryRTS.newTestResult({
-                                    failed: false,
+                                    failed: true,
                                     description: description,
-                                    miliElapsed: 0,
                                 });
                             }
                         },
