@@ -7,7 +7,8 @@ import IconButton from '@material-ui/core/IconButton';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
 import 'static/styles/DrawerIconButton.css';
-import UserFiles from '../UserFiles';
+import UserFileItems from '../../containers/UserFileItems';
+import NewFileField from '../../containers/NewFileField';
 import 'static/styles/DrawerIconButton.css';
 import LoadingFolderIcon from '../LoadingFolderIcon';
 import ListItemStyles from '../../../../components/ListItemStyles';
@@ -18,16 +19,28 @@ import AddIcon from '@material-ui/icons/Add';
 type FilesFolderProps = {
     open: boolean,
     disabled: boolean,
-    onCreateFile: () => void,
     toggleFolder: () => void,
 };
 
 type Props = FilesFolderProps & WithStyles<ListItemStylesTypes>;
 
-class FilesFolder extends React.Component<Props> {
+type State = {
+    hasNewFileField: boolean,
+};
+
+class FilesFolder extends React.Component<Props, State> {
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            hasNewFileField: false,
+        }
+    }
+
+    newFileField = () => { this.setState({ hasNewFileField: true }) };
 
     render() {
-        const { open, disabled, onCreateFile, toggleFolder, classes } = this.props;
+        const { open, disabled, toggleFolder, classes } = this.props;
 
         return (
             <div>
@@ -59,7 +72,7 @@ class FilesFolder extends React.Component<Props> {
                                         aria-label="New File"
                                         color="inherit"
                                         disabled={disabled}
-                                        onClick={onCreateFile}
+                                        onClick={this.newFileField}
                                         classes={{ root: classes.noButtonBackground }}
                                     >
                                         <AddIcon color="inherit" />
@@ -76,7 +89,11 @@ class FilesFolder extends React.Component<Props> {
                         disablePadding
                         dense
                     >
-                        <UserFiles />
+                        <UserFileItems />
+                        <NewFileField
+                            newFile={this.state.hasNewFileField}
+                            deleteFileField={() => { this.setState({ hasNewFileField: false }) }}
+                        />
                     </List>
                 </Collapse>
             </div>

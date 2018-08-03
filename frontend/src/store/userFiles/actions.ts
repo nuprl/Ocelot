@@ -32,16 +32,6 @@ export const closeFilesFolder: ActionCreator<t.CloseFilesFolderAction>
         type: t.CLOSE_FILES_FOLDER
     });
 
-export const createNewFileField: ActionCreator<t.CreateNewFileFieldAction>
-    = () => ({
-        type: t.CREATE_NEW_FILE_FIELD
-    });
-
-export const deleteNewFileField: ActionCreator<t.DeleteNewFileFieldAction>
-    = () => ({
-        type: t.DELETE_NEW_FILE_FIELD
-    });
-
 export const createNewFile: ActionCreator<t.CreateNewFileAction>
     = (fileName: string, loggedIn: boolean) => ({
         type: t.CREATE_NEW_FILE,
@@ -61,11 +51,6 @@ export const deleteFile: ActionCreator<t.DeleteFileAction>
         fileIndex: fileIndex,
         fileName: fileName,
         loggedIn: loggedIn
-    });
-
-export const triggerNewFileError: ActionCreator<t.TriggerNewFileErrorAction>
-    = () => ({
-        type: t.TRIGGER_NEW_FILE_ERROR
     });
 
 export const editFileLocal: ActionCreator<t.EditFileLocalAction>

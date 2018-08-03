@@ -23,8 +23,6 @@ const initialState: t.UserFilesState = {
             content: helloWorldCode
         }],
         selectedFileIndex: 0,
-        newFile: false,
-        newFileError: false,
         fileSaved: [true]
     }
 };
@@ -89,25 +87,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                     open: false,
                 }
             };
-        case t.CREATE_NEW_FILE_FIELD:
-            return {
-                filesInfo: {
-                    ...state.filesInfo,
-                    newFile: true,
-                },
-                folderInfo: {
-                    ...state.folderInfo,
-                    open: true,
-                }
-            };
-        case t.DELETE_NEW_FILE_FIELD:
-            return {
-                ...state,
-                filesInfo: {
-                    ...state.filesInfo,
-                    newFile: false,
-                }
-            };
         case t.CREATE_NEW_FILE:
             return {
                 ...state,
@@ -121,7 +100,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                         },
                     ],
                     selectedFileIndex: state.filesInfo.files.length,
-                    newFileError: false,
                     fileSaved: [
                         ...state.filesInfo.fileSaved,
                         true,
@@ -153,14 +131,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                 newState.filesInfo.selectedFileIndex = -1;
             }
             return newState;
-        case t.TRIGGER_NEW_FILE_ERROR:
-            return {
-                ...state,
-                filesInfo: {
-                    ...state.filesInfo,
-                    newFileError: true
-                }
-            };
         case t.EDIT_FILE_LOCAL:
             newFiles = [...state.filesInfo.files];
             newFiles[action.fileIndex] = {
