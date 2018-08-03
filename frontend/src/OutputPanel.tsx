@@ -43,7 +43,6 @@ class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
 }
 
 const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
-    language: 'javascript',
     wordWrap: 'on',
     overviewRulerLanes: 0,
     glyphMargin: false,

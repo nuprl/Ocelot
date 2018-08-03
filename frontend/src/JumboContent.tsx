@@ -137,48 +137,13 @@ class JumboContent extends React.Component<Props, State> {
             window.localStorage.setItem('code', this.state.code);
         }
 
-        elementaryRTS.enableTests(false);
-        if (mode === 'testing') {
-            elementaryRTS.enableTests(true);
-        }
-
         try {
             const runner = stopify.stopifyLocallyFromAst(compiled.node);
             setGlobals((runner as any).g);
-            (runner as any).g.test = (description: string, testFunc: () => void) => {
-                // TODO (Sam): Need to organize it more, 
-                // I need stopify and the runner so this was the only part I could
-                // have the test function declared.
-                runner.externalHOF(complete => {
-                    return (runner.runStopifiedCode(
-                        () => {
-                            if (!elementaryRTS.getEnableTests()){
-                                return;
-                            }
-                            try {
-                                testFunc();
-                                elementaryRTS.newTestResult({
-                                    failed: false,
-                                    description: description,
-                                });
-                            } catch (error) {
-                                elementaryRTS.newTestResult({
-                                    failed: true,
-                                    description: description,
-                                    error: error.message,
-                                });
-                            }
-                        },
-                        (result) => {
-                            if (result.type === 'normal') {
-                                complete({ type: 'normal', value: result.value });
-                            }
-                            else {
-                                complete(result);
-                            }
-                        }) as never);
-                });
-            };
+            elementaryRTS.enableTests(false, runner);
+            if (mode === 'testing') {
+                elementaryRTS.enableTests(true, runner);
+            }
             this.setState({ asyncRunner: runner, status: mode }, () => {
                 (window as any).lib220.setRunner(runner);
                 runner.run((result: any) => {

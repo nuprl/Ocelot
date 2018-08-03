@@ -14,6 +14,7 @@ export function setGlobals(g: any) {
       visibleConsole.appendLogMessage({ method: 'log', data: [...message] });
     }
   });
+  g.test = elementaryRTS.test;
   g.assert = elementaryRTS.assert;
   g.lib220 = (window as any).lib220;
   g.Math = Math;
