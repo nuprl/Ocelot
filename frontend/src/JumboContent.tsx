@@ -130,7 +130,7 @@ class JumboContent extends React.Component<Props, State> {
                 // that is ORed with runner and CompileError from elementaryjs
                 this.hasConsole && this.hasConsole.appendLogMessage({
                     method: 'error',
-                    data: [`Line ${err.location.start.line}: ${err.message}`]
+                    data: [`Line ${err.line}: ${err.message}`]
                 });
             }
             return;
