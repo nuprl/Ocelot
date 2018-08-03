@@ -165,6 +165,7 @@ class JumboContent extends React.Component<Props, State> {
                                 elementaryRTS.newTestResult({
                                     failed: true,
                                     description: description,
+                                    error: error.message,
                                 });
                             }
                         },
