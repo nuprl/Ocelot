@@ -51,7 +51,7 @@ class JumboContent extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = { 
+        this.state = {
             asyncRunner: undefined,
             status: 'stopped',
             code: ''
@@ -66,15 +66,15 @@ class JumboContent extends React.Component<Props, State> {
         if (result.type === 'exception') {
             console.error(result);
             if (this.hasConsole) {
-                this.hasConsole.appendLogMessage({ 
+                this.hasConsole.appendLogMessage({
                     method: 'error',
                     data: [result.value.message]
                 });
                 for (let line of result.stack) {
-                    this.hasConsole.appendLogMessage({ 
+                    this.hasConsole.appendLogMessage({
                         method: 'error',
                         data: [line]
-                    });    
+                    });
                 }
             }
         }
@@ -101,8 +101,8 @@ class JumboContent extends React.Component<Props, State> {
     shouldComponentUpdate(nextProps: Props, nextState: State) {
         // code may not have to be in .state
         return this.props !== nextProps ||
-          this.state.asyncRunner !== nextState.asyncRunner ||
-          this.state.status !== nextState.status;
+            this.state.asyncRunner !== nextState.asyncRunner ||
+            this.state.status !== nextState.status;
     }
 
     onRun(mode: 'running' | 'testing') {
@@ -120,10 +120,7 @@ class JumboContent extends React.Component<Props, State> {
                 // console.log('History saved');
             }).catch(err => console.log(err)); // will do for now
         }
-        const compiled = elementaryJS.compile(this.state.code, {
-            isOnline: true,
-            runTests: mode === 'testing',
-        });
+        const compiled = elementaryJS.compile(this.state.code, true);
         if (compiled.kind === 'error') {
             for (const err of compiled.errors) {
                 console.error(`Line ${err.location.start.line}: ${err.message}`);
@@ -133,16 +130,60 @@ class JumboContent extends React.Component<Props, State> {
         if (window.location.hostname === 'localhost') {
             window.localStorage.setItem('code', this.state.code);
         }
-        
+
+        elementaryRTS.enableTests(false);
+        if (mode === 'testing') {
+            elementaryRTS.enableTests(true);
+        }
+
         try {
             const runner = stopify.stopifyLocallyFromAst(compiled.node);
             setGlobals((runner as any).g);
+            (runner as any).g.test = (description: string, testFunc: () => void) => {
+                // TODO (Sam): Need to organize it more, 
+                // I need stopify and the runner so this was the only part I could
+                // have the test function declared.
+                runner.externalHOF(complete => {
+                    return (runner.runStopifiedCode(
+                        () => {
+                            try {
+                                testFunc();
+                                elementaryRTS.newTestResult({
+                                    failed: false,
+                                    description: description,
+                                    miliElapsed: 0,
+                                });
+                            } catch (error) {
+                                elementaryRTS.newTestResult({
+                                    failed: false,
+                                    description: description,
+                                    miliElapsed: 0,
+                                });
+                            }
+                        },
+                        (result) => {
+                            if (result.type === 'normal') {
+                                complete({ type: 'normal', value: result.value });
+                            }
+                            else {
+                                complete(result);
+                            }
+                        }) as never);
+                });
+            };
             this.setState({ asyncRunner: runner, status: mode }, () => {
                 (window as any).lib220.setRunner(runner);
                 runner.run((result: any) => {
                     // tslint:disable-next-line:no-console
                     // console.log(result);
                     this.handleStopifyResult(result);
+                    if (this.state.status === 'testing' && this.hasConsole) {
+                        const summary = elementaryRTS.summary();
+                        this.hasConsole.appendLogMessage({
+                            method: 'log',
+                            data: [summary.output, ...summary.style]
+                        });
+                    }
                     this.setState({ status: 'stopped' });
                 });
             });
@@ -156,7 +197,7 @@ class JumboContent extends React.Component<Props, State> {
                 // tslint:disable-next-line:no-console
                 console.error(e);
             }
-        }    
+        }
     }
 
     onStop() {
@@ -174,44 +215,44 @@ class JumboContent extends React.Component<Props, State> {
     }
 
     render() {
-      return (
-        <SplitPane split="horizontal" minSize={48} defaultSize="25%"
-                   primary="second">
-            <SplitPane
-                split="vertical"
-                defaultSize="50%"
-                minSize={0}
-                pane1Style={{maxWidth: '100%'}}>
-                <div style={{ width: '100%', height: '100%' }}>
-                    <Button color="secondary"
+        return (
+            <SplitPane split="horizontal" minSize={48} defaultSize="25%"
+                primary="second">
+                <SplitPane
+                    split="vertical"
+                    defaultSize="50%"
+                    minSize={0}
+                    pane1Style={{ maxWidth: '100%' }}>
+                    <div style={{ width: '100%', height: '100%' }}>
+                        <Button color="secondary"
                             onClick={() => this.onRun('running')}
                             disabled={this.state.status !== 'stopped'}>
-                      <PlayIcon color="inherit" />
-                      Run
+                            <PlayIcon color="inherit" />
+                            Run
                     </Button>
-                    <Button color="secondary" 
+                        <Button color="secondary"
                             onClick={() => this.onRun('testing')}
                             disabled={this.state.status !== 'stopped'}>
-                      <ExploreIcon color="inherit" />
-                      Test
+                            <ExploreIcon color="inherit" />
+                            Test
                     </Button>
-                    <MuiThemeProvider theme={redTheme}>
-                        <Button color="secondary" 
+                        <MuiThemeProvider theme={redTheme}>
+                            <Button color="secondary"
                                 onClick={() => this.onStop()}
                                 disabled={this.state.status === 'stopped'}>
-                        <StopIcon color="inherit" />
-                        Stop
+                                <StopIcon color="inherit" />
+                                Stop
                         </Button>
-                    </MuiThemeProvider>
+                        </MuiThemeProvider>
 
-                    <CodeEditor updateCode={(code) => this.updateCode(code)}/>
-                </div>
+                        <CodeEditor updateCode={(code) => this.updateCode(code)} />
+                    </div>
 
-                <CanvasOutput />
-            </SplitPane>
-            <OutputPanel runner={this.state.asyncRunner} 
-                         recvHasConsole={(c) => this.recvHasConsole(c)} />
-      </SplitPane>);
+                    <CanvasOutput />
+                </SplitPane>
+                <OutputPanel runner={this.state.asyncRunner}
+                    recvHasConsole={(c) => this.recvHasConsole(c)} />
+            </SplitPane>);
     }
 
 }
