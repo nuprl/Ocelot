@@ -123,7 +123,13 @@ class JumboContent extends React.Component<Props, State> {
         const compiled = elementaryJS.compile(this.state.code, true);
         if (compiled.kind === 'error') {
             for (const err of compiled.errors) {
-                console.error(`Line ${err.location.start.line}: ${err.message}`);
+                // TODO (Sam) : These logs won't go away since the runner is the same
+                // Maybe use something else other than the runner or have a type
+                // that is ORed with runner and CompileError from elementaryjs
+                this.hasConsole && this.hasConsole.appendLogMessage({
+                    method: 'error',
+                    data: [`Line ${err.location.start.line}: ${err.message}`]
+                });
             }
             return;
         }
@@ -191,7 +197,12 @@ class JumboContent extends React.Component<Props, State> {
             if (e instanceof elementaryRTS.ElementaryRuntimeError) {
                 // Don't report stack traces. Count on ElementaryJS to report
                 // line numbers.
-                console.error(e.message);
+                if (this.hasConsole) {
+                    this.hasConsole.appendLogMessage({
+                        method: 'error',
+                        data: [e.message]
+                    });
+                }
             }
             else {
                 // tslint:disable-next-line:no-console
@@ -216,7 +227,7 @@ class JumboContent extends React.Component<Props, State> {
 
     render() {
         return (
-            <SplitPane split="horizontal" minSize={48} defaultSize="25%"
+            <SplitPane split="horizontal" minSize={0} defaultSize="25%"
                 primary="second">
                 <SplitPane
                     split="vertical"

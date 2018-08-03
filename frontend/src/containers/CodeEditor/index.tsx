@@ -201,7 +201,7 @@ class CodeEditor extends React.Component<Props> {
                     onChange={this.onChange}
                     editorDidMount={this.editorDidMount}
                     editorWillMount={this.editorWillMount}
-                    height="calc(100% - 48px)"
+                    height="100%"
                 />
             </div >
         );
