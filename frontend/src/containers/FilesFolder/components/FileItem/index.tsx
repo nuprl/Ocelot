@@ -67,13 +67,24 @@ const FileItem: React.StatelessComponent<Props> = ({
                 styleBody
             />
             < ListItemSecondaryAction className={`fadeIcon ${classes.listItemColor}`} >
-                <Tooltip id="tooltip-icon" title="Delete">
+                <Tooltip
+                    id="tooltip-icon"
+                    title="Delete"
+                    disableFocusListener
+                    disableTouchListener
+                    classes={{
+                        tooltipPlacementBottom: classes.closerTooltip
+                    }}
+                >
                     <div>  {/* surround the button with a div to suppress the warning even though it's
                             not really necessary*/}
                         <IconButton
                             aria-label="Delete"
                             color="inherit"
                             onClick={onDelete}
+                            classes={{
+                                root: classes.noButtonBackground
+                            }}
                         >
                             <DeleteIcon color="inherit" />
                         </IconButton>

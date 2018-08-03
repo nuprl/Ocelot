@@ -46,6 +46,7 @@ function* makeFileChanges(action: t.ChangeFileActions) {
         }
     ];
     if (isDeleteFileAction(action)) {
+        yield put(triggerNotification('Removing file...'));
         fileChangeRequest = [
             {
                 fileName: action.fileName,

@@ -12,7 +12,7 @@ import Button from '@material-ui/core/Button';
 import StopIcon from '@material-ui/icons/Stop';
 import * as types from './types';
 import { RootState } from './store';
-import { getSelectedFileName } from './store/userFiles/selectors';
+import { getSelectedFileName, getSelectedFileIndex } from './store/userFiles/selectors';
 import { AsyncRun } from 'stopify';
 import { connect } from 'react-redux';
 import * as stopify from 'stopify';
@@ -30,6 +30,7 @@ import * as elementaryRTS from 'elementary-js/dist/runtime';
 
 const redTheme = createMuiTheme({
     palette: {
+        type: 'dark',
         primary: red,
     }
 });
@@ -42,7 +43,8 @@ type State = {
 
 type Props = {
     filename: string,
-    loggedIn: boolean
+    loggedIn: boolean,
+    fileIndex: number,
 }
 
 class JumboContent extends React.Component<Props, State> {
@@ -194,8 +196,13 @@ class JumboContent extends React.Component<Props, State> {
 
     render() {
         return (
-            <SplitPane split="horizontal" minSize={0} defaultSize="25%"
-                primary="second">
+            <SplitPane
+                split="horizontal"
+                minSize={0}
+                defaultSize="25%"
+                primary="second"
+                pane2Style={{ maxHeight: '100%' }}
+            >
                 <SplitPane
                     split="vertical"
                     defaultSize="50%"
@@ -204,20 +211,20 @@ class JumboContent extends React.Component<Props, State> {
                     <div style={{ width: '100%', height: '100%' }}>
                         <Button color="secondary"
                             onClick={() => this.onRun('running')}
-                            disabled={this.state.status !== 'stopped'}>
+                            disabled={this.state.status !== 'stopped' || this.props.fileIndex === -1}>
                             <PlayIcon color="inherit" />
                             Run
-                    </Button>
+                        </Button>
                         <Button color="secondary"
                             onClick={() => this.onRun('testing')}
-                            disabled={this.state.status !== 'stopped'}>
+                            disabled={this.state.status !== 'stopped' ||  this.props.fileIndex === -1}>
                             <ExploreIcon color="inherit" />
                             Test
-                    </Button>
+                        </Button>
                         <MuiThemeProvider theme={redTheme}>
-                            <Button color="secondary"
+                            <Button
                                 onClick={() => this.onStop()}
-                                disabled={this.state.status === 'stopped'}>
+                                disabled={this.state.status === 'stopped' ||  this.props.fileIndex === -1}>
                                 <StopIcon color="inherit" />
                                 Stop
                         </Button>
@@ -237,7 +244,8 @@ class JumboContent extends React.Component<Props, State> {
 
 const mapStateToProps = (state: RootState) => ({
     filename: getSelectedFileName(state),
-    loggedIn: state.userLogin.loggedIn
+    loggedIn: state.userLogin.loggedIn,
+    fileIndex: getSelectedFileIndex(state)
 });
 
 export default connect(mapStateToProps)(JumboContent);

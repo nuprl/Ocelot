@@ -9,7 +9,9 @@ export type ListItemStylesTypes =
     | 'loadingIcon'
     | 'show'
     | 'codeIcon'
-    | 'tinyPadding';
+    | 'tinyPadding'
+    | 'noButtonBackground'
+    | 'closerTooltip';
 
 const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
     nested: {
@@ -62,6 +64,14 @@ const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
     tinyPadding: {
         paddingTop: '3px',
         paddingBottom: '3px'
+    },
+    noButtonBackground: {
+        '&:hover':{
+            backgroundColor: '#ffffff00'
+        }
+    },
+    closerTooltip: {
+        margin: '0 0'
     }
 
 });

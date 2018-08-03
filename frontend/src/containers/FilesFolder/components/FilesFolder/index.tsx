@@ -43,7 +43,16 @@ class FilesFolder extends React.Component<Props> {
                         <ItemTypography text="Files" className={classes.listItemColor} />
                         {/* -- Delete Button -- */}
                         < ListItemSecondaryAction className={`fadeIcon ${classes.listItemColor}`} >
-                            <Tooltip id="tooltip-icon" title="New File" disableHoverListener={disabled}>
+                            <Tooltip
+                                id="tooltip-icon"
+                                title="New File"
+                                disableHoverListener={disabled}
+                                disableFocusListener
+                                disableTouchListener
+                                classes={{
+                                    tooltipPlacementBottom: classes.closerTooltip
+                                }}
+                            >
                                 <div>  {/* surround the button with a div to suppress the warning even though it's
                             not really necessary*/}
                                     <IconButton
@@ -51,6 +60,7 @@ class FilesFolder extends React.Component<Props> {
                                         color="inherit"
                                         disabled={disabled}
                                         onClick={onCreateFile}
+                                        classes={{ root: classes.noButtonBackground }}
                                     >
                                         <AddIcon color="inherit" />
                                     </IconButton>

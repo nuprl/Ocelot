@@ -16,8 +16,28 @@ import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
 import elemjshighlight from './elemjsHighlighter';
 import { setMonacoEditor } from '../../store/codeEditor/actions';
+import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
+import PawIcon from '@material-ui/icons/Pets';
+import Typography from '@material-ui/core/Typography';
 
 const debounceWait = 500; // milliseconds;
+
+const styles: StyleRulesCallback = theme => ({
+    emptyState: {
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center', /* Vertical center alignment */
+        justifyContent: 'center', /* Horizontal center alignment */
+    },
+    pawIcon: {
+        fontSize: '8em',
+        color: theme.palette.primary.contrastText,
+        opacity: 0.4,
+        marginBottom: '0.3em',
+    }
+})
 
 type Props = {
     enabled: boolean,
@@ -39,7 +59,7 @@ type Props = {
     ) => void,
     setEditor: (editor: monacoEditor.editor.IStandaloneCodeEditor) => void,
     triggerFileLoading: (fileIndex: number) => void,
-};
+} & WithStyles<'emptyState' | 'pawIcon'>;
 
 type FileEdit = {
     fileName: string,
@@ -177,7 +197,18 @@ class CodeEditor extends React.Component<Props> {
     };
 
     render() {
-        const { code } = this.props;
+        const { code, enabled, classes } = this.props;
+
+        if (!enabled) {
+            return (
+                <div className={classes.emptyState}>
+                    <PawIcon className={classes.pawIcon} />
+                    <Typography variant="subheading" align="center" style={{opacity: 0.4}}>
+                        Select/Create a file to get started
+                    </Typography>
+                </div>
+            );
+        }
 
         const options: monacoEditor.editor.IEditorConstructionOptions = {
             selectOnLineNumbers: true,
@@ -238,4 +269,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     triggerFileLoading: (fileIndex: number) => { dispatch(markFileNotSaved(fileIndex)); },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CodeEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(CodeEditor));

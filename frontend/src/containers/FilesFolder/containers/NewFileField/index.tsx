@@ -120,12 +120,21 @@ class NewFileField extends React.Component<Props> {
                 <ListItemSecondaryAction
                     className={`${classes.listItemColor}`}
                 >
-                    <Tooltip id="tooltip-icon" title="Delete">
+                    <Tooltip
+                        disableFocusListener
+                        disableTouchListener
+                        id="tooltip-icon"
+                        title="Delete"
+                        classes={{
+                            tooltipPlacementBottom: classes.closerTooltip
+                        }}
+                    >
                         <IconButton
                             aria-label="delete"
                             color="inherit"
                             className={`${classes.listItemColor}`}
                             onClick={deleteFileField}
+                            classes={{ root: classes.noButtonBackground }}
                         >
                             <DeleteIcon color="inherit" />
                         </IconButton>
