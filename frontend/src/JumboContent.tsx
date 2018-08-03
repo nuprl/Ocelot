@@ -208,7 +208,7 @@ class JumboContent extends React.Component<Props, State> {
                     defaultSize="50%"
                     minSize={0}
                     pane1Style={{ maxWidth: '100%' }}>
-                    <div style={{ width: '100%', height: '100%' }}>
+                    <div style={{ width: '100%', height: '100%', minWidth: '286px' }}>
                         <Button color="secondary"
                             onClick={() => this.onRun('running')}
                             disabled={this.state.status !== 'stopped' || this.props.fileIndex === -1}>
