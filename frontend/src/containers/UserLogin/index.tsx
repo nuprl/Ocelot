@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import LoginLogout from './components/LoginLogout';
 import { GoogleLoginResponse } from 'react-google-login';
-import { logInUserRequest, logOutUser, loadingOngoing } from '../../store/userLogin/actions';
+import { logInUserRequest, logOutUser, loadingOngoing, notLoading } from '../../store/userLogin/actions';
 import { RootState } from '../../store/';
 import { batchActions } from '../../store/batchActions';
 import { resetDefaultFiles, closeFilesFolder, openFilesFolder } from '../../store/userFiles/actions';
@@ -30,6 +30,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     },
     // surround with curly braces so that it does not return what dispatch returns
     onLoading: () => { dispatch(loadingOngoing()); },
+    onNotLoading: () => { dispatch(notLoading()); }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginLogout);

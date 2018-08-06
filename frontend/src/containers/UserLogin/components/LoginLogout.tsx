@@ -11,6 +11,7 @@ type LoginLogoutProps = {
     onLogin: (googleUser: GoogleLoginResponse) => void,
     onLogout: () => void,
     onLoading: () => void,
+    onNotLoading: () => void,
 };
 
 class LoginLogout extends React.Component<LoginLogoutProps> {
@@ -20,8 +21,9 @@ class LoginLogout extends React.Component<LoginLogoutProps> {
     }
 
     onFailure = (response: { error: string }) => {
-        this.props.onLogout(); // need a better way to have less logic in this module
+        // this.props.onLogout(); // need a better way to have less logic in this module
         // there's way too much logic embedded for a presentational component
+        this.props.onNotLoading();
     }
 
     render() {

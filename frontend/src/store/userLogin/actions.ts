@@ -23,3 +23,8 @@ export const loadingOngoing: ActionCreator<t.LoadingOngoingAction>
     = () => ({
         type: t.LOADING_ONGOING
     });
+
+export const notLoading: ActionCreator<t.NotLoadingAction> 
+= () => ({
+    type: t.NOT_LOADING
+});

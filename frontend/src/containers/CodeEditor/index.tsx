@@ -131,6 +131,9 @@ class CodeEditor extends React.Component<Props> {
         if (!this.props.enabled) {
             this.editor.updateOptions({ readOnly: true });
         }
+        if (prevProps.fileIndex !== this.props.fileIndex) {
+            this.props.updateCode(this.props.code);
+        }
         const endingCriteria = prevProps.fileIndex === this.props.fileIndex
             || prevProps.isSaved
             || !prevProps.loggedIn

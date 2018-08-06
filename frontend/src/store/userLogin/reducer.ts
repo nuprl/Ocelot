@@ -33,6 +33,11 @@ const userLogin: Reducer<t.UserLoginState> = (
                 ...state,
                 loading: true
             };
+        case t.NOT_LOADING:
+            return {
+                ...state,
+                loading: false,
+            };
         default:
             return state;
     }
