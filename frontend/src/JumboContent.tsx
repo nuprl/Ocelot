@@ -156,7 +156,7 @@ class JumboContent extends React.Component<Props, State> {
                     // console.log(result);
                     this.handleStopifyResult(result);
                     if (this.state.status === 'testing' && this.hasConsole) {
-                        const summary = elementaryRTS.summary();
+                        const summary = elementaryRTS.summary(true);
                         this.hasConsole.appendLogMessage({
                             method: 'log',
                             data: [summary.output, ...summary.style]
@@ -226,6 +226,7 @@ class JumboContent extends React.Component<Props, State> {
                         </Button>
                         <MuiThemeProvider theme={redTheme}>
                             <Button
+                                color="primary"
                                 onClick={() => this.onStop()}
                                 disabled={this.state.status === 'stopped' ||  this.props.fileIndex === -1}>
                                 <StopIcon color="inherit" />
