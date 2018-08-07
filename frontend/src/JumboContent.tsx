@@ -15,7 +15,6 @@ import { RootState } from './store';
 import { getSelectedFileName, getSelectedFileIndex } from './store/userFiles/selectors';
 import { AsyncRun } from 'stopify';
 import { connect } from 'react-redux';
-import { debounce } from 'lodash';
 import * as stopify from 'stopify';
 import * as elementaryJS from 'elementary-js';
 import { saveHistory } from './utils/api/saveHistory'
@@ -110,8 +109,7 @@ class JumboContent extends React.Component<Props, State> {
 
     onRun(mode: 'running' | 'testing') {
         if (this.props.loggedIn) {
-            debounce(() => {
-                saveHistory(this.props.filename, this.state.code).then((res) => {
+            saveHistory(this.props.filename, this.state.code).then((res) => {
                 // tslint:disable-next-line:no-console
                 if (isFailureResponse(res)) {
                     // tslint:disable-next-line:no-console
@@ -123,7 +121,6 @@ class JumboContent extends React.Component<Props, State> {
                 // tslint:disable-next-line:no-console
                 // console.log('History saved');
             }).catch(err => console.log(err)); // will do for now
-        }, 500);
         }
         const compiled = elementaryJS.compile(this.state.code, true);
         if (compiled.kind === 'error') {

@@ -276,7 +276,6 @@ async function changeFile(req: Request) {
       currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
       if (currentFileChange.type === 'create') {
         verbose && console.log(`\tSaving file: ${currentFileChange.fileName}`);
-        verbose && console.log(`Content: ${currentFileChange.changes!}, type: ${typeof currentFileChange.changes!}`);
         // Non-null assertion of changes can be saved
         await timePromise(currentFile.save(currentFileChange.changes!, { resumable: false }));
         // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
@@ -363,9 +362,11 @@ async function saveToHistory(req: Request) {
     verbose && console.log('Checking if file exists...');
     const fileExists = (await fileBucket.file(fullFileName).exists())[0]
     if (!fileExists) { // checks if file exists in paws-student-files
+      verbose && console.log('File does not exists, history not appended');
       return failureResponse('History not updated, file does not exist');
     }
     if (snapshot.code.length === 0) {
+      verbose && console.log('No code given, history not appended');
       return {
         statusCode: 200,
         body: { status: 'success', message: 'No code, update not necessary'}
@@ -385,6 +386,7 @@ async function saveToHistory(req: Request) {
     }
     if (newestHistoryExists && newestFile !== undefined && newestFile.toString() === snapshot.code) {
       // why can't typescript figure this out? I need to put in newestFile !== undefined...
+      verbose && console.log('Code is the same, history not appended');
       return {
         statusCode: 200,
         body: { status: 'success', message: 'Code is the same, update not necessary'}
