@@ -37,7 +37,18 @@ const styles: StyleRulesCallback = theme => ({
         opacity: 0.4,
         marginBottom: '0.3em',
     }
-})
+});
+
+const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
+    selectOnLineNumbers: true,
+    mouseWheelZoom: true,
+    fontSize: 18,
+    fontFamily: 'Fira Mono',
+    minimap: {
+        enabled: false,
+    },
+    // scrollBeyondLastLine: false,
+};
 
 type Props = {
     enabled: boolean,
@@ -127,10 +138,6 @@ class CodeEditor extends React.Component<Props> {
         if (this.editor === undefined) {
             return;
         }
-        this.editor.updateOptions({ readOnly: false });
-        if (!this.props.enabled) {
-            this.editor.updateOptions({ readOnly: true });
-        }
         if (prevProps.fileIndex !== this.props.fileIndex) {
             this.props.updateCode(this.props.code);
         }
@@ -213,17 +220,6 @@ class CodeEditor extends React.Component<Props> {
             );
         }
 
-        const options: monacoEditor.editor.IEditorConstructionOptions = {
-            selectOnLineNumbers: true,
-            mouseWheelZoom: true,
-            fontSize: 18,
-            fontFamily: 'Fira Mono',
-            minimap: {
-                enabled: false,
-            },
-            // scrollBeyondLastLine: false,
-        };
-
         return (
             <div style={{ height: 'calc(100% - 40px)', width: '100%' }}>
                 <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
@@ -231,7 +227,7 @@ class CodeEditor extends React.Component<Props> {
                     language="elementaryjs"
                     theme="vs-dark"
                     value={code}
-                    options={options}
+                    options={monacoOptions}
                     onChange={this.onChange}
                     editorDidMount={this.editorDidMount}
                     editorWillMount={this.editorWillMount}
