@@ -18,5 +18,6 @@ export function setGlobals(g: any) {
   g.assert = elementaryRTS.assert;
   g.lib220 = (window as any).lib220;
   g.Math = Math;
+  g.Array = elementaryRTS.SafeArray;
 }
 
