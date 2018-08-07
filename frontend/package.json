@@ -49,8 +49,8 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server",
-    "deploy": "gsutil -h Cache-Control:private -m rsync -d -r build gs://paws",
     "serve-local": "http-server build -p 8080",
+    "deploy": "rsync -avzdOL build/ ocelot-ide.org:/var/www/ocelot-ide.org/",
     "test": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts test --env=jsdom"
   },
   "homepage": "https://storage.googleapis.com/paws/"

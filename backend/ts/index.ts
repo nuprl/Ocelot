@@ -11,9 +11,9 @@ import * as uid from 'uid-safe';
 import * as morgan from 'morgan'; // for logging in all http traffic on console.
 
 const storage = Storage();
-const fileBucket = storage.bucket('paws-student-files');
-const settingsBucket = storage.bucket('paws-settings');
-const historyBucket = storage.bucket('paws-student-history');
+const fileBucket = storage.bucket('ocelot-student-files');
+const settingsBucket = storage.bucket('plasma-settings');
+const historyBucket = storage.bucket('ocelot-student-history');
 
 const datastore = new Datastore({});
 const datastoreKind = 'CS220AllowedAccounts';
@@ -45,7 +45,7 @@ async function getSettings() {
     return settings;
   }
   verbose && console.log('\tGetting settings.json');
-  const settingsFile = await timePromise(settingsBucket.file('settings.json').download());
+  const settingsFile = await timePromise(settingsBucket.file('ocelot-settings.json').download());
   settings = JSON.parse(settingsFile.toString());
   return settings;
 }

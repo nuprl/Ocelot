@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "tsc -w",
     "serve": "node dist/testServer",
-    "deploy": "gcloud beta functions deploy --trigger-http paws"
+    "deploy": "gcloud functions deploy --trigger-http paws"
   },
   "dependencies": {
     "@google-cloud/datastore": "^1.4.1",

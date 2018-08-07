@@ -44,5 +44,5 @@ export const getUrl = (path: string): string => {
     if (window.location.host.substring(0, 9) === 'localhost') { // if hosted on localhost
         return `http://localhost:8000/${path}`;
     }
-    return `https://us-central1-umass-compsci220.cloudfunctions.net/paws/${path}`;
+    return `https://us-central1-arjunguha-research-group.cloudfunctions.net/paws/${path}`;
 };

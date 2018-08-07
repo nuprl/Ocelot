@@ -47,7 +47,7 @@ class GoogleLoginButton extends React.Component<GoogleLoginButtonProps> {
             <Fade in={show}>
                 <div style={{ display: (show ? 'inline-block' : 'none') }}>
                     <GoogleLogin
-                        clientId="883053712992-bp84lpgqrdgceasrhvl80m1qi8v2tqe9.apps.googleusercontent.com"
+                        clientId="692270598994-p92ku4bbjkvcddouh578eb1a07s8mghc.apps.googleusercontent.com"
                         onSuccess={props.onSuccess}
                         onFailure={props.onFailure}
                         prompt="select_account" // always prompts user to select a specific account
