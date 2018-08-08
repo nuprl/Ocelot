@@ -52,12 +52,13 @@ class Index extends React.Component<WithStyles<WithStylesClasses>> {
           case 'chrome':
           case 'firefox':
           case 'safari':
+          case 'ios':
             const { classes } = this.props;
             return (<JumboContent classes={classes} />);
           default:
             return (
               <Typography variant="display1" align="center">
-                Lol, go use chrome, firefox or safari
+                Your browser is unsupported, please use chrome, firefox or safari.
           </Typography>
             );
         }
