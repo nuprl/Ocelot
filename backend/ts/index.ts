@@ -636,6 +636,12 @@ paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
 paws.get('/testo', wrapHandler(testDatastore));
 paws.post('/error', wrapHandler(async req => {
-  await errorReporting.report(req.body, req);
+  console.error(req.body);
+  if (req.headers['content-type'] === 'application/json') {
+    await errorReporting.report(JSON.stringify(req.body));
+  }
+  else {
+    await errorReporting.report(String(req.body));
+  }
   return { statusCode: 200, body: { status: 'ok' } };
 }));
