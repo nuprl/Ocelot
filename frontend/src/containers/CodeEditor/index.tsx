@@ -44,6 +44,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     mouseWheelZoom: true,
     fontSize: 18,
     fontFamily: 'Fira Mono',
+    autoIndent: true,
     minimap: {
         enabled: false,
     },
@@ -104,8 +105,8 @@ class CodeEditor extends React.Component<Props> {
                 blockComment: ['/*', '*/']
             },
             indentationRules: {
-                increaseIndentPattern: /.*(\{|\[|\()/, // indent on brackets...etc
-                decreaseIndentPattern: /.*(\}|\]|\))/ //unindent on closing brackets...etc
+                increaseIndentPattern: /^.*\{[^}\"']*$/,
+                decreaseIndentPattern: /^(.*\*\/)?\s*\}[;\s]*$/
             },
         });
         monaco.languages.registerCompletionItemProvider('elementaryjs', {
