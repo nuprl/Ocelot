@@ -1,20 +1,13 @@
 import * as React from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Collapse from '@material-ui/core/Collapse';
-import ItemTypography from '../../../../components/ItemTypography';
-import IconButton from '@material-ui/core/IconButton';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Tooltip from '@material-ui/core/Tooltip';
 import 'static/styles/DrawerIconButton.css';
 import UserFileItems from '../../containers/UserFileItems';
 import NewFileField from '../../containers/NewFileField';
 import 'static/styles/DrawerIconButton.css';
-import LoadingFolderIcon from '../LoadingFolderIcon';
 import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
-import { WithStyles } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+import { WithStyles, Button } from '@material-ui/core';
 
 type FilesFolderProps = {
     open: boolean,
@@ -40,7 +33,7 @@ class FilesFolder extends React.Component<Props, State> {
     newFileField = () => { this.setState({ hasNewFileField: true }) };
 
     render() {
-        const { open, disabled, toggleFolder, classes } = this.props;
+        const { disabled, toggleFolder, classes } = this.props;
 
         return (
             <div>
@@ -50,52 +43,21 @@ class FilesFolder extends React.Component<Props, State> {
                         onClick={toggleFolder}
                         disabled={disabled}
                         dense
-                        classes={{ dense: classes.tinyPadding }}
-                    >
-                        <LoadingFolderIcon loading={disabled} className={classes.listItemColor} />
-                        <ItemTypography text="Files" className={classes.listItemColor} />
-                        {/* -- Delete Button -- */}
-                        < ListItemSecondaryAction className={`fadeIcon ${classes.listItemColor}`} >
-                            <Tooltip
-                                id="tooltip-icon"
-                                title="New File"
-                                disableHoverListener={disabled}
-                                disableFocusListener
-                                disableTouchListener
-                                classes={{
-                                    tooltipPlacementBottom: classes.closerTooltip
-                                }}
-                            >
-                                <div>  {/* surround the button with a div to suppress the warning even though it's
-                            not really necessary*/}
-                                    <IconButton
-                                        aria-label="New File"
-                                        color="inherit"
-                                        disabled={disabled}
-                                        onClick={this.newFileField}
-                                        classes={{ root: classes.noButtonBackground }}
-                                    >
-                                        <AddIcon color="inherit" />
-                                    </IconButton>
-                                </div>
-                            </Tooltip>
-                        </ListItemSecondaryAction>
-                        {/* ---- */}
+                        classes={{ dense: classes.tinyPadding }}>
+                        <Button
+                            disabled={disabled}
+                            onClick={this.newFileField}>
+                            New
+                        </Button>
                     </ListItem>
                 </div>
-                <Collapse in={open} timeout="auto">
-                    <List
-                        component="div"
-                        disablePadding
-                        dense
-                    >
-                        <UserFileItems />
-                        <NewFileField
-                            newFile={this.state.hasNewFileField}
-                            deleteFileField={() => { this.setState({ hasNewFileField: false }) }}
-                        />
-                    </List>
-                </Collapse>
+                <List component="div" disablePadding dense >
+                    <UserFileItems />
+                    <NewFileField
+                        newFile={this.state.hasNewFileField}
+                        deleteFileField={() => { this.setState({ hasNewFileField: false }) }}
+                    />
+                </List>
             </div>
         );
     }

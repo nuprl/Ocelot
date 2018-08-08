@@ -2,8 +2,6 @@ import * as React from 'react';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import { StyleRulesCallback, WithStyles, withStyles } from '@material-ui/core/styles';
-import ListButton from '../ListButton';
-import StarBorderIcon from '@material-ui/icons/StarBorder';
 import FilesFolder from '../../containers/FilesFolder';
 
 const styles: StyleRulesCallback = theme => ({
@@ -36,12 +34,6 @@ const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
             {/* Setting toolbar is so hacky, I don't know how to override it */}
             <List dense>
                 <FilesFolder />
-            </List>
-            <List dense>
-                <ListButton
-                    icon={<StarBorderIcon />}
-                    text="CS 220"
-                />
             </List>
         </Drawer>
     );
