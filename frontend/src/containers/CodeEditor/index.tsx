@@ -222,7 +222,7 @@ class CodeEditor extends React.Component<Props> {
         }
 
         return (
-            <div style={{ height: 'calc(100% - 40px)', width: '100%' }}>
+            <div style={{ height: '100%', width: '100%' }}>
                 <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
                 <MonacoEditor
                     language="elementaryjs"
