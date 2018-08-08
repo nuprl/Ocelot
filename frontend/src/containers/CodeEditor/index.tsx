@@ -43,7 +43,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     selectOnLineNumbers: true,
     mouseWheelZoom: true,
     fontSize: 14,
-    fontFamily: 'consolas',
+    fontFamily: 'Fira Mono',
     autoIndent: true,
     minimap: {
         enabled: false,

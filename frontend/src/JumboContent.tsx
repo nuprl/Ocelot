@@ -315,7 +315,6 @@ class JumboContent extends React.Component<Props, State> {
                     minSize={0}
                     pane1Style={{ maxWidth: '100%' }}>
                     <div style={{ width: '100%', height: '100%', minWidth: '286px' }}>
-
                         <CodeEditor updateCode={(code) => this.updateCode(code)}/>
                     </div>
                     <CanvasOutput />
