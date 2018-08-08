@@ -37,7 +37,7 @@ const redTheme = createMuiTheme({
 
 type State = {
     asyncRunner: AsyncRun | undefined,
-    status: 'running' | 'testing' | 'stopped',
+    status: 'running' | 'testing' | 'stopped' | 'pausing',
     code: string
 }
 
@@ -181,11 +181,16 @@ class JumboContent extends React.Component<Props, State> {
     }
 
     onStop() {
+        if (!(this.state.status === 'running' ||
+              this.state.status === 'testing')) {
+            return;
+        }
         const asyncRun = this.state.asyncRunner;
         if (typeof asyncRun === 'undefined') {
             // UI glitch. Is this possible?
             return;
         }
+        this.setState({ status: 'pausing' });
         asyncRun.pause((line?: number) => {
             // NOTE: We do *not* remove the asyncRun object. This will allow
             // a user to continue mucking around in the console after killing a 
@@ -225,7 +230,7 @@ class JumboContent extends React.Component<Props, State> {
                             <Button
                                 color="primary"
                                 onClick={() => this.onStop()}
-                                disabled={this.state.status === 'stopped' ||  this.props.fileIndex === -1}>
+                                disabled={(this.state.status === 'stopped' || this.state.status === 'pausing') ||  this.props.fileIndex === -1}>
                                 <StopIcon color="inherit" />
                                 Stop
                         </Button>
