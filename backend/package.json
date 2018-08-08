@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@google-cloud/datastore": "^1.4.1",
+    "@google-cloud/error-reporting": "^0.5.1",
     "@google-cloud/storage": "^1.7.0",
     "@types/uid-safe": "^2.1.1",
     "body-parser": "^1.18.3",

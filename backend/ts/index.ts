@@ -9,6 +9,9 @@ import * as path from 'path'; // for manipulating paths
 import * as cors from 'cors'; // allows sending http requests to different domains
 import * as uid from 'uid-safe';
 import * as morgan from 'morgan'; // for logging in all http traffic on console.
+import { ErrorReporting } from '@google-cloud/error-reporting';
+
+const errorReporting = new ErrorReporting();
 
 const storage = Storage();
 const fileBucket = storage.bucket('ocelot-student-files');
@@ -632,3 +635,7 @@ paws.post('/changefile', wrapHandler(changeFile));
 paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
 paws.get('/testo', wrapHandler(testDatastore));
+paws.post('/error', wrapHandler(async req => {
+  await errorReporting.report(req.body, req);
+  return { statusCode: 200, body: { status: 'ok' } };
+}));

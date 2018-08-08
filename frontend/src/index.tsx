@@ -12,3 +12,20 @@ ReactDOM.render(
     </Provider>,
     document.querySelector('#root')
 );
+
+
+window.addEventListener('error', (x) => {
+    const err = {
+        message: x.message,
+        line: x.lineno,
+        col: x.colno,
+        error: String(x.error)
+    };
+    fetch('https://us-cen-research-group.cloudfunctions.net/paws/error', {
+      body: JSON.stringify(err),
+      headers: { 'Content-Type': 'application/json' }
+    }).catch(reason => {
+        console.error('Failed to log error ', reason);
+    });
+    console.error(x.message);
+});
