@@ -3,8 +3,14 @@ import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Fade from '@material-ui/core/Fade';
 import PawIcon from '@material-ui/icons/Pets';
+import RunIcon from '@material-ui/icons/PlayArrow';
+import TestIcon from '@material-ui/icons/Explore';
+import Button from '@material-ui/core/Button';
+import FileIcon from '@material-ui/icons/FileCopy';
+import StopIcon from '@material-ui/icons/Stop';
+import CanvasIcon from '@material-ui/icons/Wallpaper';
+import ConsoleIcon from '@material-ui/icons/NavigateNext';
 
 const styles: StyleRulesCallback = theme => {
     return {
@@ -32,19 +38,54 @@ const TitledAppbar: React.StatelessComponent<WithStyles<string> & TitledAppbarPr
         <AppBar position="absolute">
             <Toolbar variant="dense">
                 <PawIcon className={classes.icon}/>
-                <Fade in={true} timeout={700} >
-                    <Typography
-                        variant="subheading"
-                        color="inherit"
-                        classes={{
-                            subheading: classes.title,
-                        }}
-                        className={classes.flex}
-                        noWrap
-                    >
-                        {title}
-                    </Typography>
-                </Fade>
+                <Typography
+                    variant="subheading"
+                    color="inherit"
+                    classes={{
+                        subheading: classes.title,
+                    }}
+                    noWrap
+                >
+                    {title}
+                </Typography>
+                <div style={{width: 50}} />
+                <Button
+                        color="secondary"
+                        onClick={() => console.log("Clicked files")}>
+                    <FileIcon />
+                    Files
+                </Button>
+                <Button
+                        color="secondary"
+                        onClick={() => console.log("Clicked run")}>
+                    <RunIcon />
+                    Run
+                </Button>
+                <Button
+                        color="secondary"
+                        onClick={() => console.log("Clicked test")}>
+                    <TestIcon />
+                    Test
+                </Button>
+                <Button
+                        color="secondary"
+                        onClick={() => console.log("Clicked stop")}>
+                    <StopIcon />
+                    Stop
+                </Button>
+                <Button
+                        color="secondary"
+                        onClick={() => console.log("Clicked console")}>
+                    <ConsoleIcon />
+                    Console
+                </Button>
+                <Button
+                        color="secondary"
+                        onClick={() => console.log("Clicked canvas")}>
+                    <CanvasIcon />
+                    Canvas
+                </Button>
+                <div className={classes.flex} />
                 {children}
             </Toolbar>
         </AppBar>

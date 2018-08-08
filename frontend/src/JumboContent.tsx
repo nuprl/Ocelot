@@ -20,6 +20,9 @@ import * as elementaryJS from 'elementary-js';
 import { saveHistory } from './utils/api/saveHistory'
 import { isFailureResponse } from './utils/api/apiHelpers';
 import { setGlobals } from './runner';
+import MenuAppbar from './components/MenuAppbar';
+import SideDrawer from './components/SideDrawer';
+import Notification from './containers/Notification';
 
 // TODO(arjun): I think these hacks are necessary for eval to work. We either 
 // do them here or we do them within the implementation of Stopify. I want 
@@ -45,6 +48,10 @@ type Props = {
     filename: string,
     loggedIn: boolean,
     fileIndex: number,
+    classes: {root:string,
+         jumboContent:string, 
+         toolbar:string, 
+         jumboContainer:string},
 }
 
 class JumboContent extends React.Component<Props, State> {
@@ -201,6 +208,19 @@ class JumboContent extends React.Component<Props, State> {
 
     render() {
         return (
+            <div className={this.props.classes.root}>
+                <Notification />
+                <MenuAppbar title="Ocelot" />
+                <SplitPane
+                  split="vertical"
+                  defaultSize={250}
+                  minSize={0}
+                >
+                  <SideDrawer />
+                  <div className={this.props.classes.jumboContainer}>
+                    <div className={this.props.classes.toolbar} style={{ minHeight: '48px' }} />
+                    {/* Gotta figure out a way to not override css with inline-style */}
+                    <div className={this.props.classes.jumboContent}>
             <SplitPane
                 split="horizontal"
                 minSize={0}
@@ -243,7 +263,12 @@ class JumboContent extends React.Component<Props, State> {
                 </SplitPane>
                 <OutputPanel runner={this.state.asyncRunner}
                     recvHasConsole={(c) => this.recvHasConsole(c)} />
-            </SplitPane>);
+            </SplitPane>
+                    </div>
+                  </div>
+                </SplitPane>
+              </div>
+            );
     }
 
 }

@@ -1,10 +1,6 @@
 import * as React from 'react';
 import withStyles, { WithStyles, StyleRulesCallback, } from '@material-ui/core/styles/withStyles';
 import CustomTheme from './components/CustomTheme';
-import MenuAppbar from './components/MenuAppbar';
-import SideDrawer from './components/SideDrawer';
-import SplitPane from 'react-split-pane';
-import Notification from './containers/Notification';
 import JumboContent from './JumboContent';
 import { detect } from 'detect-browser';
 import 'static/styles/JumboContent.css';
@@ -51,31 +47,13 @@ class Index extends React.Component<WithStyles<WithStylesClasses>> {
 
       render() {
         const browser = detect();
+        console.log(this.props);
         switch (browser && browser.name) {
           case 'chrome':
           case 'firefox':
           case 'safari':
             const { classes } = this.props;
-            return (
-              <div className={classes.root}>
-                <Notification />
-                <MenuAppbar title="Ocelot" />
-                <SplitPane
-                  split="vertical"
-                  defaultSize={250}
-                  minSize={0}
-                >
-                  <SideDrawer />
-                  <div className={classes.jumboContainer}>
-                    <div className={classes.toolbar} style={{ minHeight: '48px' }} />
-                    {/* Gotta figure out a way to not override css with inline-style */}
-                    <div className={classes.jumboContent}>
-                      <JumboContent />
-                    </div>
-                  </div>
-                </SplitPane>
-              </div>
-            );
+            return (<JumboContent classes={classes} />);
           default:
             return (
               <Typography variant="display1" align="center">
