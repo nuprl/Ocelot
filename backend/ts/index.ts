@@ -28,29 +28,12 @@ let sessionDuration: number | undefined = undefined; // hours
 type Settings = { clientID: string, sessionDuration: number };
 let settings: Settings | undefined = undefined;
 
-let verbose: boolean = true;
-let miliTimes: number[] = [];
-
-// IMPORTANT: Should I wrap all function bodies in try catch just in case?
-
-function timePromise<T>(promise: Promise<T>) {
-  const now = Date.now();
-  return promise.then((data: T) => {
-    const timeElapsed = Date.now() - now;
-    verbose && console.log(`\t\tMiliseconds: ${timeElapsed}`);
-    verbose && miliTimes.push(timeElapsed);
-    return data;
-  })
-}
-
 async function getSettings() {
   if (settings !== undefined) {
     return settings;
   }
-  verbose && console.log('\tGetting settings.json');
-  const settingsFile = await timePromise(settingsBucket.file('ocelot-settings.json').download());
-  settings = JSON.parse(settingsFile.toString());
-  return settings;
+  const settingsFile = await settingsBucket.file('ocelot-settings.json').download();
+  return JSON.parse(settingsFile.toString());
 }
 
 async function getClientID() {
@@ -109,11 +92,9 @@ async function checkValidSession(userEmail: string, sessionId: string): Promise<
   const key = datastore.key([datastoreKind, userEmail, 'session', sessionId]);
   // kind: session, name is a sessionId
   const query = datastore.createQuery('session').filter('__key__', '=', key);
-  verbose && console.log('\tQuerying valid session');
-  const [results] = await timePromise(datastore.runQuery(query));
+  const [results] = await datastore.runQuery(query);
   if (results.length === 1 && isWithinSessionTime((results[0] as any).time)) {
-    verbose && console.log('\tUpdating session id');
-    await timePromise(updateSessionId(userEmail, sessionId));
+    await updateSessionId(userEmail, sessionId);
     return true;
   }
   return false;
@@ -123,8 +104,7 @@ async function checkValidUser(userEmail: string): Promise<boolean> {
   const query = datastore
     .createQuery(datastoreKind)
     .filter('__key__', '=', datastore.key([datastoreKind, userEmail]));
-  verbose && console.log('\tQuerying valid user');
-  const [results] = await timePromise(datastore.runQuery(query));
+  const [results] = await datastore.runQuery(query);
   if (results.length === 1) {
     return true;
   }
@@ -149,8 +129,7 @@ async function getArrayOfFiles(userEmail: string): Promise<Storage.File[]> {
     delimiter: '/',
     prefix: userEmail + '/'
   }; // delimiter makes it so that we get only the direct child of prefix
-  verbose && console.log('\tQuerying list of files');
-  const [files] = await timePromise(fileBucket.getFiles(prefixAndDelimiter));
+  const [files] = await fileBucket.getFiles(prefixAndDelimiter);
   // get files for folder
 
   return files;
@@ -211,8 +190,7 @@ async function getFile(req: Request) {
     const userFilesPromises = filteredFiles.map(async (file) => { 
       // downloading files asynchronously all at the same time is
       // few hundred miliseconds faster
-      verbose && console.log(`\tDownloading file: ${file.name}`);
-      const [fileContents] = await timePromise(file.download());
+      const [fileContents] = await file.download();
       return {
         name: path.basename(file.name),
         content: fileContents.toString(),
@@ -220,9 +198,6 @@ async function getFile(req: Request) {
     });
 
     const userFiles = await Promise.all(userFilesPromises);
-
-    verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
-    miliTimes = [];
 
     return {
       statusCode: 200,
@@ -273,14 +248,12 @@ async function changeFile(req: Request) {
     let fileExists, currentFile, currentFileChange: FileChange;
     for (currentFileChange of req.body.fileChanges) {
       if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid filename
-        verbose && console.log('No simple filename'); // this will make saving file fail silently (bad)
         continue;
       }
       currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
       if (currentFileChange.type === 'create') {
-        verbose && console.log(`\tSaving file: ${currentFileChange.fileName}`);
         // Non-null assertion of changes can be saved
-        await timePromise(currentFile.save(currentFileChange.changes!, { resumable: false }));
+        await currentFile.save(currentFileChange.changes!, { resumable: false });
         // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
         /* There is some overhead when using a resumable upload that can cause noticeable performance 
         degradation while uploading a series of small files. When uploading files less than 10MB, 
@@ -290,24 +263,15 @@ async function changeFile(req: Request) {
       }
       fileExists = await currentFile.exists();
       if (!fileExists[0]) {
-        verbose && console.log('File does not exist');
         continue;
       }
       if (currentFileChange.type === 'delete') {
-        verbose && console.log(`\tDeleting file: ${currentFileChange.fileName}`)
-        await timePromise(currentFile.delete());
+        await currentFile.delete();
         continue
       }
       // guaranteed it's a rename
-      verbose && console.log(`\tRenaming file: ${currentFileChange.fileName}`)
-      await timePromise(currentFile.move(`${req.body.userEmail}/${currentFileChange.changes}`));
+      await currentFile.move(`${req.body.userEmail}/${currentFileChange.changes}`);
     }
-
-    verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
-    // since it's async, miliTimes is shared so there could be different instances of 
-    // this function running, and the miliTimes could get cleared out by one function
-    // after another function made changes to it, making the array empty.
-    miliTimes = [];
 
     return {
       statusCode: 200,
@@ -362,14 +326,11 @@ async function saveToHistory(req: Request) {
 
   try {
     const fullFileName = `${req.body.userEmail}/${snapshot.fileName}`;
-    verbose && console.log('Checking if file exists...');
     const fileExists = (await fileBucket.file(fullFileName).exists())[0]
     if (!fileExists) { // checks if file exists in paws-student-files
-      verbose && console.log('File does not exists, history not appended');
       return failureResponse('History not updated, file does not exist');
     }
     if (snapshot.code.length === 0) {
-      verbose && console.log('No code given, history not appended');
       return {
         statusCode: 200,
         body: { status: 'success', message: 'No code, update not necessary'}
@@ -389,14 +350,12 @@ async function saveToHistory(req: Request) {
     }
     if (newestHistoryExists && newestFile !== undefined && newestFile.toString() === snapshot.code) {
       // why can't typescript figure this out? I need to put in newestFile !== undefined...
-      verbose && console.log('Code is the same, history not appended');
       return {
         statusCode: 200,
         body: { status: 'success', message: 'Code is the same, update not necessary'}
       };
     }
     const file = historyBucket.file(`${req.body.userEmail}/${snapshot.fileName}`);
-    verbose && console.log('Saving snapshot to history...')
     await file.save(snapshot.code, { resumable: false });
     await file.setMetadata({ contentType: 'text/javascript' });
     return {
@@ -529,16 +488,12 @@ async function login(req: Request) {
   }
 
   const sessionEntityKey = datastore.key([datastoreKind, userEmail, 'session', sessionId]);
-  verbose && console.log(`\tSaving session to datastore`);
-  await timePromise(datastore.upsert({
+  await datastore.upsert({
     key: sessionEntityKey,
     data: {
       time: Date.now()
     }
-  }));
-
-  verbose && console.log(`Total Idle time: ${miliTimes.reduce((acc, val) => acc + val, 0)}`)
-  miliTimes = [];
+  });
 
   return {
     statusCode: 200,
@@ -551,57 +506,10 @@ async function login(req: Request) {
   };
 }
 
-let s = 1;
-// for testing stuff
-async function testDatastore(req: Request) {
-
-  // const kind = 'CS220AllowedAccounts';
-  // const users = ['chunghinlee', 'arjunguha', 'rachitnigam', 'sambaxter'];
-  // const emailDomain = 'umass.edu'
-  // for (let i = 0; i < users.length; i++) {
-  //   const userKey = datastore.key([kind, users[i] + '@' + emailDomain]);
-  //   const userEntity = {
-  //     key: userKey,
-  //     data: {
-  //       email: users[i] + '@' + emailDomain
-  //     }
-  //   };
-
-  //   try {
-  //     await datastore.save(userEntity);
-  //     verbose && console.log(`Saved ${userEntity.key.name}: ${userEntity.data.email}`);
-  //   } catch (err) {
-  //     console.error('ERROR:', err);
-  //   }
-  // }
-
-  const file = fileBucket.file('chunghinlee@umass.edu/lolDude.txt');
-  const contents = `LOL WHAT THIS IS? ${s++}`;
-
-
-  file.save(contents, {
-    metadata: {
-      contentType: 'text/plain'
-    }
-  }).then(() => {
-    verbose && console.log('yayayaya');
-  });
-  // file.delete().then(() => {
-  //   verbose && console.log('DELETED');
-  // }).catch(err => {
-  //   verbose && console.log('ERror', err.message);
-  // });
-  return { statusCode: 200, body: { status: 'ok' } };
-
-}
-
 export const paws = express();
 paws.use(morgan(':method :url :status :res[content-length] - :response-time ms')); // logging all http traffic
 
-paws.use(cors()); // shouldn't this have options for which domain to allow? (will be dealt later)
-// allows cross-origin resource sharing, i.e stops Same Origin Policy from 
-// happening across different ports, we need to do this to send post requests
-// (Same Origin Policy is on by default to prevent cross site resource forgery)
+paws.use(cors()); // TODO(arjun): Limit to trusted domains
 
 paws.use(bodyParser.json()); // parse all incoming json data
 
@@ -625,16 +533,13 @@ function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, bo
   }
 }
 
-paws.get('/', (req: Request, res: Response) => { // simple get request
-  res.status(200).send('Hello World');
-});
 
 paws.post('/getfile', wrapHandler(getFile));
 paws.post('/login', wrapHandler(login));
 paws.post('/changefile', wrapHandler(changeFile));
 paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
-paws.get('/testo', wrapHandler(testDatastore));
+
 paws.post('/error', wrapHandler(async req => {
   console.error(req.body);
   if (req.headers['content-type'] === 'application/json') {
