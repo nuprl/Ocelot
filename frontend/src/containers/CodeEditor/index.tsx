@@ -42,12 +42,13 @@ const styles: StyleRulesCallback = theme => ({
 const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     selectOnLineNumbers: true,
     mouseWheelZoom: true,
-    fontSize: 18,
-    fontFamily: 'Fira Mono',
+    fontSize: 14,
+    fontFamily: 'consolas',
     autoIndent: true,
     minimap: {
         enabled: false,
     },
+    renderIndentGuides: false
     // scrollBeyondLastLine: false,
 };
 
