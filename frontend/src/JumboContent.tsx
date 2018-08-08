@@ -7,7 +7,7 @@ import red from '@material-ui/core/colors/red';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import PlayIcon from '@material-ui/icons/PlayArrow';
 import CodeEditor from './containers/CodeEditor';
-import ExploreIcon from '@material-ui/icons/Explore';
+import ExploreIcon from '@material-ui/icons/Spellcheck';
 import Button from '@material-ui/core/Button';
 import StopIcon from '@material-ui/icons/Stop';
 import * as types from './types';
@@ -20,9 +20,20 @@ import * as elementaryJS from 'elementary-js';
 import { saveHistory } from './utils/api/saveHistory'
 import { isFailureResponse } from './utils/api/apiHelpers';
 import { setGlobals } from './runner';
-import MenuAppbar from './components/MenuAppbar';
 import SideDrawer from './components/SideDrawer';
 import Notification from './containers/Notification';
+
+import UserLogin from './containers/UserLogin';
+import HistoryButton from './containers/HistoryButton';
+
+// import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import PawIcon from '@material-ui/icons/Pets';
+import FileIcon from '@material-ui/icons/FileCopy';
+import CanvasIcon from '@material-ui/icons/Wallpaper';
+import ConsoleIcon from '@material-ui/icons/NavigateNext';
 
 // TODO(arjun): I think these hacks are necessary for eval to work. We either 
 // do them here or we do them within the implementation of Stopify. I want 
@@ -30,6 +41,22 @@ import Notification from './containers/Notification';
 import * as elementaryRTS from 'elementary-js/dist/runtime';
 (window as any).stopify = stopify;
 (window as any).elementaryjs = elementaryRTS;
+
+
+const classes =  {
+    flex: {
+        flex: '1',
+    },
+    icon: {
+        marginBottom: '0.25em',
+        marginRight: '1.5',
+    },
+    title: {
+        fontFamily: 'Fira Mono, Roboto, Arial, sans-serif',
+        fontWeight: '400',
+    },
+};
+
 
 const redTheme = createMuiTheme({
     palette: {
@@ -210,7 +237,61 @@ class JumboContent extends React.Component<Props, State> {
         return (
             <div className={this.props.classes.root}>
                 <Notification />
-                <MenuAppbar title="Ocelot" />
+                <AppBar position="absolute">
+        <Toolbar variant="dense">
+            <PawIcon style={classes.icon}/>
+            <Typography
+                variant="subheading"
+                color="inherit"
+                noWrap>
+                Ocelot
+            </Typography>
+            <div style={{width: 50}} />
+            <Button
+                    color="secondary"
+                    onClick={() => console.log("Clicked files")}>
+                <FileIcon />
+                Files
+            </Button>
+            <Button color="secondary"
+                onClick={() => this.onRun('running')}
+                disabled={this.state.status !== 'stopped' || this.props.fileIndex === -1}>
+                <PlayIcon color="inherit" />
+                Run
+            </Button>
+            <Button color="secondary"
+                onClick={() => this.onRun('testing')}
+                disabled={this.state.status !== 'stopped' ||  this.props.fileIndex === -1}>
+                <ExploreIcon color="inherit" />
+                Test
+            </Button>
+            <MuiThemeProvider theme={redTheme}>
+                <Button
+                    color="primary"
+                    onClick={() => this.onStop()}
+                    disabled={(this.state.status === 'stopped' || this.state.status === 'pausing') ||  this.props.fileIndex === -1}>
+                    <StopIcon color="inherit" />
+                    Stop
+            </Button>
+            </MuiThemeProvider>
+            <Button
+                    color="secondary"
+                    onClick={() => console.log("Clicked console")}>
+                <ConsoleIcon />
+                Console
+            </Button>
+            <Button
+                    color="secondary"
+                    onClick={() => console.log("Clicked canvas")}>
+                <CanvasIcon />
+                Canvas
+            </Button>
+            <div style={classes.flex} />
+            <HistoryButton />
+            <div style={{ display: 'inline-block', width: '0.5em' }} />
+            <UserLogin />
+        </Toolbar>
+    </AppBar>
                 <SplitPane
                   split="vertical"
                   defaultSize={250}
@@ -234,31 +315,9 @@ class JumboContent extends React.Component<Props, State> {
                     minSize={0}
                     pane1Style={{ maxWidth: '100%' }}>
                     <div style={{ width: '100%', height: '100%', minWidth: '286px' }}>
-                        <Button color="secondary"
-                            onClick={() => this.onRun('running')}
-                            disabled={this.state.status !== 'stopped' || this.props.fileIndex === -1}>
-                            <PlayIcon color="inherit" />
-                            Run
-                        </Button>
-                        <Button color="secondary"
-                            onClick={() => this.onRun('testing')}
-                            disabled={this.state.status !== 'stopped' ||  this.props.fileIndex === -1}>
-                            <ExploreIcon color="inherit" />
-                            Test
-                        </Button>
-                        <MuiThemeProvider theme={redTheme}>
-                            <Button
-                                color="primary"
-                                onClick={() => this.onStop()}
-                                disabled={(this.state.status === 'stopped' || this.state.status === 'pausing') ||  this.props.fileIndex === -1}>
-                                <StopIcon color="inherit" />
-                                Stop
-                        </Button>
-                        </MuiThemeProvider>
 
-                        <CodeEditor updateCode={(code) => this.updateCode(code)} />
+                        <CodeEditor updateCode={(code) => this.updateCode(code)}/>
                     </div>
-
                     <CanvasOutput />
                 </SplitPane>
                 <OutputPanel runner={this.state.asyncRunner}
