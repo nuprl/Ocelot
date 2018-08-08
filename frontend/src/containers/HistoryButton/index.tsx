@@ -206,12 +206,6 @@ class HistoryButton extends React.Component<Props, State> {
             color="inherit"
 
         />
-        history.map((elem) => {
-            const dateTime = new Date(
-                elem.dateCreated + " " + elem.timeCreated + " UTC");
-            elem.dateCreated = dateTime.toLocaleDateString('en-US');
-            elem.timeCreated = dateTime.toLocaleTimeString('en-US');
-        });
         if (!loading) {
             content = history.map((elem, index) => (
                 <div

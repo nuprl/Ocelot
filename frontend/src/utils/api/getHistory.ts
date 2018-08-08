@@ -52,6 +52,12 @@ export const getFileHistory = async (fileName: string): Promise<FileHistoryRespo
             // for the frontend, I always have a data field that contains either message, or...data
         }
         const history: FileHistory[] = jsonResponse.data.history;
+        history.map((elem) => {
+            const dateTime = new Date(
+                elem.dateCreated + " " + elem.timeCreated + " UTC");
+            elem.dateCreated = dateTime.toLocaleDateString('en-US');
+            elem.timeCreated = dateTime.toLocaleTimeString('en-US');
+        });
 
         const reversedHistory = history.map((elem, index) => history[history.length - 1 - index]);
 
