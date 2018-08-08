@@ -35,6 +35,8 @@ import FileIcon from '@material-ui/icons/FileCopy';
 import CanvasIcon from '@material-ui/icons/Wallpaper';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
 
+import * as lib220 from 'elementary-js/dist/lib220';
+
 // TODO(arjun): I think these hacks are necessary for eval to work. We either 
 // do them here or we do them within the implementation of Stopify. I want 
 // them here for now until I'm certain there isn't a cleaner way.
@@ -181,7 +183,7 @@ class JumboContent extends React.Component<Props, State> {
                 elementaryRTS.enableTests(true, runner);
             }
             this.setState({ asyncRunner: runner, status: mode }, () => {
-                (window as any).lib220.setRunner(runner);
+                lib220.setRunner(runner);
                 runner.run((result: any) => {
                     // tslint:disable-next-line:no-console
                     // console.log(result);

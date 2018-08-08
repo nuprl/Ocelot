@@ -1,6 +1,6 @@
 import * as elementaryRTS from 'elementary-js/dist/runtime';
 import * as types from './types';
-
+import * as lib220 from 'elementary-js/dist/lib220';
 let visibleConsole : types.HasConsole;
 
 export function setConsole(visibleConsole_: types.HasConsole) {
@@ -16,7 +16,7 @@ export function setGlobals(g: any) {
   });
   g.test = elementaryRTS.test;
   g.assert = elementaryRTS.assert;
-  g.lib220 = (window as any).lib220;
+  g.lib220 = lib220;
   g.Math = Math;
 }
 
