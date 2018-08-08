@@ -7,16 +7,13 @@ import '../../static/styles/Scrollbar.css';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Popper from '@material-ui/core/Popper';
-import Tooltip from '@material-ui/core/Tooltip';
 import ListItem from '@material-ui/core/ListItem';
 import Collapse from '@material-ui/core/Collapse';
-import HistoryIcon from '@material-ui/icons/Storage';
-import IconButton from '@material-ui/core/IconButton';
+import HistoryIcon from '@material-ui/icons/History';
 import Typography from '@material-ui/core/Typography';
 import BubbleIcon from '@material-ui/icons/BubbleChart';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import { isFailureResponse } from '../../utils/api/apiHelpers';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
@@ -87,7 +84,6 @@ type Props = WithStyles<StyleClasses> & {
 };
 
 type State = {
-    tooltipOpen: boolean,
     open: boolean,
     loading: boolean,
     history: FileHistory[],
@@ -106,7 +102,6 @@ class HistoryButton extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            tooltipOpen: false,
             open: false,
             loading: false,
             history: [],
@@ -146,10 +141,6 @@ class HistoryButton extends React.Component<Props, State> {
     onClickAway = () => { this.setState({ open: false, codeOpenIndex: -1 }); };
 
     openHistory = () => { this.setState({ open: true }); };
-
-    openTooltip = () => { this.setState({ tooltipOpen: true }); };
-
-    closeTooltip = () => { this.setState({ tooltipOpen: false }); };
 
     toggleCode = (index: number) => {
         if (this.state.codeOpenIndex === index) {
@@ -199,7 +190,7 @@ class HistoryButton extends React.Component<Props, State> {
             return null;
         }
         const { classes, code } = this.props;
-        const { open, tooltipOpen, loading, history, codeOpenIndex } = this.state;
+        const { open, loading, history, codeOpenIndex } = this.state;
         let content: JSX.Element | JSX.Element[] = <CircularProgress
             size={50}
             style={{ marginTop: '125px', marginLeft: '175px' }}
@@ -262,28 +253,17 @@ class HistoryButton extends React.Component<Props, State> {
                 color="inherit"
                 style={{ marginTop: '150px' }}
             >
-                No history saved :)
+                No history saved
             </Typography>
         }
         return (
             <div>
-                <Tooltip
-                    title="History"
-                    onOpen={this.openTooltip}
-                    onClose={this.closeTooltip}
-                    open={!open && tooltipOpen}
-                >
-                    <IconButton
-                        color="inherit"
-                        aria-label="Layout"
-                        buttonRef={node => {
-                            this.anchorEl = node;
-                        }}
-                        onClick={this.onClick}
-                    >
-                        <HistoryIcon />
-                    </IconButton>
-                </Tooltip>
+                <Button
+                        color="secondary"
+                        onClick={this.onClick}>
+                    <HistoryIcon />
+                    History
+                </Button>
                 <Popper
                     open={open}
                     placement="bottom-end"
@@ -307,9 +287,6 @@ class HistoryButton extends React.Component<Props, State> {
                                     <div className={classes.list}>
                                         <List
                                             dense
-                                            subheader={
-                                                <ListSubheader component="div">History</ListSubheader>
-                                            }
                                             classes={{
                                                 dense: classes.newDense
                                             }}

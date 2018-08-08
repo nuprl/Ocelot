@@ -288,8 +288,8 @@ class JumboContent extends React.Component<Props, State> {
                 <CanvasIcon />
                 Canvas
             </Button>
-            <div style={classes.flex} />
             <HistoryButton />
+            <div style={classes.flex} />
             <div style={{ display: 'inline-block', width: '0.5em' }} />
             <UserLogin />
         </Toolbar>
