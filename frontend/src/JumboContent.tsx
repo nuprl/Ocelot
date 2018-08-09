@@ -177,45 +177,35 @@ class JumboContent extends React.Component<Props, State> {
       window.localStorage.setItem('code', this.state.code);
     }
 
-    try {
-      const runner = stopify.stopifyLocallyFromAst(compiled.node);
-      setGlobals((runner as any).g);
-      elementaryRTS.enableTests(false, runner);
-      if (mode === 'testing') {
-        elementaryRTS.enableTests(true, runner);
-      }
-      this.setState({ asyncRunner: runner, status: mode }, () => {
-        lib220.setRunner(runner);
-        runner.run((result: any) => {
-          // tslint:disable-next-line:no-console
-          // console.log(result);
-          this.handleStopifyResult(result);
-          if (this.state.status === 'testing' && this.hasConsole) {
-            const summary = elementaryRTS.summary(true);
-            this.hasConsole.appendLogMessage({
-              method: 'log',
-              data: [summary.output, ...summary.style]
-            });
-          }
-          this.setState({ status: 'stopped' });
+    const runner = stopify.stopifyLocallyFromAst(compiled.node);
+    if (runner.kind === 'error') {
+      if (this.hasConsole) {
+        this.hasConsole.appendLogMessage({
+          method: 'error',
+          data: [runner.exception]
         });
-      });
-    } catch (e) {
-      if (e instanceof elementaryRTS.ElementaryRuntimeError) {
-        // Don't report stack traces. Count on ElementaryJS to report
-        // line numbers.
-        if (this.hasConsole) {
+      }
+      return;
+    }
+    setGlobals((runner as any).g);
+    elementaryRTS.enableTests(false, runner);
+    if (mode === 'testing') {
+      elementaryRTS.enableTests(true, runner);
+    }
+    this.setState({ asyncRunner: runner, status: mode }, () => {
+      lib220.setRunner(runner);
+      runner.run(result => {
+        this.handleStopifyResult(result);
+        if (this.state.status === 'testing' && this.hasConsole) {
+          const summary = elementaryRTS.summary(true);
           this.hasConsole.appendLogMessage({
-            method: 'error',
-            data: [e.message]
+            method: 'log',
+            data: [summary.output, ...summary.style]
           });
         }
-      }
-      else {
-        // tslint:disable-next-line:no-console
-        console.error(e);
-      }
-    }
+        this.setState({ status: 'stopped' });
+      });
+    });
   }
 
   onStop() {
