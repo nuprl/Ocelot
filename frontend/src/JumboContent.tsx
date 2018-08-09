@@ -244,10 +244,7 @@ class JumboContent extends React.Component<Props, State> {
         <AppBar position="absolute">
           <Toolbar variant="dense">
             <PawIcon style={classes.icon} />
-            <Typography
-              variant="subheading"
-              color="inherit"
-              noWrap>
+            <Typography variant="subheading" color="inherit" noWrap>
               Ocelot
             </Typography>
             <div style={{ width: 50 }} />
@@ -296,11 +293,7 @@ class JumboContent extends React.Component<Props, State> {
             <UserLogin />
           </Toolbar>
         </AppBar>
-        <SplitPane
-          split="vertical"
-          defaultSize={250}
-          minSize={0}
-        >
+        <SplitPane split="vertical" defaultSize={250} minSize={0}>
           <SideDrawer />
           <div className={this.props.classes.jumboContainer}>
             <div className={this.props.classes.toolbar} style={{ minHeight: '48px' }} />
