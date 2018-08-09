@@ -163,11 +163,11 @@ export class Sandbox {
     }
 
     onStopClicked() {
-        if (this.mode === 'running' || this.mode === 'testing') {
+        if (this.mode === 'stopped') {
             console.info(`Clicked Stop while in mode ${this.mode}`);
             return;
         }
-        if (this.mode === 'stopped') {
+        if (this.mode === 'stopping') {
             // NOTE(arjun): I think this can happen and is less surprising.
             // E.g., a student may click a button several times
             return;
