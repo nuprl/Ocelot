@@ -10,9 +10,7 @@ import RightArrowIcon from '@material-ui/icons/KeyboardArrowRight';
 import { Console } from 'console-feed';
 import { inspectorTheme } from './static/styles/consoleStyle';
 import 'static/styles/Scrollbar.css';
-import { AsyncRun } from 'stopify';
-import * as stopify from 'stopify';
-import * as runner from './runner';
+import { Sandbox } from './sandbox';
 
 class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
     logRef: HTMLDivElement | null = null;
@@ -90,7 +88,7 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 type Props = WithStyles<'root'> & {
-    runner: AsyncRun | undefined,
+    sandbox: Sandbox,
     aref: (panel: OutputPanel) => void
 }
 
@@ -113,13 +111,6 @@ class OutputPanel extends React.Component<Props, State> {
         };
     }
 
-    componentWillReceiveProps(nextProps: Props) {
-        // Clear console when program reloads.
-        if (nextProps.runner !== this.props.runner) {
-            this.setState({ logs: [] });
-        }
-    }
-
     error(...message: any[]) {
         this.appendLogMessage({ method: 'error', data: message });
     }
@@ -140,11 +131,11 @@ class OutputPanel extends React.Component<Props, State> {
     }
 
     componentDidMount() {
+        this.props.sandbox.setConsole(this);
         this.props.aref(this);
-        runner.setConsole(this);
     }
 
-    addNewCommandResult = (command: string, result: any, isError: boolean) => {
+    command = (command: string, result: any, isError: boolean) => {
         this.appendLogMessage({ method: 'command', data: [command] });
         this.appendLogMessage({ method: isError ? 'error' : 'result', data: [result] });
     };
@@ -187,25 +178,11 @@ class OutputPanel extends React.Component<Props, State> {
                 event.stopPropagation();
                 const command = editor.getValue();
                 editor.setValue('');
-
-                const runner = this.props.runner;
-                if (runner === undefined) {
-                    console.error('Need to click run (TODO)');
-                    return;
-                }
                 this.setState({
                     historyLocation: -1,
                     commandHistory: [command, ...this.state.commandHistory]
                 });
-
-                (runner as any).evalAsync(command, (result: stopify.Result) => {
-                    if (result.type === 'normal') {
-                        this.addNewCommandResult(command, result.value, false);
-                    }
-                    else {
-                        this.addNewCommandResult(command, result.value, true);
-                    }
-                });
+                this.props.sandbox.onConsoleInput(command);
             }
         });
     }

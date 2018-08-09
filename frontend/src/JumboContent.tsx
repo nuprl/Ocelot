@@ -13,16 +13,12 @@ import StopIcon from '@material-ui/icons/Stop';
 import * as types from './types';
 import { RootState } from './store';
 import { getSelectedFileName, getSelectedFileIndex } from './store/userFiles/selectors';
-import { AsyncRun } from 'stopify';
 import { connect } from 'react-redux';
-import * as stopify from 'stopify';
-import * as elementaryJS from 'elementary-js';
 import { saveHistory } from './utils/api/saveHistory'
 import { isFailureResponse } from './utils/api/apiHelpers';
-import { setGlobals } from './runner';
 import SideDrawer from './components/SideDrawer';
 import Notification from './containers/Notification';
-
+import * as sandbox from './sandbox';
 import UserLogin from './containers/UserLogin';
 import HistoryButton from './containers/HistoryButton';
 
@@ -34,15 +30,6 @@ import PawIcon from '@material-ui/icons/Pets';
 import FileIcon from '@material-ui/icons/FileCopy';
 import CanvasIcon from '@material-ui/icons/Wallpaper';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
-
-import * as lib220 from 'elementary-js/dist/lib220';
-
-// TODO(arjun): I think these hacks are necessary for eval to work. We either 
-// do them here or we do them within the implementation of Stopify. I want 
-// them here for now until I'm certain there isn't a cleaner way.
-import * as elementaryRTS from 'elementary-js/dist/runtime';
-(window as any).stopify = stopify;
-(window as any).elementaryjs = elementaryRTS;
 
 
 const classes = {
@@ -67,12 +54,6 @@ const redTheme = createMuiTheme({
   }
 });
 
-type State = {
-  asyncRunner: AsyncRun | undefined,
-  status: 'running' | 'testing' | 'stopped' | 'pausing',
-  code: string
-}
-
 type Props = {
   filename: string,
   loggedIn: boolean,
@@ -85,124 +66,73 @@ type Props = {
   },
 }
 
-class JumboContent extends React.Component<Props, State> {
+type ExecutionProps = {
+  sandbox: sandbox.Sandbox, 
+  loggedIn: boolean,
+  filename: string
+}
+class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.Mode }> {
 
-  private console!: types.HasConsole;
-
-  constructor(props: Props) {
+  constructor(props: ExecutionProps) {
     super(props);
-    this.state = {
-      asyncRunner: undefined,
-      status: 'stopped',
-      code: ''
-    };
+    this.state = { mode: 'stopped' };
+  }
+  
+  componentDidMount() {
+    this.props.sandbox.addModeListener((mode) => {
+      this.setState({ mode: mode });
+    });
   }
 
-  handleStopifyResult = (result: stopify.Result) => {
-    if (result.type === 'exception') {
-      if (result.value instanceof Error) {
-        this.console.error(result.value.message);
-      }
-      else {
-        this.console.error(result.value);
-      }
-      for (let line of result.stack) {
-        this.console.error(line);
-      }
-    }
-  }
-
-  setRunner(asyncRunner: AsyncRun) {
-    this.setState({ asyncRunner: asyncRunner });
-  }
-
-  getRunner(): AsyncRun | undefined {
-    return this.state.asyncRunner;
-  }
-
-  clearRunner() {
-    if (this.state.asyncRunner !== undefined) {
-      this.setState({ asyncRunner: undefined });
-    }
-  }
-
-  updateCode(code: string) {
-    this.setState({ code: code });
-  }
-
-  shouldComponentUpdate(nextProps: Props, nextState: State) {
-    // code may not have to be in .state
-    return this.props !== nextProps ||
-      this.state.asyncRunner !== nextState.asyncRunner ||
-      this.state.status !== nextState.status;
-  }
-
-  onRun(mode: 'running' | 'testing') {
+  onRunOrTestClicked(mode: 'running' | 'testing') {
     if (this.props.loggedIn) {
-      saveHistory(this.props.filename, this.state.code).then((res) => {
-        // tslint:disable-next-line:no-console
+      // TODO(arjun): MUST be more robust. Cannot suppress errors.
+      saveHistory(this.props.filename, this.props.sandbox.getCode()).then((res) => {
         if (isFailureResponse(res)) {
-          // tslint:disable-next-line:no-console
           console.log('Something went wrong');
-          // tslint:disable-next-line:no-console
           console.log(res.data.message);
           return;
         }
-        // tslint:disable-next-line:no-console
-        // console.log('History saved');
       }).catch(err => console.log(err)); // will do for now
     }
-    const compiled = elementaryJS.compile(this.state.code, true);
-    if (compiled.kind === 'error') {
-      for (const err of compiled.errors) {
-        this.console.error(`Line ${err.line}: ${err.message}`);
-      }
-      return;
-    }
-    if (window.location.hostname === 'localhost') {
-      window.localStorage.setItem('code', this.state.code);
-    }
-
-    const runner = stopify.stopifyLocallyFromAst(compiled.node);
-    if (runner.kind === 'error') {
-      this.console.error(runner.exception);
-      return;
-    }
-    setGlobals((runner as any).g);
-    elementaryRTS.enableTests(false, runner);
-    if (mode === 'testing') {
-      elementaryRTS.enableTests(true, runner);
-    }
-    this.setState({ asyncRunner: runner, status: mode }, () => {
-      lib220.setRunner(runner);
-      runner.run(result => {
-        this.handleStopifyResult(result);
-        if (this.state.status === 'testing') {
-          const summary = elementaryRTS.summary(true);
-          this.console.log(summary.output, ...summary.style);
-        }
-        this.setState({ status: 'stopped' });
-      });
-    });
+    this.props.sandbox.onRunOrTestClicked(mode);
   }
 
-  onStop() {
-    if (!(this.state.status === 'running' ||
-      this.state.status === 'testing')) {
-      return;
-    }
-    const asyncRun = this.state.asyncRunner;
-    if (typeof asyncRun === 'undefined') {
-      // UI glitch. Is this possible?
-      return;
-    }
-    this.setState({ status: 'pausing' });
-    asyncRun.pause((line?: number) => {
-      // NOTE: We do *not* remove the asyncRun object. This will allow
-      // a user to continue mucking around in the console after killing a 
-      // running program.
-      this.setState({ status: 'stopped' });
-    });
+  render() {
+    return [
+      <Button key="run-button" color="secondary"
+        onClick={() => this.onRunOrTestClicked('running')}
+        disabled={this.state.mode !== 'stopped'}>
+        <PlayIcon color="inherit" />
+        Run
+      </Button>,
+      <Button key="test-button" color="secondary"
+        onClick={() => this.onRunOrTestClicked('testing')}
+        disabled={this.state.mode !== 'stopped'}>
+        <ExploreIcon color="inherit" />
+        Test
+      </Button>,
+      <MuiThemeProvider key="stop-button" theme={redTheme}>
+        <Button
+          color="primary"
+          onClick={() => this.props.sandbox.onStopClicked()}
+          disabled={this.state.mode === 'stopped' || this.state.mode === 'stopping'}>
+          <StopIcon color="inherit" />
+          Stop
+      </Button>
+      </MuiThemeProvider>
+    ];
+  }
+}
+
+class JumboContent extends React.Component<Props, {}> {
+
+  private console!: types.HasConsole;
+  private sandbox: sandbox.Sandbox;
+
+  constructor(props: Props) {
+    super(props);
+    this.sandbox = new sandbox.Sandbox();
   }
 
   render() {
@@ -222,27 +152,10 @@ class JumboContent extends React.Component<Props, State> {
               <FileIcon />
               Files
             </Button>
-            <Button color="secondary"
-              onClick={() => this.onRun('running')}
-              disabled={this.state.status !== 'stopped' || this.props.fileIndex === -1}>
-              <PlayIcon color="inherit" />
-              Run
-            </Button>
-            <Button color="secondary"
-              onClick={() => this.onRun('testing')}
-              disabled={this.state.status !== 'stopped' || this.props.fileIndex === -1}>
-              <ExploreIcon color="inherit" />
-              Test
-            </Button>
-            <MuiThemeProvider theme={redTheme}>
-              <Button
-                color="primary"
-                onClick={() => this.onStop()}
-                disabled={(this.state.status === 'stopped' || this.state.status === 'pausing') || this.props.fileIndex === -1}>
-                <StopIcon color="inherit" />
-                Stop
-            </Button>
-            </MuiThemeProvider>
+            <ExecutionButtons 
+              filename={this.props.filename} 
+              loggedIn={this.props.loggedIn}
+              sandbox={this.sandbox} />
             <Button
               color="secondary"
               onClick={() => console.log("Clicked console")}>
@@ -280,12 +193,11 @@ class JumboContent extends React.Component<Props, State> {
                   minSize={0}
                   pane1Style={{ maxWidth: '100%' }}>
                   <div style={{ width: '100%', height: '100%', minWidth: '286px' }}>
-                    <CodeEditor updateCode={(code) => this.updateCode(code)} />
+                    <CodeEditor updateCode={(code) => this.sandbox.setCode(code)} />
                   </div>
                   <CanvasOutput />
                 </SplitPane>
-                <OutputPanel runner={this.state.asyncRunner} 
-                  aref={x => this.console = x} />
+                <OutputPanel sandbox={this.sandbox} aref={x => this.console = x} />
               </SplitPane>
             </div>
           </div>
@@ -302,4 +214,4 @@ const mapStateToProps = (state: RootState) => ({
   fileIndex: getSelectedFileIndex(state)
 });
 
-export default connect(mapStateToProps)(JumboContent);
+export const JumboContentDefault  = connect(mapStateToProps)(JumboContent);

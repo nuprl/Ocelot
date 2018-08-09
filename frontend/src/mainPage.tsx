@@ -1,7 +1,7 @@
 import * as React from 'react';
 import withStyles, { WithStyles, StyleRulesCallback, } from '@material-ui/core/styles/withStyles';
 import CustomTheme from './components/CustomTheme';
-import JumboContent from './JumboContent';
+import * as JumboContent from './JumboContent';
 import { detect } from 'detect-browser';
 import 'static/styles/JumboContent.css';
 import 'static/styles/body.css';
@@ -54,7 +54,7 @@ class Index extends React.Component<WithStyles<WithStylesClasses>> {
           case 'safari':
           case 'ios':
             const { classes } = this.props;
-            return (<JumboContent classes={classes} />);
+            return (<JumboContent.JumboContentDefault classes={classes} />);
           default:
             return (
               <Typography variant="display1" align="center">

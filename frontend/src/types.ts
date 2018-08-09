@@ -11,6 +11,7 @@ export type Message = consoleFeed.Message |
 export type HasConsole = {
   error(...message: any[]): void;
   log(...message: any[]): void;
+  command(command: string, result: any, isError: boolean): void;
 }
 
 export type HasRunner = {
