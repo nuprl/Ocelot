@@ -7,6 +7,7 @@ import { RootState } from '../../../../store';
 import { Dispatch } from 'redux';
 import { selectFile, deleteFile } from '../../../../store/userFiles/actions';
 import { connect } from 'react-redux';
+import { triggerNotification } from '../../../../store/notification/actions';
 
 type Props = {
     files: { name: string, content: string }[],
@@ -55,7 +56,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     makeHandleDeleteFile: (index: number, name: string, loggedIn: boolean) => (() => {
         const response = prompt("Are you sure you want to delete this file? Enter YES or NO");
         if (response !== "YES") {
-          alert("Delete aborted.");
+          dispatch(triggerNotification(`Delete aborted: ${name}`, 'bottom-right'));
           return;
         }
         // index is used for removing the file from store
