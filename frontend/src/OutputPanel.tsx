@@ -13,7 +13,6 @@ import 'static/styles/Scrollbar.css';
 import { AsyncRun } from 'stopify';
 import * as stopify from 'stopify';
 import * as runner from './runner';
-import * as types from './types';
 
 class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
     logRef: HTMLDivElement | null = null;
@@ -92,7 +91,7 @@ const styles: StyleRulesCallback = theme => ({
 
 type Props = WithStyles<'root'> & {
     runner: AsyncRun | undefined,
-    recvHasConsole: (hasConsole: types.HasConsole) => void;
+    aref: (panel: OutputPanel) => void
 }
 
 type State = {
@@ -121,6 +120,14 @@ class OutputPanel extends React.Component<Props, State> {
         }
     }
 
+    error(...message: any[]) {
+        this.appendLogMessage({ method: 'error', data: message });
+    }
+
+    log(...message: any[]) {
+        this.appendLogMessage({ method: 'log', data: message });
+    }
+
     /** Appends a message to the log. Bounds scrollback to 100 items. */
     appendLogMessage(message: Message | { method: 'command' | 'result' | 'error', data: any }) {
         this.setState((prevState) => {
@@ -133,7 +140,7 @@ class OutputPanel extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        this.props.recvHasConsole(this);
+        this.props.aref(this);
         runner.setConsole(this);
     }
 

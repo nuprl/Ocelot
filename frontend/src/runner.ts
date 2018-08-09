@@ -11,7 +11,7 @@ export function setGlobals(g: any) {
   g.elementaryjs = elementaryRTS;
   g.console = Object.freeze({
     log: function(...message: any[]) {
-      visibleConsole.appendLogMessage({ method: 'log', data: [...message] });
+      visibleConsole.log(...message);
     }
   });
   g.test = elementaryRTS.test;

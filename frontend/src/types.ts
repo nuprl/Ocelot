@@ -9,7 +9,8 @@ export type Message = consoleFeed.Message |
   { method: 'command' | 'result' | 'error', data: any };
 
 export type HasConsole = {
-  appendLogMessage(message: Message): void;
+  error(...message: any[]): void;
+  log(...message: any[]): void;
 }
 
 export type HasRunner = {

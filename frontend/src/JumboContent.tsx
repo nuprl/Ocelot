@@ -87,7 +87,7 @@ type Props = {
 
 class JumboContent extends React.Component<Props, State> {
 
-  private hasConsole: types.HasConsole | undefined;
+  private console!: types.HasConsole;
 
   constructor(props: Props) {
     super(props);
@@ -98,24 +98,16 @@ class JumboContent extends React.Component<Props, State> {
     };
   }
 
-  recvHasConsole(c: types.HasConsole) {
-    this.hasConsole = c;
-  }
-
   handleStopifyResult = (result: stopify.Result) => {
     if (result.type === 'exception') {
-      console.error(result);
-      if (this.hasConsole) {
-        this.hasConsole.appendLogMessage({
-          method: 'error',
-          data: [result.value.message]
-        });
-        for (let line of result.stack) {
-          this.hasConsole.appendLogMessage({
-            method: 'error',
-            data: [line]
-          });
-        }
+      if (result.value instanceof Error) {
+        this.console.error(result.value.message);
+      }
+      else {
+        this.console.error(result.value);
+      }
+      for (let line of result.stack) {
+        this.console.error(line);
       }
     }
   }
@@ -163,13 +155,7 @@ class JumboContent extends React.Component<Props, State> {
     const compiled = elementaryJS.compile(this.state.code, true);
     if (compiled.kind === 'error') {
       for (const err of compiled.errors) {
-        // TODO (Sam) : These logs won't go away since the runner is the same
-        // Maybe use something else other than the runner or have a type
-        // that is ORed with runner and CompileError from elementaryjs
-        this.hasConsole && this.hasConsole.appendLogMessage({
-          method: 'error',
-          data: [`Line ${err.line}: ${err.message}`]
-        });
+        this.console.error(`Line ${err.line}: ${err.message}`);
       }
       return;
     }
@@ -179,12 +165,7 @@ class JumboContent extends React.Component<Props, State> {
 
     const runner = stopify.stopifyLocallyFromAst(compiled.node);
     if (runner.kind === 'error') {
-      if (this.hasConsole) {
-        this.hasConsole.appendLogMessage({
-          method: 'error',
-          data: [runner.exception]
-        });
-      }
+      this.console.error(runner.exception);
       return;
     }
     setGlobals((runner as any).g);
@@ -196,12 +177,9 @@ class JumboContent extends React.Component<Props, State> {
       lib220.setRunner(runner);
       runner.run(result => {
         this.handleStopifyResult(result);
-        if (this.state.status === 'testing' && this.hasConsole) {
+        if (this.state.status === 'testing') {
           const summary = elementaryRTS.summary(true);
-          this.hasConsole.appendLogMessage({
-            method: 'log',
-            data: [summary.output, ...summary.style]
-          });
+          this.console.log(summary.output, ...summary.style);
         }
         this.setState({ status: 'stopped' });
       });
@@ -306,8 +284,8 @@ class JumboContent extends React.Component<Props, State> {
                   </div>
                   <CanvasOutput />
                 </SplitPane>
-                <OutputPanel runner={this.state.asyncRunner}
-                  recvHasConsole={(c) => this.recvHasConsole(c)} />
+                <OutputPanel runner={this.state.asyncRunner} 
+                  aref={x => this.console = x} />
               </SplitPane>
             </div>
           </div>
