@@ -98,6 +98,7 @@ export class Sandbox {
         g.assert = elementaryRTS.assert;
         g.lib220 = lib220;
         g.Math = Math;
+        g.Array.prototype = Object.freeze(Array.prototype);
       }
       
     private onResult(result: stopify.Result) {
