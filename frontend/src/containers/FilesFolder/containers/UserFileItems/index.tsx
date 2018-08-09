@@ -53,6 +53,11 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
         dispatch(selectFile(index));
     }),
     makeHandleDeleteFile: (index: number, name: string, loggedIn: boolean) => (() => {
+        const response = prompt("Are you sure you want to delete this file? Enter YES or NO");
+        if (response !== "YES") {
+          alert("Delete aborted.");
+          return;
+        }
         // index is used for removing the file from store
         // the name is for removing the file from the database
         dispatch(deleteFile(index, name, loggedIn));
