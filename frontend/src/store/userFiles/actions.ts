@@ -17,21 +17,6 @@ export const loadFilesFailure: ActionCreator<t.LoadFilesFailureAction>
         type: t.LOAD_FILES_FAILURE
     });
 
-export const toggleFilesFolder: ActionCreator<t.ToggleFilesFolderAction>
-    = () => ({
-        type: t.TOGGLE_FILES_FOLDER
-    });
-
-export const openFilesFolder: ActionCreator<t.OpenFilesFolderAction>
-    = () => ({
-        type: t.OPEN_FILES_FOLDER
-    });
-
-export const closeFilesFolder: ActionCreator<t.CloseFilesFolderAction>
-    = () => ({
-        type: t.CLOSE_FILES_FOLDER
-    });
-
 export const createNewFile: ActionCreator<t.CreateNewFileAction>
     = (fileName: string, loggedIn: boolean) => ({
         type: t.CREATE_NEW_FILE,

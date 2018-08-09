@@ -2,14 +2,6 @@ import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import { RootState } from '../../store';
-import {
-    getSelectedCode,
-    isValidFileIndex,
-    getSelectedFileName,
-    getSelectedFileIndex,
-    getSelectedIsSaved
-} from '../../store/userFiles/selectors';
-import { editFileCloud, editFileLocal, markFileNotSaved } from '../../store/userFiles/actions';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
@@ -54,25 +46,25 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
 };
 
 type Props = {
-    enabled: boolean,
-    code: string,
-    fileIndex: number,
-    fileName: string,
+    fileInfo: {
+        code: string,
+        fileName: string,
+        enabled: boolean,
+        fileIndex: number,
+      }
     loggedIn: boolean,
-    isSaved: boolean,
     updateCode: (code: string) => void,
     saveCode: (
         fileIndex: number,
         content: string,
     ) => void,
-    saveCodeToCloud: (
+    saveCodeCloud: (
         fileName: string,
         fileIndex: number,
         content: string,
         loggedIn: boolean,
     ) => void,
     setEditor: (editor: monacoEditor.editor.IStandaloneCodeEditor) => void,
-    triggerFileLoading: (fileIndex: number) => void,
 } & WithStyles<'emptyState' | 'pawIcon'>;
 
 type FileEdit = {
@@ -141,21 +133,20 @@ class CodeEditor extends React.Component<Props> {
         if (this.editor === undefined) {
             return;
         }
-        if (prevProps.fileIndex !== this.props.fileIndex) {
-            this.props.updateCode(this.props.code);
+        if (prevProps.fileInfo.fileIndex !== this.props.fileInfo.fileIndex) {
+            this.props.updateCode(this.props.fileInfo.code);
         }
-        const endingCriteria = prevProps.fileIndex === this.props.fileIndex
-            || prevProps.isSaved
+        const endingCriteria = prevProps.fileInfo.fileIndex === this.props.fileInfo.fileIndex
             || !prevProps.loggedIn
-            || prevProps.fileIndex === -1;
+            || prevProps.fileInfo.fileIndex === -1;
 
         if (endingCriteria) {
             return;
         }
         this.fileEditsQueue.push({
-            fileName: prevProps.fileName,
-            fileIndex: prevProps.fileIndex,
-            code: prevProps.code,
+            fileName: prevProps.fileInfo.fileName,
+            fileIndex: prevProps.fileInfo.fileIndex,
+            code: prevProps.fileInfo.code,
         });
         this.editor.focus();
     }
@@ -167,30 +158,27 @@ class CodeEditor extends React.Component<Props> {
         this.editor.layout();
     }
 
-    triggerFileLoadingAnim = () => this.props.triggerFileLoading(this.props.fileIndex);
-
     saveCodeCloudWrapper = () => {
         // tslint:disable-next-line:no-console
         let fileEdit: FileEdit;
+        console.log('Saving code');
         while (this.fileEditsQueue.length > 0) {
+            console.log('In loop');
             fileEdit = this.fileEditsQueue.shift() as FileEdit;
-            if (fileEdit.fileIndex === this.props.fileIndex) {
+            if (fileEdit.fileIndex === this.props.fileInfo.fileIndex) {
                 continue;
             }
-            this.props.saveCodeToCloud(
+            this.props.saveCodeCloud(
                 fileEdit.fileName,
                 fileEdit.fileIndex,
                 fileEdit.code,
                 this.props.loggedIn
             );
         }
-        if (this.props.isSaved) {
-            return;
-        }
-        this.props.saveCodeToCloud(
-            this.props.fileName,
-            this.props.fileIndex,
-            this.props.code,
+        this.props.saveCodeCloud(
+            this.props.fileInfo.fileName,
+            this.props.fileInfo.fileIndex,
+            this.props.fileInfo.code,
             this.props.loggedIn
         );
 
@@ -200,17 +188,16 @@ class CodeEditor extends React.Component<Props> {
 
     onChange = (code: string) => {
         if (this.props.loggedIn) {
-            // this.debouncedFileLoading();
-            this.triggerFileLoadingAnim();
             this.debouncedSaveCodeCloud();
         }
         this.props.updateCode(code);
-        this.props.saveCode(this.props.fileIndex, code);
+        this.props.saveCode(this.props.fileInfo.fileIndex, code);
 
     };
 
     render() {
-        const { code, enabled, classes } = this.props;
+        const { fileInfo, classes } = this.props;
+        const { code, enabled } = fileInfo;
 
         if (!enabled) {
             return (
@@ -241,33 +228,13 @@ class CodeEditor extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-    enabled: isValidFileIndex(state),
-    code: getSelectedCode(state),
-    fileIndex: getSelectedFileIndex(state),
-    fileName: getSelectedFileName(state),
     loggedIn: state.userLogin.loggedIn,
-    isSaved: getSelectedIsSaved(state),
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    saveCodeToCloud: (
-        fileName: string,
-        fileIndex: number,
-        content: string,
-        loggedIn: boolean
-    ) => {
-        dispatch(editFileCloud(fileName, fileIndex, content, loggedIn));
-    },
-    saveCode: (
-        fileIndex: number,
-        content: string,
-    ) => {
-        dispatch(editFileLocal(fileIndex, content));
-    },
     setEditor: (editor: monacoEditor.editor.IStandaloneCodeEditor) => {
         dispatch(setMonacoEditor(editor))
     },
-    triggerFileLoading: (fileIndex: number) => { dispatch(markFileNotSaved(fileIndex)); },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(CodeEditor));

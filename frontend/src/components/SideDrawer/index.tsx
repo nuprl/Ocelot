@@ -19,8 +19,18 @@ const styles: StyleRulesCallback = theme => ({
 
 type Styles = 'drawerPaper' | 'toolbar' | 'noBorder';
 
-const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
-    { classes }
+type Props = {
+    userFilesInfo: {
+        files: { name: string, content: string }[],
+        selectedFileIndex: number,
+    },
+    makeHandleClickFile: (fileIndex: number) => (() => void),
+    makeHandleDeleteFile: (fileIndex: number, name: string, loggedIn: boolean) => (() => void),
+    onCreateFile: (fileName: string, loggedIn: boolean) => void,
+}
+
+const SideDrawer: React.StatelessComponent<WithStyles<Styles> & Props> = (
+    { classes, userFilesInfo, makeHandleClickFile, makeHandleDeleteFile, onCreateFile }
 ) => (
         <Drawer
             variant="permanent"
@@ -33,7 +43,12 @@ const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
             <div className={classes.toolbar} style={{minHeight: '48px'}}/>
             {/* Setting toolbar is so hacky, I don't know how to override it */}
             <List dense>
-                <FilesFolder />
+                <FilesFolder 
+                    userFilesInfo={userFilesInfo}
+                    makeHandleClickFile={makeHandleClickFile}
+                    makeHandleDeleteFile={makeHandleDeleteFile}
+                    onCreateFile={onCreateFile}
+                />
             </List>
         </Drawer>
     );

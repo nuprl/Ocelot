@@ -4,9 +4,6 @@ import { Action } from 'redux';
 export const LOAD_FILES_REQUEST = 'LOAD_FILES_REQUEST';
 export const LOAD_FILES_SUCCESS = 'LOAD_FILES_SUCCESS';
 export const LOAD_FILES_FAILURE = 'LOAD_FILES_FAILURE';
-export const TOGGLE_FILES_FOLDER = 'TOGGLE_FILES_FOLDER';
-export const OPEN_FILES_FOLDER = 'OPEN_FILES_FOLDER';
-export const CLOSE_FILES_FOLDER = 'CLOSE_FILES_FOLDER';
 export const CREATE_NEW_FILE = 'CREATE_NEW_FILE';
 // this should have a saga 
 export const EDIT_FILE_LOCAL = 'EDIT_FILE_LOCAL';
@@ -35,18 +32,6 @@ export interface LoadFilesSuccessAction extends Action {
 
 export interface LoadFilesFailureAction extends Action {
     type: 'LOAD_FILES_FAILURE';
-}
-
-export interface ToggleFilesFolderAction extends Action {
-    type: 'TOGGLE_FILES_FOLDER';
-}
-
-export interface OpenFilesFolderAction extends Action {
-    type: 'OPEN_FILES_FOLDER';
-}
-
-export interface CloseFilesFolderAction extends Action {
-    type: 'CLOSE_FILES_FOLDER';
 }
 
 export interface CreateNewFileAction extends Action {
@@ -100,9 +85,6 @@ export type UserFilesActions =
     | LoadFilesRequestAction
     | LoadFilesSuccessAction
     | LoadFilesFailureAction
-    | ToggleFilesFolderAction
-    | OpenFilesFolderAction
-    | CloseFilesFolderAction
     | CreateNewFileAction
     | SelectFileAction
     | DeleteFileAction
@@ -121,7 +103,6 @@ export type ChangeFileActions =
 export type UserFilesState = {
     folderInfo: {
         filesLoading: boolean
-        open: boolean,
     },
     filesInfo: {
         files: UserFiles,

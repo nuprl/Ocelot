@@ -17,7 +17,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { isFailureResponse } from '../../utils/api/apiHelpers';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import { getSelectedFileName, getSelectedCode } from '../../store/userFiles/selectors';
 import { getFileHistory, FileHistory } from '../../utils/api/getHistory';
 import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import { MonacoDiffEditor } from 'react-monaco-editor';
@@ -307,9 +306,7 @@ class HistoryButton extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-    fileName: getSelectedFileName(state),
     loggedIn: state.userLogin.loggedIn,
-    code: getSelectedCode(state),
     editor: state.codeEditor.monacoEditor
 });
 

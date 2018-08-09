@@ -14,7 +14,6 @@ console.log(greeting('World'));
 
 const initialState: t.UserFilesState = {
     folderInfo: {
-        open: true,
         filesLoading: false,
     },
     filesInfo: {
@@ -39,7 +38,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                 ...state,
                 folderInfo: {
                     filesLoading: true,
-                    open: false,
                 }
             };
         case t.LOAD_FILES_SUCCESS:
@@ -51,7 +49,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                     selectedFileIndex: -1
                 },
                 folderInfo: {
-                    open: true,
                     filesLoading: false,
                 }
             };
@@ -61,30 +58,6 @@ const userFiles: Reducer<t.UserFilesState> = (
                 folderInfo: {
                     ...state.folderInfo,
                     filesLoading: false,
-                }
-            };
-        case t.TOGGLE_FILES_FOLDER:
-            return {
-                ...state,
-                folderInfo: {
-                    ...state.folderInfo,
-                    open: !state.folderInfo.open
-                }
-            };
-        case t.OPEN_FILES_FOLDER:
-            return {
-                ...state,
-                folderInfo: {
-                    ...state.folderInfo,
-                    open: true,
-                }
-            };
-        case t.CLOSE_FILES_FOLDER:
-            return {
-                ...state,
-                folderInfo: {
-                    ...state.folderInfo,
-                    open: false,
                 }
             };
         case t.CREATE_NEW_FILE:

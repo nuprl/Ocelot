@@ -14,8 +14,6 @@ import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';
 import { RootState } from '../../../../store';
-import { Dispatch } from 'redux';
-import { createNewFile } from '../../../../store/userFiles/actions';
 import { UserFiles } from '../../../../store/userFiles/types';
 import FormHelperText from '@material-ui/core/FormHelperText';
 
@@ -160,20 +158,8 @@ class NewFileField extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-    // wantNewFile: state.userFiles.filesInfo.newFile,
-    files: state.userFiles.filesInfo.files,
     // newFileError: state.userFiles.filesInfo.newFileError,
     loggedIn: state.userLogin.loggedIn
 });
 
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-    onCreateFile: (fileName: string, loggedIn: boolean) => {
-        dispatch(createNewFile(fileName, loggedIn));
-        // dispatch(deleteNewFileField());
-    },
-    // notifyError: () => {
-    //     dispatch(triggerNewFileError());
-    // }
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ListItemStyles(NewFileField));
+export default connect(mapStateToProps)(ListItemStyles(NewFileField));

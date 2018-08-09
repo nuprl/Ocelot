@@ -3,21 +3,46 @@ import { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-lo
 import EmailText from './EmailText';
 import GoogleLogoutButton from './GoogleLogoutButton';
 import GoogleLoginButton from './GoogleLoginButton';
+import { validateUser } from '../../../utils/api/validateUser';
+import { isFailureResponse } from '../../../utils/api/apiHelpers';
+import { getUserFiles } from '../../../utils/api/getUserFiles';
 
 type LoginLogoutProps = {
     loggedIn: boolean,
     loading: boolean,
     email: string,
-    onLogin: (googleUser: GoogleLoginResponse) => void,
+    onLogin: (response: GoogleLoginResponse) => void,
     onLogout: () => void,
     onLoading: () => void,
     onNotLoading: () => void,
+    setFiles: (userFiles: {name: string, content: string}[]) => void,
 };
 
 class LoginLogout extends React.Component<LoginLogoutProps> {
 
     onSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         this.props.onLogin(response as GoogleLoginResponse);
+        validateUser(response as GoogleLoginResponse).then((response) => {
+            if (isFailureResponse(response)) {
+                console.log(response.data.message)
+                return;
+            }
+
+            this.loadFiles();
+
+        }).catch(error => {
+            console.log('Could not validate user', error);
+        });
+    }
+
+    loadFiles = () => {
+        getUserFiles().then(response => {
+            if (isFailureResponse(response)) {
+                console.log('Could not get files');
+                return;
+            }
+            this.props.setFiles(response.data.userFiles);
+        });
     }
 
     onFailure = (response: { error: string }) => {

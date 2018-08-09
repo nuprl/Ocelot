@@ -10,9 +10,14 @@ import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles, Button } from '@material-ui/core';
 
 type FilesFolderProps = {
-    open: boolean,
     disabled: boolean,
-    toggleFolder: () => void,
+    userFilesInfo: {
+        files: { name: string, content: string }[],
+        selectedFileIndex: number,
+    },
+    makeHandleDeleteFile: (fileIndex: number, name: string, loggedIn: boolean) => (() => void),
+    makeHandleClickFile: (fileIndex: number) => (() => void),
+    onCreateFile: (fileName: string, loggedIn: boolean) => void,
 };
 
 type Props = FilesFolderProps & WithStyles<ListItemStylesTypes>;
@@ -33,14 +38,19 @@ class FilesFolder extends React.Component<Props, State> {
     newFileField = () => { this.setState({ hasNewFileField: true }) };
 
     render() {
-        const { disabled, toggleFolder, classes } = this.props;
+        const { 
+            disabled, 
+            classes, 
+            userFilesInfo, 
+            makeHandleDeleteFile, 
+            makeHandleClickFile,
+            onCreateFile
+        } = this.props;
 
         return (
             <div>
                 <div className="fileItem">
                     <ListItem
-                        button
-                        onClick={toggleFolder}
                         disabled={disabled}
                         dense
                         classes={{ dense: classes.tinyPadding }}>
@@ -52,8 +62,14 @@ class FilesFolder extends React.Component<Props, State> {
                     </ListItem>
                 </div>
                 <List component="div" disablePadding dense >
-                    <UserFileItems />
+                    <UserFileItems 
+                        userFilesInfo={userFilesInfo}
+                        makeHandleClickFile={makeHandleClickFile}
+                        makeHandleDeleteFile={makeHandleDeleteFile}
+                    />
                     <NewFileField
+                        files={userFilesInfo.files}
+                        onCreateFile={onCreateFile}
                         newFile={this.state.hasNewFileField}
                         deleteFileField={() => { this.setState({ hasNewFileField: false }) }}
                     />

@@ -4,8 +4,7 @@ import LoginLogout from './components/LoginLogout';
 import { GoogleLoginResponse } from 'react-google-login';
 import { logInUserRequest, logOutUser, loadingOngoing, notLoading } from '../../store/userLogin/actions';
 import { RootState } from '../../store/';
-import { batchActions } from '../../store/batchActions';
-import { resetDefaultFiles, closeFilesFolder, openFilesFolder } from '../../store/userFiles/actions';
+import { resetDefaultFiles } from '../../store/userFiles/actions';
 
 const mapStateToProps = (state: RootState) => ({
     loggedIn: state.userLogin.loggedIn,
@@ -16,14 +15,8 @@ const mapStateToProps = (state: RootState) => ({
 const mapDispatchToProps = (dispatch: Dispatch) => ({
     onLogin: (googleUser: GoogleLoginResponse) => { dispatch(logInUserRequest(googleUser)); },
     onLogout: () => { 
-        dispatch(
-            batchActions(
-                logOutUser(),
-                closeFilesFolder()
-            )
-        ); 
+        dispatch(logOutUser()); 
         dispatch(resetDefaultFiles());
-        dispatch(openFilesFolder());
         // Not sure if I should put this here
         localStorage.removeItem('userEmail');
         localStorage.removeItem('sessionId');
