@@ -5,6 +5,8 @@ import { configureStore } from './store';
 import Index from './mainPage';
 
 import { USERNAME } from './store/userLogin/saga'
+import { EJSVERSION } from 'elementary-js/dist/version';
+import { OCELOTVERSION } from './version';
 
 const store = configureStore();
 
@@ -19,6 +21,8 @@ ReactDOM.render(
 window.addEventListener('error', (x) => {
     const err = {
         username: USERNAME,
+        ejsversion: EJSVERSION,
+        ocelotversion: OCELOTVERSION,
         message: x.message,
         line: x.lineno,
         col: x.colno,

@@ -47,7 +47,7 @@
     "webpack-dev-server": "^3.1.5"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "echo \"let OCELOTVERSION = '$(git rev-parse --short HEAD)';\nexport { OCELOTVERSION };\" > src/version.ts && webpack",
     "start": "webpack-dev-server",
     "serve-local": "http-server build",
     "deploy": "rsync -azdOL build/ ocelot@ocelot-ide.org:/var/www/ocelot-ide.org/",
