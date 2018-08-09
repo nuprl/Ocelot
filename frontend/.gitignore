@@ -9,6 +9,9 @@
 # production
 /build
 
+# auto-generated files
+/src/version.ts
+
 # misc
 .DS_Store
 .env.local
