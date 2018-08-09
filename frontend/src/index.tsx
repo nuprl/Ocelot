@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 import { configureStore } from './store';
 import Index from './mainPage';
 
+import { USERNAME } from './store/userLogin/saga'
+
 const store = configureStore();
 
 ReactDOM.render(
@@ -16,6 +18,7 @@ ReactDOM.render(
 
 window.addEventListener('error', (x) => {
     const err = {
+        username: USERNAME,
         message: x.message,
         line: x.lineno,
         col: x.colno,

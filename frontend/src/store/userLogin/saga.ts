@@ -8,6 +8,9 @@ import { batchActions } from '../../store/batchActions';
 import { validateUserResponse, validateUser } from '../../utils/api/validateUser';
 import { isFailureResponse } from '../../utils/api/apiHelpers';
 
+let USERNAME: string = "UserNotLoggedIn";
+export { USERNAME };
+
 function* validate(action: LogInUserRequestAction) {
     const response: validateUserResponse = yield call(validateUser, action.googleUser);
     if (isFailureResponse(response)) {
@@ -17,6 +20,8 @@ function* validate(action: LogInUserRequestAction) {
         ));
         return;
     }
+    USERNAME = response.data.email;
+    console.log("User logged in: " + USERNAME);
     yield put(logInUserSuccess(response.data.email));
     // batching these two actions here would not let Saga know I dispatched a loadFilesRequest
     yield put(loadFilesRequest());
