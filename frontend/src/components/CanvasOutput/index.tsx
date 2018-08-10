@@ -50,6 +50,7 @@ class CanvasOutput extends React.Component<Props, {}> {
         return (
             <div
                 className={classes.root}
+                id="canvasOutput"
             >
                 <ReactResizeDetector handleWidth handleHeight onResize={this.onResize} />
                 <div id="canvases" className={`${classes.canvasArea} scrollbars`}>

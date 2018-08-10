@@ -201,7 +201,7 @@ class OutputPanel extends React.Component<Props, State> {
     render() {
         const { classes } = this.props;
         return (
-            <div className={classes.root}>
+            <div className={classes.root} id="outputPanel">
                 <div style={{
                     height: '100%',
                     flexDirection: 'column',

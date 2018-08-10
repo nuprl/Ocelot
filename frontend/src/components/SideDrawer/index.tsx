@@ -39,6 +39,7 @@ const SideDrawer: React.StatelessComponent<WithStyles<Styles> & Props> = (
                 paper: classes.drawerPaper,
                 paperAnchorDockedLeft: classes.noBorder
             }}
+            id="sideDrawer"
         >
             <div className={classes.toolbar} style={{minHeight: '48px'}}/>
             {/* Setting toolbar is so hacky, I don't know how to override it */}

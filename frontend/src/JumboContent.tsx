@@ -250,6 +250,54 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     element.click();
   };
 
+  togglePanel = (elementId: string, 
+    styleProperty: 'width' | 'height', 
+    defaultSize: number | string, // if default size is number, it'll be in pixel
+    closedSize: number | string ) => {
+    let element = document.getElementById(elementId);
+    if (element === null) {
+      return;
+    }
+    const numberRegx = /(\d*\.)?\d+/;
+    if (typeof defaultSize === 'string' && !numberRegx.test(defaultSize)) {
+      return;
+    }
+    if (typeof closedSize === 'string' && !numberRegx.test(closedSize)) {
+      return;
+    }
+    let parent = element.parentElement as HTMLElement; // assuming element must have parent
+    closedSize = typeof closedSize === 'number' ? `${closedSize}px` : closedSize;
+    let currentStyle = parent.getAttribute('style');
+    if (currentStyle === null) {
+      parent.setAttribute('style', `${styleProperty}: ${closedSize};`);
+      return;
+    }
+    const stylePropRegx = new RegExp(`${styleProperty}\\s*:\\s*\\d+(\\.\\d*)?[a-zA-Z%]+;?`, 'g');
+    const matches = (currentStyle.match(stylePropRegx) || []);
+    if (matches.length <= 0) { // if no width/height is set
+      parent.style[styleProperty] = closedSize
+      return;
+    }
+
+    const latestPropertyPixel = (matches[matches.length - 1].match(numberRegx) as RegExpMatchArray)[0]
+    const closedSizeVal = Number((closedSize.match(numberRegx) as RegExpMatchArray)[0]);
+    const isTiny = Math.abs(Number(latestPropertyPixel) - closedSizeVal) < 10; // can vary for px and %
+    if (isTiny && matches.length === 1) { // if tiny width/height set by user
+      defaultSize = typeof defaultSize === 'number' ? `${defaultSize}px` : defaultSize
+      parent.style[styleProperty] = defaultSize; // toggle back to default
+      return;
+    }
+    if (isTiny && matches.length > 1) { // this is usually not possible but I'll cover it
+      // remove latest width/height
+      parent.setAttribute('style', currentStyle.replace(matches[matches.length - 1], ''));
+      return;
+    }
+    const endsInSemicolon = /;\s*$/.test(currentStyle);
+    const semicolon = endsInSemicolon ? '' : ';';
+    parent.setAttribute('style', currentStyle + semicolon + `${styleProperty}: ${closedSize};`);
+
+  };
+
   render() {
 
     const { selectedFileIndex, files } = this.state;
@@ -277,7 +325,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             <div style={{ width: 50 }} />
             <Button
               color="secondary"
-              onClick={() => console.log("Clicked files")}>
+              onClick={() => this.togglePanel('sideDrawer', 'width', 250, 0)}>
               <FileIcon />
               Files
             </Button>
@@ -294,13 +342,13 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             </Button>
             <Button
               color="secondary"
-              onClick={() => console.log("Clicked console")}>
+              onClick={() => this.togglePanel('outputPanel', 'height', '25%', 0)}>
               <ConsoleIcon />
               Console
             </Button>
             <Button
               color="secondary"
-              onClick={() => console.log("Clicked canvas")}>
+              onClick={() => this.togglePanel('codeEditor', 'width', '50%', '100%')}>
               <CanvasIcon />
               Canvas
             </Button>
@@ -332,8 +380,9 @@ class JumboContent extends React.Component<Props, JumboContentState> {
                   split="vertical"
                   defaultSize="50%"
                   minSize={0}
+                  maxSize="100%"
                   pane1Style={{ maxWidth: '100%' }}>
-                  <div style={{ width: '100%', height: '100%', minWidth: '286px' }}>
+                  <div style={{ width: '100%', height: '100%', minWidth: '286px' }} id="codeEditor">
                     <CodeEditor 
                       updateCode={(code) => this.sandbox.setCode(code)} 
                       fileInfo={fileInfo}
