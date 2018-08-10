@@ -195,7 +195,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
         }
         return true;
       });
-      return { files: newFiles }
+      return { files: newFiles, selectedFileIndex: -1 }
     });
     if (!loggedIn) {
       return;
@@ -242,6 +242,14 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     })
   };
 
+  onDownload = () => {
+    let element = document.createElement("a");
+    let file = new Blob([this.sandbox.getCode()], {type: 'application/javascript'});
+    element.href = URL.createObjectURL(file);
+    element.download = this.state.files[this.state.selectedFileIndex].name;
+    element.click();
+  };
+
   render() {
 
     const { selectedFileIndex, files } = this.state;
@@ -279,7 +287,8 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               sandbox={this.sandbox} />
             <Button
               color="secondary"
-              onClick={() => console.log("Clicked download")}>
+              disabled={!isSelected}
+              onClick={this.onDownload}>
               <DownloadIcon />
               Download
             </Button>
