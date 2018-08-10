@@ -10,6 +10,7 @@ import CodeEditor from './containers/CodeEditor';
 import ExploreIcon from '@material-ui/icons/Spellcheck';
 import Button from '@material-ui/core/Button';
 import StopIcon from '@material-ui/icons/Stop';
+import DownloadIcon from '@material-ui/icons/ArrowDownward';
 import * as types from './types';
 import { RootState } from './store';
 import { connect } from 'react-redux';
@@ -276,6 +277,12 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               filename={fileInfo.fileName} 
               loggedIn={this.props.loggedIn}
               sandbox={this.sandbox} />
+            <Button
+              color="secondary"
+              onClick={() => console.log("Clicked download")}>
+              <DownloadIcon />
+              Download
+            </Button>
             <Button
               color="secondary"
               onClick={() => console.log("Clicked console")}>
