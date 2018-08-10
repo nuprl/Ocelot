@@ -140,7 +140,7 @@ export class Sandbox {
         this.setMode(mode);
         runner.run(result => {
             this.onResult(result);
-            if (this.mode === 'testing') {
+            if (this.mode === 'testing' && result.type !== 'exception') {
               const summary = elementaryRTS.summary(true);
               this.console.log(summary.output, ...summary.style);
             }
