@@ -3,13 +3,13 @@ import * as elementaryJS from 'elementary-js';
 import * as elementaryRTS from 'elementary-js/dist/runtime';
 import * as types from './types';
 import * as lib220 from 'elementary-js/dist/lib220';
+import { console } from './errors';
 
-// TODO(arjun): I think these hacks are necessary for eval to work. We either 
-// do them here or we do them within the implementation of Stopify. I want 
+// TODO(arjun): I think these hacks are necessary for eval to work. We either
+// do them here or we do them within the implementation of Stopify. I want
 // them here for now until I'm certain there isn't a cleaner way.
 (window as any).stopify = stopify;
 (window as any).elementaryjs = elementaryRTS;
-
 
 export type Mode = 'running' | 'testing' | 'stopped' | 'stopping';
 
@@ -37,16 +37,16 @@ type ModeListener = (mode: Mode) => void;
 /**
  * Implements the web-based sandbox that uses both Stopify and ElementaryJS.
  * The rest of the program should not have to use Stopify or ElementaryJS.
- * 
+ *
  * To initialize the sandbox, the following methods must be invoked after
  * construction:
- * 
+ *
  * 1. setConsole, to hold a reference to the console
  * 2. addModeListener, to receive updates when the execution mode changes
  *
  * When the user's program changes, call setCode. Note that this does *not*
  * recompile the program.
- * 
+ *
  * Finally, use onRunOrTestClick, onConsoleInput, and onStopClicked to actually
  * control program execution.
  *
@@ -98,8 +98,8 @@ export class Sandbox {
         g.assert = elementaryRTS.assert;
         g.lib220 = lib220;
         g.Math = Math;
-      }
-      
+    }
+
     private onResult(result: stopify.Result) {
         if (result.type === 'exception') {
             if (result.value instanceof Error) {
@@ -116,7 +116,7 @@ export class Sandbox {
     
     onRunOrTestClicked(mode: 'testing' | 'running') {
         if (this.mode === 'testing' || this.mode === 'running') {
-            console.info(`Clicked Run while in mode ${this.mode}`);
+            console.error(`Clicked Run while in mode ${this.mode}`);
             return;
         }
         const compiled = elementaryJS.compile(this.editorCode, true);
@@ -126,7 +126,7 @@ export class Sandbox {
           }
           return;
         }
-    
+
         const runner = stopify.stopifyLocallyFromAst(compiled.node);
         if (runner.kind === 'error') {
           this.console.error(runner.exception);
@@ -150,6 +150,9 @@ export class Sandbox {
 
     onConsoleInput(userInputLine: string) {
         // TODO(arjun): Apply ElementaryJS
+        if (this.mode !== 'stopped') {
+            console.error(`called onConsoleInput with mode = ${this.mode}`);
+        }
         this.setMode('running');
         (this.runner as any).evalAsync(userInputLine, (result: stopify.Result) => {
             this.setMode('stopped');
@@ -164,7 +167,7 @@ export class Sandbox {
 
     onStopClicked() {
         if (this.mode === 'stopped') {
-            console.info(`Clicked Stop while in mode ${this.mode}`);
+            console.error(`Clicked Stop while in mode ${this.mode}`);
             return;
         }
         if (this.mode === 'stopping') {

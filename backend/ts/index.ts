@@ -453,11 +453,8 @@ async function getFileHistory(req: Request) {
  * @returns statusCode and contents in body
  */
 async function login(req: Request) {
-
   // check if user has active session, if so, just return session
-
-
-  const ticket = await (await getOAuthClient()).verifyIdToken({ // verify and get ticket
+  const ticket = await (await getOAuthClient()).verifyIdToken({
     idToken: req.body.token,
     audience: (await getClientID())
   });
