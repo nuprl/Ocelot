@@ -135,6 +135,10 @@ class OutputPanel extends React.Component<Props, State> {
         this.props.aref(this);
     }
 
+    echo(command: string) {
+        this.appendLogMessage({ method: 'command', data: [command] });
+    }
+
     command = (command: string, result: any, isError: boolean) => {
         this.appendLogMessage({ method: 'command', data: [command] });
         this.appendLogMessage({ method: isError ? 'error' : 'result', data: [result] });

@@ -157,20 +157,25 @@ export class Sandbox {
     }
 
     onConsoleInput(userInputLine: string) {
-        // TODO(arjun): Apply ElementaryJS
         if (this.mode !== 'stopped') {
             console.error(`called onConsoleInput with mode = ${this.mode}`);
             return;
         }
+        this.console.echo(userInputLine);
+        const elementaryResult = elementaryJS.compile(userInputLine, true);
+        if (elementaryResult.kind === 'error') {
+            this.reportElementaryError(elementaryResult);
+            return;
+        }
         this.setMode('running');
-        // elementaryJ
-        (this.runner as any).evalAsync(userInputLine, (result: stopify.Result) => {
+        (this.runner as any).evalAsyncFromAst(
+            elementaryResult.node, (result: stopify.Result) => {
             this.setMode('stopped');
             if (result.type === 'normal') {
-                this.console.command(userInputLine, result.value, false);
+                this.console.log(result.value);
             }
             else {
-                this.console.command(userInputLine, result.value, true);
+                this.console.error(result.value); // NOTE(arjun): Stack trace?
             }
         });
     }
