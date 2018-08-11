@@ -218,21 +218,25 @@ async function getFile(req: Request) {
 
 }
 
-function downloadUrl(url: string): Promise<{result:string, data:string}> {
+function downloadImage(url: string): 
+    Promise<{result:string, encoding:string, data:string}> {
   let payload: Buffer[] = [];
-  return new Promise<{result:string, data:string}> ( resolve => {
+  let encoding = "";
+  return new Promise<{result:string, encoding:string, data:string}> ( resolve => {
     try {
       let responseCallback = (res: http.IncomingMessage) => {
         const contentType = res.headers['content-type'];
         if (typeof(contentType) === 'undefined' || !contentType.startsWith("image/")) {
-          resolve({result: "error", data: "Not an image"});
+          resolve({result: "error", encoding:"", data: "Not an image"});
+          return;
         }
+        encoding = contentType;
         res.on('data', function (chunk : Buffer) {
           payload.push(chunk);
         });
         res.on('end', function () {
           const data = Buffer.from(Buffer.concat(payload)).toString('base64');
-          resolve({result: "ok", data: data});
+          resolve({result: "ok", encoding: encoding, data: data});
         })
       }
       if (isHTTP(url)) {
@@ -240,7 +244,7 @@ function downloadUrl(url: string): Promise<{result:string, data:string}> {
       } else if (isHTTPS(url)) {
         https.get(url, responseCallback);
       } else {
-        resolve({result: "error", data: "URL not supported"});
+        resolve({result: "error", encoding: "", data: "URL not supported"});
       }
     } catch(e) {
       resolve(e.toString());
@@ -265,13 +269,14 @@ function isAcceptableUrl(url: string) {
  * userEmail
  * sessionId
  * url
- * It downloads the URL and returns the data in base64 format
+ * It downloads the URL and returns the encoding as astr, and data in base64 format
  *
  * @param {Request} req
  * @returns statusCode and contents in base64.
  */
-async function getURL(req: Request) {
+async function getImage(req: Request) {
   let data: string | Buffer = "Invalid Data";
+  let encoding = "";
   try {
     const userEmail = req.body.userEmail;
     const sessionId = req.body.sessionId;
@@ -291,11 +296,12 @@ async function getURL(req: Request) {
     if (!isValidEmail) {
       return failureResponse('Invalid email');
     }
-    const payload = await downloadUrl(url);
+    const payload = await downloadImage(url);
     if (payload.result !== "ok") {
       return failureResponse(payload.data as string);
     }
     data = payload.data;
+    encoding = payload.encoding;
   } catch (e) {
     return { statusCode: 500, body: { status: 'error', message: e } };
   }
@@ -304,6 +310,7 @@ async function getURL(req: Request) {
     body: {
       status: 'success',
       data: {
+        encoding: encoding,
         data: data,
       }
     }
@@ -630,7 +637,7 @@ paws.post('/login', wrapHandler(login));
 paws.post('/changefile', wrapHandler(changeFile));
 paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
-paws.post('/geturl', wrapHandler(getURL));
+paws.post('/getimage', wrapHandler(getImage));
 
 paws.post('/error', wrapHandler(async req => {
   console.error(req.body);
