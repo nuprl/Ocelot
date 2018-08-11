@@ -10,6 +10,8 @@ import * as cors from 'cors'; // allows sending http requests to different domai
 import * as uid from 'uid-safe';
 import * as morgan from 'morgan'; // for logging in all http traffic on console.
 import { ErrorReporting } from '@google-cloud/error-reporting';
+import * as https from "https"
+import * as http from "http"
 
 const errorReporting = new ErrorReporting();
 
@@ -214,6 +216,98 @@ async function getFile(req: Request) {
     return { statusCode: 500, body: { status: 'error', message: e } };
   }
 
+}
+
+function downloadUrl(url: string): Promise<{result:string, data:string}> {
+  let payload: Buffer[] = [];
+  return new Promise<{result:string, data:string}> ( resolve => {
+    try {
+      let responseCallback = (res: http.IncomingMessage) => {
+        const contentType = res.headers['content-type'];
+        if (typeof(contentType) === 'undefined' || !contentType.startsWith("image/")) {
+          resolve({result: "error", data: "Not an image"});
+        }
+        res.on('data', function (chunk : Buffer) {
+          payload.push(chunk);
+        });
+        res.on('end', function () {
+          const data = Buffer.from(Buffer.concat(payload)).toString('base64');
+          resolve({result: "ok", data: data});
+        })
+      }
+      if (isHTTP(url)) {
+        http.get(url, responseCallback);
+      } else if (isHTTPS(url)) {
+        https.get(url, responseCallback);
+      } else {
+        resolve({result: "error", data: "URL not supported"});
+      }
+    } catch(e) {
+      resolve(e.toString());
+    }
+  });
+}
+
+function isHTTP(url: string) {
+  return (url.slice(0,7) === "http://");
+}
+
+function isHTTPS(url: string) {
+  return (url.slice(0,8) === "https://");
+}
+
+function isAcceptableUrl(url: string) {
+  return isHTTP(url) || isHTTPS(url);
+}
+
+/**
+ * Given:
+ * userEmail
+ * sessionId
+ * url
+ * It downloads the URL and returns the data in base64 format
+ *
+ * @param {Request} req
+ * @returns statusCode and contents in base64.
+ */
+async function getURL(req: Request) {
+  let data: string | Buffer = "Invalid Data";
+  try {
+    const userEmail = req.body.userEmail;
+    const sessionId = req.body.sessionId;
+    const url = req.body.url;
+    if (undefinedExists(userEmail, sessionId, url)) {
+      return failureResponse(`Incomplete request ${userEmail}, ${sessionId}, ${url}`);
+    }
+    if (!isAcceptableUrl(url)) {
+      return failureResponse(`URL not supported`);
+    }
+    // check against database for sessionId
+    const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
+    if (!isValidSession) {
+      return failureResponse('Invalid session');
+    }
+    const isValidEmail: boolean = await isSimpleValidEmail(userEmail);
+    if (!isValidEmail) {
+      return failureResponse('Invalid email');
+    }
+    const payload = await downloadUrl(url);
+    if (payload.result !== "ok") {
+      return failureResponse(payload.data as string);
+    }
+    data = payload.data;
+  } catch (e) {
+    return { statusCode: 500, body: { status: 'error', message: e } };
+  }
+  return {
+    statusCode: 200,
+    body: {
+      status: 'success',
+      data: {
+        data: data,
+      }
+    }
+  };
 }
 
 
@@ -539,6 +633,7 @@ paws.post('/login', wrapHandler(login));
 paws.post('/changefile', wrapHandler(changeFile));
 paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
+paws.post('/geturl', wrapHandler(getURL));
 
 paws.post('/error', wrapHandler(async req => {
   console.error(req.body);
