@@ -559,6 +559,16 @@ async function getUrl(req: Request, res: Response) {
       res.status(500).send("Incomplete request");
       return;
     }
+    const validSession = await checkValidSession(userEmail as string, sessionId as string);
+    if (!validSession) {
+      res.status(500).send("Invalid session");
+      return;
+    }
+    const validUser = await checkValidUser(userEmail as string);
+    if (!validUser) {
+      res.status(500).send("Invalid user");
+      return;
+    }
     const result = await downloadUrl(url as string);
     if (result.errcode !== "ok") {
       res.status(500).send(result.data);
