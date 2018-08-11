@@ -247,7 +247,10 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     let file = new Blob([this.sandbox.getCode()], {type: 'application/javascript'});
     element.href = URL.createObjectURL(file);
     element.download = this.state.files[this.state.selectedFileIndex].name;
+    element.style.display = 'none';
+    document.body.appendChild(element);
     element.click();
+    document.body.removeChild(element);
   };
 
   togglePanel = (elementId: string, 
