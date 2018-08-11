@@ -12,6 +12,7 @@ import * as morgan from 'morgan'; // for logging in all http traffic on console.
 import { ErrorReporting } from '@google-cloud/error-reporting';
 import * as https from "https"
 import * as http from "http"
+import { URLSearchParams } from 'url';
 
 const errorReporting = new ErrorReporting();
 
@@ -63,6 +64,12 @@ async function getSessionDuration() {
   return sessionDuration;
 }
 
+function undefinedOrNull(...properties: (any | undefined | null)[]) {
+  function isInvalid(acc: boolean, val: (any | undefined | null)) {
+    return acc || typeof val === 'undefined' || val === null;
+  }
+  return properties.reduce(isInvalid, false);
+}
 
 function undefinedExists(...properties: (any | undefined)[]) {
   function hasUndefined(acc: boolean, val: (any | undefined)) {
@@ -217,106 +224,6 @@ async function getFile(req: Request) {
   }
 
 }
-
-function downloadImage(url: string): 
-    Promise<{result:string, encoding:string, data:string}> {
-  let payload: Buffer[] = [];
-  let encoding = "";
-  return new Promise<{result:string, encoding:string, data:string}> ( resolve => {
-    try {
-      let responseCallback = (res: http.IncomingMessage) => {
-        const contentType = res.headers['content-type'];
-        if (typeof(contentType) === 'undefined' || !contentType.startsWith("image/")) {
-          resolve({result: "error", encoding:"", data: "Not an image"});
-          return;
-        }
-        encoding = contentType;
-        res.on('data', function (chunk : Buffer) {
-          payload.push(chunk);
-        });
-        res.on('end', function () {
-          const data = Buffer.from(Buffer.concat(payload)).toString('base64');
-          resolve({result: "ok", encoding: encoding, data: data});
-        })
-      }
-      if (isHTTP(url)) {
-        http.get(url, responseCallback);
-      } else if (isHTTPS(url)) {
-        https.get(url, responseCallback);
-      } else {
-        resolve({result: "error", encoding: "", data: "URL not supported"});
-      }
-    } catch(e) {
-      resolve(e.toString());
-    }
-  });
-}
-
-function isHTTP(url: string) {
-  return (url.slice(0,7) === "http://");
-}
-
-function isHTTPS(url: string) {
-  return (url.slice(0,8) === "https://");
-}
-
-function isAcceptableUrl(url: string) {
-  return isHTTP(url) || isHTTPS(url);
-}
-
-/**
- * Given:
- * userEmail
- * sessionId
- * url
- * It downloads the URL and returns the encoding as astr, and data in base64 format
- *
- * @param {Request} req
- * @returns statusCode and contents in base64.
- */
-async function getImage(req: Request) {
-  let data: string | Buffer = "Invalid Data";
-  let encoding = "";
-  try {
-    const userEmail = req.body.userEmail;
-    const sessionId = req.body.sessionId;
-    const url = req.body.url;
-    if (undefinedExists(userEmail, sessionId, url)) {
-      return failureResponse(`Incomplete request ${userEmail}, ${sessionId}, ${url}`);
-    }
-    if (!isAcceptableUrl(url)) {
-      return failureResponse(`URL not supported`);
-    }
-    // check against database for sessionId
-    const isValidSession: boolean = await checkValidSession(userEmail, sessionId);
-    if (!isValidSession) {
-      return failureResponse('Invalid session');
-    }
-    const isValidEmail: boolean = await isSimpleValidEmail(userEmail);
-    if (!isValidEmail) {
-      return failureResponse('Invalid email');
-    }
-    const payload = await downloadImage(url);
-    if (payload.result !== "ok") {
-      return failureResponse(payload.data as string);
-    }
-    data = payload.data;
-    encoding = payload.encoding;
-  } catch (e) {
-    return { statusCode: 500, body: { status: 'error', message: e } };
-  }
-  return {
-    statusCode: 200,
-    body: {
-      status: 'success',
-      data: {
-        encoding: encoding,
-        data: data,
-      }
-    }
-  };
-}
-
 
 interface FileChange {
   fileName: string;
@@ -604,6 +511,62 @@ async function login(req: Request) {
   };
 }
 
+function isHTTP(url: string) {
+  return (url.slice(0,7) === "http://");
+}
+
+function isHTTPS(url: string) {
+  return (url.slice(0,8) === "https://");
+}
+
+function downloadUrl(url: string): 
+    Promise<{errcode:string, data:string | Buffer}> {
+  let payload: Buffer[] = [];
+  return new Promise<{errcode:string, data:string | Buffer}> ( resolve => {
+    try {
+      let responseCallback = (res: http.IncomingMessage) => {
+        res.on('data', function (chunk : Buffer) {
+          payload.push(chunk);
+        });
+        res.on('end', function () {
+          const data = Buffer.concat(payload);
+          resolve({errcode: "ok", data: data});
+        })
+      }
+      if (isHTTP(url)) {
+        http.get(url, responseCallback);
+      } else if (isHTTPS(url)) {
+        https.get(url, responseCallback);
+      } else {
+        resolve({errcode: "error", data: "URL not supported"});
+      }
+    } catch(e) {
+      resolve({errcode: "exception", data: e.toString()});
+    }
+  });
+}
+
+async function getUrl(req: Request, res: Response) {
+  try {
+    let params = new URLSearchParams(req.url);
+    const url = params.get('/geturl?url');
+    const userEmail = params.get('user');
+    const sessionId = params.get('session');
+    if (undefinedOrNull(url, userEmail, sessionId)) {
+      res.status(500).send("Incomplete request");
+      return;
+    }
+    const result = await downloadUrl(url as string);
+    if (result.errcode !== "ok") {
+      res.status(500).send(result.data);
+      return;
+    }
+    res.status(200).send(result.data);
+  } catch(e) {
+    res.status(500).send("Exception: " + e.toString);
+  }
+}
+
 export const paws = express();
 paws.use(morgan(':method :url :status :res[content-length] - :response-time ms')); // logging all http traffic
 
@@ -637,7 +600,7 @@ paws.post('/login', wrapHandler(login));
 paws.post('/changefile', wrapHandler(changeFile));
 paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
-paws.post('/getimage', wrapHandler(getImage));
+paws.get('/geturl', getUrl);
 
 paws.post('/error', wrapHandler(async req => {
   console.error(req.body);
