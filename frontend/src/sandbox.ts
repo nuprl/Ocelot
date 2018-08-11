@@ -113,7 +113,7 @@ export class Sandbox {
             }
         }
     }
-    
+
     onRunOrTestClicked(mode: 'testing' | 'running') {
         if (this.mode === 'testing' || this.mode === 'running') {
             console.error(`Clicked Run while in mode ${this.mode}`);
@@ -152,6 +152,7 @@ export class Sandbox {
         // TODO(arjun): Apply ElementaryJS
         if (this.mode !== 'stopped') {
             console.error(`called onConsoleInput with mode = ${this.mode}`);
+            return;
         }
         this.setMode('running');
         (this.runner as any).evalAsync(userInputLine, (result: stopify.Result) => {
