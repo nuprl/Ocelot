@@ -272,30 +272,46 @@ class JumboContent extends React.Component<Props, JumboContentState> {
       parent.setAttribute('style', `${styleProperty}: ${closedSize};`);
       return;
     }
-    const stylePropRegx = new RegExp(`${styleProperty}\\s*:\\s*\\d+(\\.\\d*)?[a-zA-Z%]+;?`, 'g');
-    const matches = (currentStyle.match(stylePropRegx) || []);
+    const stylePropRegx = new RegExp(`(m(?:in|ax)-)?${styleProperty}\\s*:\\s*\\d+(?:\\.\\d*)?[a-zA-Z%]+;?`, 'g');
+    let matches: string[] = [], matcher;
+    matcher = stylePropRegx.exec(currentStyle);
+    while (matcher !== null) { // negative lookbehind alternative
+      if (!matcher[1]) {
+        matches.push(matcher[0]);
+      }
+      matcher = stylePropRegx.exec(currentStyle);
+    }
     if (matches.length <= 0) { // if no width/height is set
       parent.style[styleProperty] = closedSize
       return;
     }
 
     const latestPropertyPixel = (matches[matches.length - 1].match(numberRegx) as RegExpMatchArray)[0]
-    const closedSizeVal = Number((closedSize.match(numberRegx) as RegExpMatchArray)[0]);
-    const isTiny = Math.abs(Number(latestPropertyPixel) - closedSizeVal) < 10; // can vary for px and %
+    let closedSizeVal = Number((closedSize.match(numberRegx) as RegExpMatchArray)[0]);
+    const isTiny = Math.abs(Number(latestPropertyPixel) - closedSizeVal) < 10; // will not with cmp % and px
     if (isTiny && matches.length === 1) { // if tiny width/height set by user
       defaultSize = typeof defaultSize === 'number' ? `${defaultSize}px` : defaultSize
       parent.style[styleProperty] = defaultSize; // toggle back to default
       return;
     }
-    if (isTiny && matches.length > 1) { // this is usually not possible but I'll cover it
+    if (isTiny && matches.length > 1) {
       // remove latest width/height
-      parent.setAttribute('style', currentStyle.replace(matches[matches.length - 1], ''));
+      let currIndex = -1;
+      parent.setAttribute('style', 
+        currentStyle.replace(stylePropRegx, (match, groupOne) => {
+            if (typeof groupOne === 'undefined') { // if matched
+              currIndex += 1;
+            }
+            if (currIndex === matches.length - 1 && typeof groupOne === 'undefined') {
+              return ''; // replace the match
+            }
+            return match;
+        }));
       return;
     }
     const endsInSemicolon = /;\s*$/.test(currentStyle);
     const semicolon = endsInSemicolon ? '' : ';';
     parent.setAttribute('style', currentStyle + semicolon + `${styleProperty}: ${closedSize};`);
-
   };
 
   render() {
