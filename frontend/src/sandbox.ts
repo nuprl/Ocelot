@@ -142,9 +142,8 @@ export class Sandbox {
         }
         this.runner = runner;
         this.setGlobals();
+        elementaryRTS.setRunner(runner);
         elementaryRTS.enableTests(mode === 'testing', runner);
-        this.runner = runner;
-        lib220.setRunner(runner);
         this.setMode(mode);
         runner.run(result => {
             this.onResult(result);
