@@ -89,15 +89,33 @@ export class Sandbox {
     }
 
     private setGlobals() {
-        const g = (this.runner as any).g; // NOTE(arjun): Update Stopify iface
-        g.elementaryjs = elementaryRTS;
-        g.console = Object.freeze({
-          log: (...message: any[]) => this.console.log(...message)
+        // These are the globals passed to ElementaryJS.
+        const globals = {
+            elementaryjs: elementaryRTS,
+            console: Object.freeze({
+                log: (...message: any[]) => this.console.log(...message)
+            }),
+            test: elementaryRTS.test,
+            assert: elementaryRTS.assert,
+            lib220: Object.freeze(lib220),
+            math: Math
+        };
+
+        // We can use .get and .set traps to intercept reads and writes to
+        // global variables. Any other trap is useless (I think), since Stopify
+        // does not use the global object in any other way.
+        const globalProxy = new Proxy(globals, {
+            get: (o, k) => {
+                if (!Object.hasOwnProperty.call(o, k)) {
+                    const msg = `${String(k)} is not defined`;
+                    throw new elementaryRTS.ElementaryRuntimeError(msg);
+                }
+                return (o as any)[k];
+            }
         });
-        g.test = elementaryRTS.test;
-        g.assert = elementaryRTS.assert;
-        g.lib220 = lib220;
-        g.Math = Math;
+
+        // TODO(arjun): Update Stopify iface
+        (this.runner as any).g = globalProxy;
     }
 
     private onResult(result: stopify.Result) {
