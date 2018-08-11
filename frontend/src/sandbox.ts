@@ -102,15 +102,25 @@ export class Sandbox {
 
     private onResult(result: stopify.Result) {
         if (result.type === 'exception') {
-            if (result.value instanceof Error) {
-                this.console.error(result.value.message);
+            let message = result.value instanceof Error ?
+              result.value.message : String(result.value);
+            if (result.stack.length === 0) {
+                this.console.error(message);
+                return;
             }
-            else {
-                this.console.error(result.value);
+            message = message + ' at ' + result.stack[0];
+            if (result.stack.length === 1) {
+                this.console.error(message);
+                return;
             }
-            for (let line of result.stack) {
-                this.console.error(line);
-            }
+            this.console.error(message + '\n... ' +
+                result.stack.slice(1).join('\n... '));
+        }
+    }
+
+    private reportElementaryError(error: elementaryJS.CompileError) {
+        for (const err of error.errors) {
+            this.console.error(`Line ${err.line}: ${err.message}`);
         }
     }
 
@@ -121,10 +131,8 @@ export class Sandbox {
         }
         const compiled = elementaryJS.compile(this.editorCode, true);
         if (compiled.kind === 'error') {
-          for (const err of compiled.errors) {
-            this.console.error(`Line ${err.line}: ${err.message}`);
-          }
-          return;
+            this.reportElementaryError(compiled);
+            return;
         }
 
         const runner = stopify.stopifyLocallyFromAst(compiled.node);
@@ -155,6 +163,7 @@ export class Sandbox {
             return;
         }
         this.setMode('running');
+        // elementaryJ
         (this.runner as any).evalAsync(userInputLine, (result: stopify.Result) => {
             this.setMode('stopped');
             if (result.type === 'normal') {
