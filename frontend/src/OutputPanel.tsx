@@ -181,6 +181,9 @@ class OutputPanel extends React.Component<Props, State> {
                 event.preventDefault();
                 event.stopPropagation();
                 const command = editor.getValue();
+                if (command.trim() === '') {
+                    return;
+                } 
                 editor.setValue('');
                 this.setState({
                     historyLocation: -1,
