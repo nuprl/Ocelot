@@ -131,7 +131,7 @@ class CodeEditor extends React.Component<Props> {
         const mustLogin = window.location.search !== '?anonymous';
         if (!this.props.loggedIn && mustLogin) {
             editor.onKeyDown(event => {
-                if (mustLogin) {
+                if (mustLogin && !this.props.loggedIn) {
                     this.props.openMustLogin();
                 }
             });
