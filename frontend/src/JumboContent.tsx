@@ -296,7 +296,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     if (closedSize.includes('%')) {
       closedSizeVal = (closedSizeVal / 100) * containerLength;
     }
-    const isTiny = Math.abs(latestPropertyVal - closedSizeVal) < 10; // will not with cmp % and px
+    const isTiny = Math.abs(latestPropertyVal - closedSizeVal) < 30; // will not with cmp % and px
     if (isTiny && matches.length === 1) { // if tiny width/height set by user
       defaultSize = typeof defaultSize === 'number' ? `${defaultSize}px` : defaultSize
       parent.style[styleProperty] = defaultSize; // toggle back to default
