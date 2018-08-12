@@ -147,12 +147,17 @@ export class Sandbox {
             console.error(`Clicked Run while in mode ${this.mode}`);
             return;
         }
+        this.console.log(new Date().toLocaleString('en-us', {timeZoneName:'short'}));
+        this.console.log('Compiling...');
         const compiled = elementaryJS.compile(this.editorCode, true);
         if (compiled.kind === 'error') {
             this.reportElementaryError(compiled);
             return;
         }
-
+        this.console.log('Compilation succesful.');
+        if (mode === 'running') {
+            this.console.log('Starting program...');
+        }
         const runner = stopify.stopifyLocallyFromAst(compiled.node);
         if (runner.kind === 'error') {
           this.console.error(runner.exception);
@@ -169,6 +174,9 @@ export class Sandbox {
               const summary = elementaryRTS.summary(true);
               this.console.log(summary.output, ...summary.style);
             }
+            if (this.mode !== 'testing' && result.type === 'normal') {
+                this.console.log('Program terminated normally.');
+              }
             this.setMode('stopped');
         });
     }
