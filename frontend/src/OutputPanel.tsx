@@ -164,14 +164,6 @@ class OutputPanel extends React.Component<Props, State> {
             }
         });
         editor.onKeyDown(event => {
-            const mustLogin = window.location.search !== '?anonymous';
-            if (!this.props.loggedIn && mustLogin) {
-                editor.onKeyDown(event => {
-                    if (mustLogin) {
-                        this.props.openMustLogin();
-                    }
-                });
-            }
             const currentCursorLineNum = editor.getPosition().lineNumber;
             const totalNumLines = editor.getModel().getLineCount();
             if (event.keyCode === monaco.KeyCode.UpArrow && currentCursorLineNum === 1) { // if topmost line
@@ -218,13 +210,7 @@ class OutputPanel extends React.Component<Props, State> {
 
 
     render() {
-        const { classes } = this.props;
-
-        if (!this.props.loggedIn) {
-            const mustLogin = window.location.search !== '?anonymous';
-            monacoOptions.readOnly = mustLogin && !this.props.loggedIn;
-        }
-
+        const { classes,  } = this.props;
         return (
             <div className={classes.root} id="outputPanel">
                 <div style={{
