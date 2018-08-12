@@ -205,7 +205,7 @@ class CodeEditor extends React.Component<Props> {
     };
 
     render() {
-        const { fileInfo, classes } = this.props;
+        const { fileInfo, classes, loggedIn } = this.props;
         const { code, enabled } = fileInfo;
 
         if (!enabled) {
@@ -219,9 +219,13 @@ class CodeEditor extends React.Component<Props> {
             );
         }
 
-        if (!this.props.loggedIn) {
+        if (!loggedIn) {
             const mustLogin = window.location.search !== '?anonymous';
             monacoOptions.readOnly = mustLogin && !this.props.loggedIn;
+        }
+
+        if (loggedIn) {
+            monacoOptions.readOnly = false;
         }
 
         return (
