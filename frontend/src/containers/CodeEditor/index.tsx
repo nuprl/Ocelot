@@ -210,6 +210,11 @@ class CodeEditor extends React.Component<Props> {
             );
         }
 
+        if (!this.props.loggedIn) {
+            const mustLogin = window.location.search !== '?anonymous';
+            monacoOptions.readOnly = mustLogin && !this.props.loggedIn;
+        }
+
         return (
             <div style={{ height: '100%', width: '100%' }}>
                 <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />

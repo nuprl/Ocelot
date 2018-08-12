@@ -8,6 +8,8 @@ import 'static/styles/DrawerIconButton.css';
 import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles, Button } from '@material-ui/core';
+import { RootState } from '../../../../store';
+import { connect } from 'react-redux';
 
 type FilesFolderProps = {
     disabled: boolean,
@@ -15,6 +17,7 @@ type FilesFolderProps = {
         files: { name: string, content: string }[],
         selectedFileIndex: number,
     },
+    loggedIn: boolean,
     makeHandleDeleteFile: (fileIndex: number, name: string, loggedIn: boolean) => (() => void),
     makeHandleClickFile: (fileIndex: number) => (() => void),
     onCreateFile: (fileName: string, loggedIn: boolean) => void,
@@ -47,15 +50,21 @@ class FilesFolder extends React.Component<Props, State> {
             onCreateFile
         } = this.props;
 
+        let loginDisabled = disabled;
+        if (!this.props.loggedIn) {
+            const mustLogin = window.location.search !== '?anonymous';
+            loginDisabled = mustLogin && !this.props.loggedIn;
+        }
+
         return (
             <div>
                 <div className="fileItem">
                     <ListItem
-                        disabled={disabled}
+                        disabled={loginDisabled}
                         dense
                         classes={{ dense: classes.tinyPadding }}>
                         <Button
-                            disabled={disabled}
+                            disabled={loginDisabled}
                             onClick={this.newFileField}>
                             New
                         </Button>
@@ -78,4 +87,8 @@ class FilesFolder extends React.Component<Props, State> {
         );
     }
 }
-export default ListItemStyles(FilesFolder);
+
+const mapStateToProps = (state: RootState) => ({
+    loggedIn: state.userLogin.loggedIn,
+})
+export default connect(mapStateToProps)(ListItemStyles(FilesFolder));

@@ -11,6 +11,8 @@ import { Console } from 'console-feed';
 import { inspectorTheme } from './static/styles/consoleStyle';
 import 'static/styles/Scrollbar.css';
 import { Sandbox } from './sandbox';
+import { RootState } from './store';
+import { connect } from 'react-redux';
 
 class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
     logRef: HTMLDivElement | null = null;
@@ -89,7 +91,8 @@ const styles: StyleRulesCallback = theme => ({
 
 type Props = WithStyles<'root'> & {
     sandbox: Sandbox,
-    aref: (panel: OutputPanel) => void
+    aref: (panel: OutputPanel) => void,
+    loggedIn: boolean,
 }
 
 type State = {
@@ -207,6 +210,12 @@ class OutputPanel extends React.Component<Props, State> {
 
     render() {
         const { classes } = this.props;
+
+        if (!this.props.loggedIn) {
+            const mustLogin = window.location.search !== '?anonymous';
+            monacoOptions.readOnly = mustLogin && !this.props.loggedIn;
+        }
+
         return (
             <div className={classes.root} id="outputPanel">
                 <div style={{
@@ -235,4 +244,8 @@ class OutputPanel extends React.Component<Props, State> {
     }
 }
 
-export default withStyles(styles)(OutputPanel);
+const mapStateToProps = (state: RootState) => ({
+    loggedIn: state.userLogin.loggedIn,    
+});
+
+export default connect(mapStateToProps)(withStyles(styles)(OutputPanel));
