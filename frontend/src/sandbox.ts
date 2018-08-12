@@ -53,7 +53,7 @@ type ModeListener = (mode: Mode) => void;
  */
 export class Sandbox {
 
-    private runner: stopify.AsyncRun;
+    private runner: stopify.AsyncRun & stopify.AsyncEval;
     private console!: types.HasConsole; // bang is 'definite assignment'
     private mode: Mode;
     private modeListeners: ModeListener[];
