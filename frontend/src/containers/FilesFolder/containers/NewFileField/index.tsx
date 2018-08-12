@@ -19,7 +19,7 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 
 // this is copied from backend
 const isSimpleValidFileName = (fileName: string) => { // still incomplete but will do for now
-    return /^\w+\.js/.test(fileName);
+    return /^[\w\-]+\.js/.test(fileName);
 };
 
 type Props = {
@@ -31,7 +31,7 @@ type Props = {
 } & WithStyles<ListItemStylesTypes>;
 
 type State = {
-    newFileErrorMsg: '' | 'Duplicated file name' | 'File name does not end in .js',
+    newFileErrorMsg: '' | 'Duplicated file name' | 'File name must match regex [\w\-]+\.js',
 };
 
 class NewFileField extends React.Component<Props, State> {
@@ -52,7 +52,7 @@ class NewFileField extends React.Component<Props, State> {
                 return;
             }
             if (!isSimpleValidFileName(name)) {
-                this.setState({ newFileErrorMsg: 'File name does not end in .js' });
+                this.setState({ newFileErrorMsg: 'File name must match regex [\w\-]+\.js' });
                 return;
             }
 
