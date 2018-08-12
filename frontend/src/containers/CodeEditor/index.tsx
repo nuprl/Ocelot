@@ -65,6 +65,7 @@ type Props = {
         loggedIn: boolean,
     ) => void,
     setEditor: (editor: monacoEditor.editor.IStandaloneCodeEditor) => void,
+    openMustLogin: () => void,
 } & WithStyles<'emptyState' | 'pawIcon'>;
 
 type FileEdit = {
@@ -127,6 +128,14 @@ class CodeEditor extends React.Component<Props> {
         }
         this.props.setEditor(editor);
         this.editor = editor;
+        const mustLogin = window.location.search !== '?anonymous';
+        if (!this.props.loggedIn && mustLogin) {
+            editor.onKeyDown(event => {
+                if (mustLogin) {
+                    this.props.openMustLogin();
+                }
+            });
+        }
     }
 
     componentDidUpdate(prevProps: Props) {

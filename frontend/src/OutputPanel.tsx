@@ -93,6 +93,7 @@ type Props = WithStyles<'root'> & {
     sandbox: Sandbox,
     aref: (panel: OutputPanel) => void,
     loggedIn: boolean,
+    openMustLogin: () => void,
 }
 
 type State = {
@@ -163,6 +164,14 @@ class OutputPanel extends React.Component<Props, State> {
             }
         });
         editor.onKeyDown(event => {
+            const mustLogin = window.location.search !== '?anonymous';
+            if (!this.props.loggedIn && mustLogin) {
+                editor.onKeyDown(event => {
+                    if (mustLogin) {
+                        this.props.openMustLogin();
+                    }
+                });
+            }
             const currentCursorLineNum = editor.getPosition().lineNumber;
             const totalNumLines = editor.getModel().getLineCount();
             if (event.keyCode === monaco.KeyCode.UpArrow && currentCursorLineNum === 1) { // if topmost line

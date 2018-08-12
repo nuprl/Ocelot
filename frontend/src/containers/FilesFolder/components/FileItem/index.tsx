@@ -11,15 +11,13 @@ import IconButton from '@material-ui/core/IconButton';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Tooltip from '@material-ui/core/Tooltip';
 import 'static/styles/DrawerIconButton.css';
-import { connect } from 'react-redux';
-import { RootState } from '../../../../store';
 
 type FileItemProps = {
     isSelected?: boolean,
     onSelect: () => void,
     onDelete: () => void,
     name: string,
-    loggedIn: boolean,
+    disabled: boolean
 };
 
 type Props = FileItemProps & WithStyles<ListItemStylesTypes>;
@@ -30,13 +28,9 @@ const FileItem: React.StatelessComponent<Props> = ({
     onDelete,
     classes,
     name,
-    loggedIn,
+    disabled,
 }) => {
-    let disabled = false;
-    if (!loggedIn) {
-        const mustLogin = window.location.search !== '?anonymous';
-        disabled = mustLogin && !loggedIn;
-    }
+    
     return (
         <ListItem
             button
@@ -90,8 +84,4 @@ const FileItem: React.StatelessComponent<Props> = ({
     );
 };
 
-const mapStateToProps = (state: RootState) => ({
-    loggedIn: state.userLogin.loggedIn
-});
-
-export default connect(mapStateToProps)(ListItemStyles(FileItem));
+export default ListItemStyles(FileItem);

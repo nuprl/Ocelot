@@ -19,8 +19,15 @@ type Props = {
 class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props> {
 
     render() {
+
+        
         const { userFilesInfo, loggedIn } = this.props;
         const { files, selectedFileIndex, } = userFilesInfo;
+        let disabled = false;
+        if (!loggedIn) {
+            const mustLogin = window.location.search !== '?anonymous';
+            disabled = mustLogin && !loggedIn;
+        }
         return (
             files.map((fileObj: { name: string, content: string }, index: number) => (
                 <div
@@ -33,6 +40,7 @@ class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props>
                         onDelete={this.props.makeHandleDeleteFile(index, fileObj.name, loggedIn)}
                         name={fileObj.name}
                         key={`${fileObj.name}${index + 2}`}
+                        disabled={disabled}
                     />
                 </div>
             ))

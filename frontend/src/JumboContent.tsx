@@ -33,6 +33,11 @@ import ConsoleIcon from '@material-ui/icons/NavigateNext';
 import { saveChanges } from './utils/api/saveFileChanges';
 import { triggerNotification } from './store/notification/actions';
 import { Dispatch } from 'redux';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 
 const classes = {
@@ -127,10 +132,33 @@ class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.
   }
 }
 
+const MustLoginDialog: React.StatelessComponent<{open: boolean, onClose: () => void }> = 
+  ({ open, onClose }) => (
+    <Dialog
+          open={open}
+          onClose={onClose}
+          aria-labelledby="must-login"
+          aria-describedby="user must login to use editor"
+    >
+          <DialogTitle id="must-login">{"Login required"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Login is required to use Ocelot.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={onClose} color="secondary">
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+  );
+
 
 type JumboContentState = {
   files: {name: string, content: string}[],
   selectedFileIndex: number,
+  mustLoginDialogOpen: boolean,
 }
 class JumboContent extends React.Component<Props, JumboContentState> {
 
@@ -143,6 +171,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     this.state = {
       files: [ { name: 'HelloWorld.js', content: `// write your code here`}],
       selectedFileIndex: 0,
+      mustLoginDialogOpen: false,
     }
   }
 
@@ -324,7 +353,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
 
   render() {
 
-    const { selectedFileIndex, files } = this.state;
+    const { selectedFileIndex, files, mustLoginDialogOpen } = this.state;
     const isSelected = selectedFileIndex !== -1;
     const fileInfo = {
       code: isSelected ? files[selectedFileIndex].content : '',
@@ -340,6 +369,10 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     return (
       <div className={this.props.classes.root}>
         <Notification />
+        <MustLoginDialog 
+          open={mustLoginDialogOpen} 
+          onClose={() => this.setState({ mustLoginDialogOpen: false})}
+        />
         <AppBar position="absolute">
           <Toolbar variant="dense">
             <PawIcon style={classes.icon} />
@@ -412,11 +445,16 @@ class JumboContent extends React.Component<Props, JumboContentState> {
                       fileInfo={fileInfo}
                       saveCode={this.saveCode}
                       saveCodeCloud={this.saveCodeCloud}
+                      openMustLogin={() => this.setState({mustLoginDialogOpen: true})}
                     />
                   </div>
                   <CanvasOutput />
                 </SplitPane>
-                <OutputPanel sandbox={this.sandbox} aref={x => this.console = x} />
+                <OutputPanel 
+                  sandbox={this.sandbox} 
+                  aref={x => this.console = x} 
+                  openMustLogin={() => this.setState({mustLoginDialogOpen: true})}
+                />
               </SplitPane>
             </div>
           </div>

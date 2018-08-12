@@ -72,7 +72,7 @@ function ErrorSnackbar(props: WithStyles<'close'> & ErrorSnackbarProps) {
                     className={props.classes.close}
                     onClick={handleClick}
                 >
-                    <CloseIcon color="action" />
+                    <CloseIcon color="secondary" />
                 </IconButton>,
             ]}
         />
