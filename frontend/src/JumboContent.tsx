@@ -142,7 +142,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     this.sandbox = new sandbox.Sandbox();
     this.state = {
       files: [ { name: 'HelloWorld.js', content: `// write your code here`}],
-      selectedFileIndex: -1,
+      selectedFileIndex: 0,
     }
   }
 
