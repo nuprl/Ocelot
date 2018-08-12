@@ -289,9 +289,14 @@ class JumboContent extends React.Component<Props, JumboContentState> {
       return;
     }
 
-    const latestPropertyPixel = (matches[matches.length - 1].match(numberRegx) as RegExpMatchArray)[0]
+    const container = parent.parentElement as HTMLElement; // panel must have a parent, SplitPane
+    const containerLength = styleProperty === 'width' ? container.clientWidth : container.clientHeight;
+    const latestPropertyVal = styleProperty === 'width' ? parent.clientWidth : parent.clientHeight;
     let closedSizeVal = Number((closedSize.match(numberRegx) as RegExpMatchArray)[0]);
-    const isTiny = Math.abs(Number(latestPropertyPixel) - closedSizeVal) < 10; // will not with cmp % and px
+    if (closedSize.includes('%')) {
+      closedSizeVal = (closedSizeVal / 100) * containerLength;
+    }
+    const isTiny = Math.abs(latestPropertyVal - closedSizeVal) < 10; // will not with cmp % and px
     if (isTiny && matches.length === 1) { // if tiny width/height set by user
       defaultSize = typeof defaultSize === 'number' ? `${defaultSize}px` : defaultSize
       parent.style[styleProperty] = defaultSize; // toggle back to default
