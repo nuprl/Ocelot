@@ -194,7 +194,7 @@ export class Sandbox {
             return;
         }
         this.setMode('running');
-        this.runner..evalAsyncFromAst(
+        this.runner.evalAsyncFromAst(
             elementaryResult.node, (result: stopify.Result) => {
             this.setMode('stopped');
             if (result.type === 'normal') {
