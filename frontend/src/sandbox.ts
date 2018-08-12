@@ -157,6 +157,8 @@ export class Sandbox {
         this.console.log('Compilation succesful.');
         if (mode === 'running') {
             this.console.log('Starting program...');
+        } else if (mode === 'testing') {
+            this.console.log('Running tests...');
         }
         const runner = stopify.stopifyLocallyFromAst(compiled.node);
         if (runner.kind === 'error') {
