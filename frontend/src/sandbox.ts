@@ -114,8 +114,7 @@ export class Sandbox {
             }
         });
 
-        // TODO(arjun): Update Stopify iface
-        (this.runner as any).g = globalProxy;
+        this.runner.g = globalProxy;
     }
 
     private onResult(result: stopify.Result) {
@@ -195,7 +194,7 @@ export class Sandbox {
             return;
         }
         this.setMode('running');
-        (this.runner as any).evalAsyncFromAst(
+        this.runner..evalAsyncFromAst(
             elementaryResult.node, (result: stopify.Result) => {
             this.setMode('stopped');
             if (result.type === 'normal') {
