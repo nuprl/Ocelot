@@ -23,10 +23,8 @@ import UserLogin from './containers/UserLogin';
 import HistoryButton from './containers/HistoryButton';
 
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import PawIcon from '@material-ui/icons/Pets';
 import FileIcon from '@material-ui/icons/FileCopy';
 import CanvasIcon from '@material-ui/icons/Wallpaper';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
@@ -375,11 +373,6 @@ class JumboContent extends React.Component<Props, JumboContentState> {
         />
         <AppBar position="absolute">
           <Toolbar variant="dense">
-            <PawIcon style={classes.icon} />
-            <Typography variant="subheading" color="inherit" noWrap>
-              Ocelot
-            </Typography>
-            <div style={{ width: 50 }} />
             <Button
               color="secondary"
               onClick={() => this.togglePanel('sideDrawer', 'width', 250, 0)}>
