@@ -117,7 +117,7 @@ export class Sandbox {
         this.runner.g = globalProxy;
     }
 
-    private onResult(result: stopify.Result) {
+    private onResult(result: stopify.Result, showNormal: boolean) {
         if (result.type === 'exception') {
             let message = result.value instanceof Error ?
               result.value.message : String(result.value);
@@ -132,6 +132,9 @@ export class Sandbox {
             }
             this.console.error(message + '\n... ' +
                 result.stack.slice(1).join('\n... '));
+        }
+        else if (result.type === 'normal' && showNormal) {
+            this.console.log(result.value);
         }
     }
 
@@ -170,7 +173,7 @@ export class Sandbox {
         elementaryRTS.enableTests(mode === 'testing', runner);
         this.setMode(mode);
         runner.run(result => {
-            this.onResult(result);
+            this.onResult(result, false);
             if (this.mode === 'testing' && result.type !== 'exception') {
               const summary = elementaryRTS.summary(true);
               this.console.log(summary.output, ...summary.style);
@@ -197,12 +200,7 @@ export class Sandbox {
         this.runner.evalAsyncFromAst(
             elementaryResult.node, (result: stopify.Result) => {
             this.setMode('stopped');
-            if (result.type === 'normal') {
-                this.console.log(result.value);
-            }
-            else {
-                this.console.error(result.value); // NOTE(arjun): Stack trace?
-            }
+            this.onResult(result, true);
         });
     }
 
