@@ -46,8 +46,10 @@
  * 
  */
 
- import * as Rx from 'rxjs';
-// import * as RxOps from 'rxjs/operators';
+import * as Rx from 'rxjs';
+import * as monacoEditor from 'monaco-editor';
+
+ // import * as RxOps from 'rxjs/operators';
 
 export const loggedIn = new Rx.BehaviorSubject<boolean>(false);
 export const email = new Rx.BehaviorSubject<string>("");
@@ -58,4 +60,6 @@ export const uiActive = new Rx.BehaviorSubject<boolean>(false);
 
 loggedIn.subscribe(x => uiActive.next(x && !filesLoading.getValue()));
 
-filesLoading.subscribe(y => uiActive.next(loggedIn.getValue() && !y))
+filesLoading.subscribe(y => uiActive.next(loggedIn.getValue() && !y));
+
+export const editor = new Rx.BehaviorSubject<monacoEditor.editor.IStandaloneCodeEditor | undefined>(undefined);

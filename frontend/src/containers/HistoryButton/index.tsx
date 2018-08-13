@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { RootState } from '../../store';
 import Fade from '@material-ui/core/Fade';
 import List from '@material-ui/core/List';
 import '../../static/styles/Scrollbar.css';
@@ -78,8 +76,7 @@ const monacoOptions: monacoEditor.editor.IDiffEditorConstructionOptions = {
 
 type Props = WithStyles<StyleClasses> & {
     fileName: string,
-    code: string,
-    editor: monacoEditor.editor.IStandaloneCodeEditor | undefined
+    code: string
 };
 
 type State = {
@@ -166,7 +163,7 @@ class HistoryButton extends React.Component<Props, State> {
                 });
             setTimeout(() => { // immediate state change causes the UI to update immediately
                 // The UI looks 'buggy' if I were to not setTimeout
-                const { editor } = this.props;
+                const editor = state.editor.getValue();
                 const { history } = this.state;
                 if (editor === undefined || history.length - 1 < index) {
                     return;
@@ -311,8 +308,4 @@ class HistoryButton extends React.Component<Props, State> {
     }
 }
 
-const mapStateToProps = (state: RootState) => ({
-    editor: state.codeEditor.monacoEditor
-});
-
-export default withStyles(styles)(connect(mapStateToProps)(HistoryButton));
+export default withStyles(styles)(HistoryButton);
