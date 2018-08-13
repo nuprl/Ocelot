@@ -19,7 +19,7 @@ import { isFailureResponse, FileChange } from './utils/api/apiHelpers';
 import SideDrawer from './components/SideDrawer';
 import Notification from './containers/Notification';
 import * as sandbox from './sandbox';
-import UserLogin from './containers/UserLogin';
+import UserLogin from './loginButton';
 import HistoryButton from './containers/HistoryButton';
 
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
