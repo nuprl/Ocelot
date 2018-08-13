@@ -8,16 +8,14 @@ import 'static/styles/DrawerIconButton.css';
 import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles, Button } from '@material-ui/core';
-import { RootState } from '../../../../store';
-import { connect } from 'react-redux';
+import * as state from '../../../../state';
 
 type FilesFolderProps = {
-    disabled: boolean,
     userFilesInfo: {
         files: { name: string, content: string }[],
         selectedFileIndex: number,
     },
-    loggedIn: boolean,
+
     makeHandleDeleteFile: (fileIndex: number, name: string, loggedIn: boolean) => (() => void),
     makeHandleClickFile: (fileIndex: number) => (() => void),
     onCreateFile: (fileName: string, loggedIn: boolean) => void,
@@ -26,6 +24,7 @@ type FilesFolderProps = {
 type Props = FilesFolderProps & WithStyles<ListItemStylesTypes>;
 
 type State = {
+    loggedIn: boolean,
     hasNewFileField: boolean,
 };
 
@@ -34,15 +33,19 @@ class FilesFolder extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            loggedIn: false,
             hasNewFileField: false,
-        }
+        };
+    }
+
+    componentDidMount() {
+        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
     }
 
     newFileField = () => { this.setState({ hasNewFileField: true }) };
 
     render() {
         const { 
-            disabled, 
             classes, 
             userFilesInfo, 
             makeHandleDeleteFile, 
@@ -50,10 +53,10 @@ class FilesFolder extends React.Component<Props, State> {
             onCreateFile
         } = this.props;
 
-        let loginDisabled = disabled;
-        if (!this.props.loggedIn) {
+        let loginDisabled = this.state.loggedIn;
+        if (!this.state.loggedIn) {
             const mustLogin = window.location.search !== '?anonymous';
-            loginDisabled = mustLogin && !this.props.loggedIn;
+            loginDisabled = mustLogin && !this.state.loggedIn;
         }
 
         return (
@@ -88,7 +91,4 @@ class FilesFolder extends React.Component<Props, State> {
     }
 }
 
-const mapStateToProps = (state: RootState) => ({
-    loggedIn: state.userLogin.loggedIn,
-})
-export default connect(mapStateToProps)(ListItemStyles(FilesFolder));
+export default ListItemStyles(FilesFolder);

@@ -101,9 +101,6 @@ export type ChangeFileActions =
 
 // State type
 export type UserFilesState = {
-    folderInfo: {
-        filesLoading: boolean
-    },
     filesInfo: {
         files: UserFiles,
         selectedFileIndex: number,

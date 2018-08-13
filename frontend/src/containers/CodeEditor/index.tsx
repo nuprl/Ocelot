@@ -1,16 +1,13 @@
 import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
-import { RootState } from '../../store';
-import { Dispatch } from 'redux';
-import { connect } from 'react-redux';
 import ReactResizeDetector from 'react-resize-detector';
 import { debounce } from 'lodash';
 import elemjshighlight from './elemjsHighlighter';
-import { setMonacoEditor } from '../../store/codeEditor/actions';
 import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import PawIcon from '@material-ui/icons/Pets';
 import Typography from '@material-ui/core/Typography';
+import * as state from '../../state';
 
 const debounceWait = 500; // milliseconds;
 
@@ -51,8 +48,7 @@ type Props = {
         fileName: string,
         enabled: boolean,
         fileIndex: number,
-      }
-    loggedIn: boolean,
+    },
     updateCode: (code: string) => void,
     saveCode: (
         fileIndex: number,
@@ -64,7 +60,6 @@ type Props = {
         content: string,
         loggedIn: boolean,
     ) => void,
-    setEditor: (editor: monacoEditor.editor.IStandaloneCodeEditor) => void,
     openMustLogin: () => void,
 } & WithStyles<'emptyState' | 'pawIcon'>;
 
@@ -72,15 +67,23 @@ type FileEdit = {
     fileName: string,
     fileIndex: number,
     code: string,
+    loggedIn: boolean
 };
 
-class CodeEditor extends React.Component<Props> {
+class CodeEditor extends React.Component<Props, { loggedIn: boolean }> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
     fileEditsQueue: FileEdit[];
     constructor(props: Props) {
         super(props);
         this.editor = undefined;
         this.fileEditsQueue = [];
+        this.state = {
+            loggedIn: state.loggedIn.getValue()
+        };
+    }
+
+    componentDidMount() {
+        state.loggedIn.subscribe(x => this.setState({ loggedIn: x }));
     }
 
     editorWillMount = (monaco: typeof monacoEditor) => {
@@ -126,12 +129,11 @@ class CodeEditor extends React.Component<Props> {
                 editor.setValue(code);
             }
         }
-        this.props.setEditor(editor);
         this.editor = editor;
         const mustLogin = window.location.search !== '?anonymous';
-        if (!this.props.loggedIn && mustLogin) {
+        if (!this.state.loggedIn && mustLogin) {
             editor.onKeyDown(event => {
-                if (mustLogin && !this.props.loggedIn) {
+                if (mustLogin && !this.state.loggedIn) {
                     this.props.openMustLogin();
                 }
             });
@@ -146,13 +148,13 @@ class CodeEditor extends React.Component<Props> {
             this.props.updateCode(this.props.fileInfo.code);
         }
         const endingCriteria = prevProps.fileInfo.fileIndex === this.props.fileInfo.fileIndex
-            || !prevProps.loggedIn
             || prevProps.fileInfo.fileIndex === -1;
 
         if (endingCriteria) {
             return;
         }
         this.fileEditsQueue.push({
+            loggedIn: this.state.loggedIn,
             fileName: prevProps.fileInfo.fileName,
             fileIndex: prevProps.fileInfo.fileIndex,
             code: prevProps.fileInfo.code,
@@ -181,14 +183,14 @@ class CodeEditor extends React.Component<Props> {
                 fileEdit.fileName,
                 fileEdit.fileIndex,
                 fileEdit.code,
-                this.props.loggedIn
+                this.state.loggedIn
             );
         }
         this.props.saveCodeCloud(
             this.props.fileInfo.fileName,
             this.props.fileInfo.fileIndex,
             this.props.fileInfo.code,
-            this.props.loggedIn
+            this.state.loggedIn
         );
 
     };
@@ -196,7 +198,7 @@ class CodeEditor extends React.Component<Props> {
     debouncedSaveCodeCloud = debounce(this.saveCodeCloudWrapper, debounceWait);
 
     onChange = (code: string) => {
-        if (this.props.loggedIn) {
+        if (this.state.loggedIn) {
             this.debouncedSaveCodeCloud();
         }
         this.props.updateCode(code);
@@ -205,7 +207,8 @@ class CodeEditor extends React.Component<Props> {
     };
 
     render() {
-        const { fileInfo, classes, loggedIn } = this.props;
+        const { fileInfo, classes } = this.props;
+        const loggedIn = this.state.loggedIn;
         const { code, enabled } = fileInfo;
 
         if (!enabled) {
@@ -221,7 +224,7 @@ class CodeEditor extends React.Component<Props> {
 
         if (!loggedIn) {
             const mustLogin = window.location.search !== '?anonymous';
-            monacoOptions.readOnly = mustLogin && !this.props.loggedIn;
+            monacoOptions.readOnly = mustLogin && !this.state.loggedIn;
         }
 
         if (loggedIn) {
@@ -245,14 +248,4 @@ class CodeEditor extends React.Component<Props> {
     }
 }
 
-const mapStateToProps = (state: RootState) => ({
-    loggedIn: state.userLogin.loggedIn && !state.userFiles.folderInfo.filesLoading,
-});
-
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-    setEditor: (editor: monacoEditor.editor.IStandaloneCodeEditor) => {
-        dispatch(setMonacoEditor(editor))
-    },
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(CodeEditor));
+export default withStyles(styles)(CodeEditor);

@@ -3,25 +3,33 @@ import FileItem from '../../components/FileItem';
 import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';
-import { RootState } from '../../../../store';
-import { connect } from 'react-redux';
+import * as state from '../../../../state';
 
-type Props = {
+type Props = WithStyles<ListItemStylesTypes> & {
     userFilesInfo: {
         files: { name: string, content: string }[],
         selectedFileIndex: number,
     },
-    loggedIn: boolean,
     makeHandleClickFile: (index: number) => () => void,
     makeHandleDeleteFile: (index: number, name: string, loggedIn: boolean) => () => void,
 };
 
-class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props> {
+class UserFiles extends React.Component<Props, { loggedIn: boolean }> {
+
+    constructor(props: Props) {
+        super(props);
+        this.state = { loggedIn: false };
+    }
+
+    componentDidMount() {
+        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
+    }
 
     render() {
 
         
-        const { userFilesInfo, loggedIn } = this.props;
+        const { userFilesInfo } = this.props;
+        const loggedIn = this.state.loggedIn;
         const { files, selectedFileIndex, } = userFilesInfo;
         let disabled = false;
         if (!loggedIn) {
@@ -48,7 +56,4 @@ class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props>
     }
 }
 
-const mapStateToProps = (state: RootState) => ({
-    loggedIn: state.userLogin.loggedIn && !state.userFiles.folderInfo.filesLoading,
-});
-export default connect(mapStateToProps)(ListItemStyles(UserFiles));
+export default ListItemStyles(UserFiles);

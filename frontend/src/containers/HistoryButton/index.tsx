@@ -22,6 +22,7 @@ import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import { MonacoDiffEditor } from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import { saveHistory } from '../../utils/api/saveHistory';
+import * as state from '../../state';
 
 const styles: StyleRulesCallback = theme => ({
     list: {
@@ -77,12 +78,12 @@ const monacoOptions: monacoEditor.editor.IDiffEditorConstructionOptions = {
 
 type Props = WithStyles<StyleClasses> & {
     fileName: string,
-    loggedIn: boolean,
     code: string,
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined
 };
 
 type State = {
+    loggedIn: boolean,
     open: boolean,
     loading: boolean,
     history: FileHistory[],
@@ -102,10 +103,15 @@ class HistoryButton extends React.Component<Props, State> {
         super(props);
         this.state = {
             open: false,
+            loggedIn: false,
             loading: false,
             history: [],
             codeOpenIndex: -1,
         };
+    }
+
+    componentDidMount() {
+        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
     }
 
     shouldComponentUpdate(prevProps: Props) {
@@ -185,7 +191,7 @@ class HistoryButton extends React.Component<Props, State> {
     }
 
     render() {
-        if (!this.props.loggedIn) {
+        if (!this.state.loggedIn) {
             return null;
         }
         const { classes, code } = this.props;
@@ -306,7 +312,6 @@ class HistoryButton extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-    loggedIn: state.userLogin.loggedIn,
     editor: state.codeEditor.monacoEditor
 });
 

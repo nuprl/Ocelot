@@ -6,12 +6,13 @@ import {
     getUrl,
     SuccessResponse
  } from './apiHelpers';
-
+import * as state from '../../state';
 type UserFile = { name: string, content: string };
 
 export type UserFilesResponse = SuccessResponse<{userFiles: UserFile[]}> | FailureResponse;
 
 export const getUserFiles = async (): Promise<UserFilesResponse> => {
+
     // This function should be called in a SAGA right after logging in
     // BE SURE TO SET LOADING BEFORE CALLING THIS FUNCTION
 
@@ -45,6 +46,9 @@ export const getUserFiles = async (): Promise<UserFilesResponse> => {
         if (jsonResponse.status === 'failure') {
             return failureResponse('Your session expired, try refreshing the page');
         }
+
+
+        state.filesLoading.next(false);
 
         // be sure to open this list (set state to open)
         return successResponse<{userFiles: UserFile[]}>({

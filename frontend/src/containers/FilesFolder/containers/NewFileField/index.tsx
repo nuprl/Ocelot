@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -13,9 +12,9 @@ import FormControl from '@material-ui/core/FormControl';
 import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';
-import { RootState } from '../../../../store';
 import { UserFiles } from '../../../../store/userFiles/types';
 import FormHelperText from '@material-ui/core/FormHelperText';
+import * as state from '../../../../state';
 
 // this is copied from backend
 const isSimpleValidFileName = (fileName: string) => { // still incomplete but will do for now
@@ -25,12 +24,12 @@ const isSimpleValidFileName = (fileName: string) => { // still incomplete but wi
 type Props = {
     newFile: boolean,
     files: UserFiles,
-    loggedIn: boolean,
     deleteFileField: () => void,
     onCreateFile: (fileName: string, loggedIn: boolean) => void,
 } & WithStyles<ListItemStylesTypes>;
 
 type State = {
+    loggedIn: boolean,
     newFileErrorMsg: '' | 'Duplicated file name' | 'File name must match regex [\w\-]+\.js',
 };
 
@@ -39,7 +38,8 @@ class NewFileField extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            newFileErrorMsg: ''
+            newFileErrorMsg: '',
+            loggedIn: false
         };
         this.listener = (event) => {
             if (event.keyCode !== 13 || event.target === null) {
@@ -58,8 +58,12 @@ class NewFileField extends React.Component<Props, State> {
 
             this.props.deleteFileField();
             this.setState({ newFileErrorMsg: '' });
-            this.props.onCreateFile(name, this.props.loggedIn);
+            this.props.onCreateFile(name, this.state.loggedIn);
         };
+    }
+
+    componentDidMount() {
+        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
     }
 
     componentDidUpdate(prevProps: Props) {
@@ -157,9 +161,4 @@ class NewFileField extends React.Component<Props, State> {
     }
 }
 
-const mapStateToProps = (state: RootState) => ({
-    // newFileError: state.userFiles.filesInfo.newFileError,
-    loggedIn: state.userLogin.loggedIn
-});
-
-export default connect(mapStateToProps)(ListItemStyles(NewFileField));
+export default ListItemStyles(NewFileField);

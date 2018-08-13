@@ -13,9 +13,6 @@ console.log(greeting('World'));
 `;
 
 const initialState: t.UserFilesState = {
-    folderInfo: {
-        filesLoading: false,
-    },
     filesInfo: {
         files: [{
             name: 'helloWorld.js',
@@ -33,13 +30,6 @@ const userFiles: Reducer<t.UserFilesState> = (
         newFileSaved: boolean[],
         newState: t.UserFilesState;
     switch (action.type) {
-        case t.LOAD_FILES_REQUEST:
-            return {
-                ...state,
-                folderInfo: {
-                    filesLoading: true,
-                }
-            };
         case t.LOAD_FILES_SUCCESS:
             return {
                 filesInfo: {
@@ -48,17 +38,10 @@ const userFiles: Reducer<t.UserFilesState> = (
                     fileSaved: new Array(action.userFiles.length).fill(true),
                     selectedFileIndex: -1
                 },
-                folderInfo: {
-                    filesLoading: false,
-                }
             };
         case t.LOAD_FILES_FAILURE:
             return {
                 ...state,
-                folderInfo: {
-                    ...state.folderInfo,
-                    filesLoading: false,
-                }
             };
         case t.CREATE_NEW_FILE:
             return {

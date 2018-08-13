@@ -1,10 +1,10 @@
-import { USERNAME } from './store/userLogin/saga'
+import * as state from './state';
 import { EJSVERSION } from 'elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 
 function traceError(message: { [key: string]: any}) {
     const err = {
-        username: USERNAME,
+        username: state.email,
         ejsversion: EJSVERSION,
         ocelotversion: OCELOTVERSION,
         ...message

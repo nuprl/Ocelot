@@ -1,7 +1,6 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
 import * as t from './types';
 import { triggerNotification } from '../../store/notification/actions';
-import { logOutUser } from '../../store/userLogin/actions';
 import { loadFilesFailure, markFileSaved, } from '../../store/userFiles/actions';
 import { batchActions } from '../../store/batchActions';
 
@@ -15,8 +14,7 @@ function* fetchFiles(action: t.LoadFilesRequestAction) {
         yield put(
             batchActions(
                 triggerNotification(response.data.message, 'top'),
-                loadFilesFailure(),
-                logOutUser()
+                loadFilesFailure()
             )
         );
         return;

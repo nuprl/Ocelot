@@ -12,7 +12,6 @@ import Button from '@material-ui/core/Button';
 import StopIcon from '@material-ui/icons/Stop';
 import DownloadIcon from '@material-ui/icons/ArrowDownward';
 import * as types from './types';
-import { RootState } from './store';
 import { connect } from 'react-redux';
 import { saveHistory } from './utils/api/saveHistory'
 import { isFailureResponse, FileChange } from './utils/api/apiHelpers';
@@ -21,6 +20,7 @@ import Notification from './containers/Notification';
 import * as sandbox from './sandbox';
 import UserLogin from './loginButton';
 import HistoryButton from './containers/HistoryButton';
+import * as state from './state';
 
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -37,6 +37,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+(window as any).globalState = state;
 
 const classes = {
   flex: {
@@ -61,7 +62,6 @@ const redTheme = createMuiTheme({
 });
 
 type Props = {
-  loggedIn: boolean,
   dispatch: Dispatch,
   classes: {
     root: string,
@@ -73,14 +73,16 @@ type Props = {
 
 type ExecutionProps = {
   sandbox: sandbox.Sandbox, 
-  loggedIn: boolean,
   filename: string
 }
-class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.Mode }> {
+class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.Mode, loggedIn: boolean }> {
 
   constructor(props: ExecutionProps) {
     super(props);
-    this.state = { mode: 'stopped' };
+    this.state = { 
+      mode: 'stopped',
+      loggedIn: state.loggedIn.getValue()
+    };
   }
   
   componentDidMount() {
@@ -90,7 +92,7 @@ class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.
   }
 
   onRunOrTestClicked(mode: 'running' | 'testing') {
-    if (this.props.loggedIn) {
+    if (this.state.loggedIn) {
       // TODO(arjun): MUST be more robust. Cannot suppress errors.
       saveHistory(this.props.filename, this.props.sandbox.getCode()).then((res) => {
         if (isFailureResponse(res)) {
@@ -381,7 +383,6 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             </Button>
             <ExecutionButtons 
               filename={fileInfo.fileName} 
-              loggedIn={this.props.loggedIn}
               sandbox={this.sandbox} />
             <Button
               color="secondary"
@@ -458,12 +459,8 @@ class JumboContent extends React.Component<Props, JumboContentState> {
 
 }
 
-const mapStateToProps = (state: RootState) => ({
-  loggedIn: state.userLogin.loggedIn,
-});
-
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   dispatch: dispatch
 });
 
-export const JumboContentDefault  = connect(mapStateToProps, mapDispatchToProps)(JumboContent);
+export const JumboContentDefault  = connect(mapDispatchToProps)(JumboContent);

@@ -1,7 +1,5 @@
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { logInUserRequest, logOutUser, loadingOngoing, notLoading } from './store/userLogin/actions';
-import { RootState } from './store/';
 import { resetDefaultFiles } from './store/userFiles/actions';
 import * as React from 'react';
 import { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
@@ -9,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { validateUser } from './utils/api/validateUser';
 import { isFailureResponse } from './utils/api/apiHelpers';
 import { getUserFiles } from './utils/api/getUserFiles';
+import * as state from './state';
 
 import Fade from '@material-ui/core/Fade';
 import { GoogleLogin, } from 'react-google-login';
@@ -52,26 +51,41 @@ function GoogleLogoutButton(props: GoogleLogoutButtonProps): JSX.Element {
 }
 
 type LoginLogoutProps = {
-    loggedIn: boolean,
-    loading: boolean,
-    email: string,
-    onLogin: (response: GoogleLoginResponse) => void,
     onLogout: () => void,
-    onLoading: () => void,
-    onNotLoading: () => void,
     setFiles: (userFiles: {name: string, content: string}[]) => void,
 };
 
-class LoginLogout extends React.Component<LoginLogoutProps> {
+type LoginLogoutState = {
+    loggedIn: boolean,
+    loading: boolean,
+    email: string
+}
+
+class LoginLogout extends React.Component<LoginLogoutProps, LoginLogoutState> {
+
+    constructor(props: LoginLogoutProps) {
+        super(props);
+        this.state = {
+            loggedIn: state.loggedIn.getValue(),
+            loading: false,
+            email: state.email.getValue()
+        };
+    }
+    
+    componentDidMount() {
+        state.loggedIn.subscribe(x => this.setState({ loggedIn: x }));
+        state.email.subscribe(x => this.setState({ email: x }));
+    }
 
     onSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-        this.props.onLogin(response as GoogleLoginResponse);
         validateUser(response as GoogleLoginResponse).then((response) => {
             if (isFailureResponse(response)) {
                 console.log(response.data.message)
                 return;
             }
-
+            state.loggedIn.next(true);
+            state.email.next(response.data.email);
+            state.filesLoading.next(true);
             this.loadFiles();
 
         }).catch(error => {
@@ -92,18 +106,18 @@ class LoginLogout extends React.Component<LoginLogoutProps> {
     onFailure = (response: { error: string }) => {
         // this.props.onLogout(); // need a better way to have less logic in this module
         // there's way too much logic embedded for a presentational component
-        this.props.onNotLoading();
     }
 
     render() {
-        const { loggedIn, email } = this.props;
+        const { loggedIn, email } = this.state;
         return (
             <div>
-                <Typography style={{display: loggedIn ? "" : "none" }} variant="subheading" color="inherit">
+                <Typography style={{display: loggedIn ? "inline" : "none" }} variant="subheading" color="inherit">
                     {email}
                 </Typography>
                 <GoogleLogoutButton show={loggedIn} onClick={this.props.onLogout} />
                 <GoogleLogin
+                        style={{display: loggedIn ? "none" : "" }}
                         clientId="692270598994-p92ku4bbjkvcddouh578eb1a07s8mghc.apps.googleusercontent.com"
                         onSuccess={this.onSuccess}
                         onFailure={this.onFailure}
@@ -116,24 +130,13 @@ class LoginLogout extends React.Component<LoginLogoutProps> {
 
 }
 
-const mapStateToProps = (state: RootState) => ({
-    loggedIn: state.userLogin.loggedIn,
-    loading: state.userLogin.loading,
-    email: state.userLogin.email,
-});
-
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    onLogin: (googleUser: GoogleLoginResponse) => { dispatch(logInUserRequest(googleUser)); },
     onLogout: () => { 
-        dispatch(logOutUser()); 
         dispatch(resetDefaultFiles());
         // Not sure if I should put this here
         localStorage.removeItem('userEmail');
         localStorage.removeItem('sessionId');
-    },
-    // surround with curly braces so that it does not return what dispatch returns
-    onLoading: () => { dispatch(loadingOngoing()); },
-    onNotLoading: () => { dispatch(notLoading()); }
+    }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginLogout);
+export default connect(() => ({}), mapDispatchToProps)(LoginLogout);
