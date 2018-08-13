@@ -246,7 +246,7 @@ class CodeEditor extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-    loggedIn: state.userLogin.loggedIn,
+    loggedIn: state.userLogin.loggedIn && !state.userFiles.folderInfo.filesLoading,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

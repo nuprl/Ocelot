@@ -4,7 +4,7 @@ import LoginLogout from './components/LoginLogout';
 import { GoogleLoginResponse } from 'react-google-login';
 import { logInUserRequest, logOutUser, loadingOngoing, notLoading } from '../../store/userLogin/actions';
 import { RootState } from '../../store/';
-import { resetDefaultFiles } from '../../store/userFiles/actions';
+import { resetDefaultFiles, loadFilesSuccess } from '../../store/userFiles/actions';
 
 const mapStateToProps = (state: RootState) => ({
     loggedIn: state.userLogin.loggedIn,
@@ -23,7 +23,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
     },
     // surround with curly braces so that it does not return what dispatch returns
     onLoading: () => { dispatch(loadingOngoing()); },
-    onNotLoading: () => { dispatch(notLoading()); }
+    onNotLoading: () => { dispatch(notLoading()); },
+    loadFilesSuccess: () => { dispatch(loadFilesSuccess([]))}
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginLogout);

@@ -49,6 +49,6 @@ class UserFiles extends React.Component<WithStyles<ListItemStylesTypes> & Props>
 }
 
 const mapStateToProps = (state: RootState) => ({
-    loggedIn: state.userLogin.loggedIn,
+    loggedIn: state.userLogin.loggedIn && !state.userFiles.folderInfo.filesLoading,
 });
 export default connect(mapStateToProps)(ListItemStyles(UserFiles));

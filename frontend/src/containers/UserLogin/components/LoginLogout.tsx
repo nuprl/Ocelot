@@ -16,6 +16,7 @@ type LoginLogoutProps = {
     onLoading: () => void,
     onNotLoading: () => void,
     setFiles: (userFiles: {name: string, content: string}[]) => void,
+    loadFilesSuccess: () => void,
 };
 
 class LoginLogout extends React.Component<LoginLogoutProps> {
@@ -42,6 +43,7 @@ class LoginLogout extends React.Component<LoginLogoutProps> {
                 return;
             }
             this.props.setFiles(response.data.userFiles);
+            this.props.loadFilesSuccess();
         });
     }
 

@@ -2,7 +2,7 @@ import { call, put, takeEvery } from 'redux-saga/effects';
 import * as t from './types';
 import { triggerNotification } from '../../store/notification/actions';
 import { logOutUser } from '../../store/userLogin/actions';
-import { loadFilesSuccess, loadFilesFailure, markFileSaved, } from '../../store/userFiles/actions';
+import { loadFilesFailure, markFileSaved, } from '../../store/userFiles/actions';
 import { batchActions } from '../../store/batchActions';
 
 import { UserFilesResponse, getUserFiles } from '../../utils/api/getUserFiles';
@@ -21,7 +21,8 @@ function* fetchFiles(action: t.LoadFilesRequestAction) {
         );
         return;
     }
-    yield put(loadFilesSuccess(response.data.userFiles));
+    // yield put(loadFilesSuccess(response.data.userFiles));
+    // loading files somewhere else
 }
 
 export function* watchLoadUserFilesRequest() {
