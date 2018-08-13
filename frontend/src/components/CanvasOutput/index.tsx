@@ -39,7 +39,26 @@ class CanvasOutput extends React.Component<Props, {}> {
         super(props);
     }
 
-    componentDidMount() { // temp testing
+    componentDidMount() { // this is actually necessary
+        let canvasesElement = document.getElementById('canvases');
+        if (canvasesElement === null) {
+            return;
+        }
+        const config = { childList: true }
+        const onUpdate: MutationCallback = (mutationsList: MutationRecord[]) => {
+            for (let mutation of mutationsList) {
+                if (mutation.type !== 'childList' || canvasesElement === null) {
+                    continue;
+                }
+                canvasesElement.scrollTop = canvasesElement.scrollHeight;
+                while (canvasesElement.childElementCount > 5) {
+                    canvasesElement.removeChild(canvasesElement.firstChild as Node);
+                }
+            }
+        }
+
+        let observer = new MutationObserver(onUpdate);
+        observer.observe(canvasesElement, config);
     }
 
     onResize = () => {
@@ -53,8 +72,7 @@ class CanvasOutput extends React.Component<Props, {}> {
                 id="canvasOutput"
             >
                 <ReactResizeDetector handleWidth handleHeight onResize={this.onResize} />
-                <div id="canvases" className={`${classes.canvasArea} scrollbars`}>
-                </div>
+                <div id="canvases" className={`${classes.canvasArea} scrollbars`} />
             </div>
         );
     }
