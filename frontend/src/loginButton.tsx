@@ -104,8 +104,14 @@ class LoginLogout extends React.Component<LoginLogoutProps, LoginLogoutState> {
     }
 
     onFailure = (response: { error: string }) => {
-        // this.props.onLogout(); // need a better way to have less logic in this module
-        // there's way too much logic embedded for a presentational component
+        state.notification.next({ message: response.error, position: 'top' });
+        this.props.onLogout();
+    }
+
+    onLogout() {
+        state.loggedIn.next(false);
+        state.email.next('');
+        this.props.onLogout(); // dispatch redux stuff
     }
 
     render() {
@@ -115,7 +121,7 @@ class LoginLogout extends React.Component<LoginLogoutProps, LoginLogoutState> {
                 <Typography style={{display: loggedIn ? "inline" : "none" }} variant="subheading" color="inherit">
                     {email}
                 </Typography>
-                <GoogleLogoutButton show={loggedIn} onClick={this.props.onLogout} />
+                <GoogleLogoutButton show={loggedIn} onClick={() => this.onLogout()} />
                 <GoogleLogin
                         style={{display: loggedIn ? "none" : "" }}
                         clientId="692270598994-p92ku4bbjkvcddouh578eb1a07s8mghc.apps.googleusercontent.com"
