@@ -4,6 +4,7 @@ import * as elementaryRTS from 'elementary-js/dist/runtime';
 import * as types from './types';
 import * as lib220 from 'elementary-js/dist/lib220';
 import { console } from './errors';
+import * as state from './state';
 
 // TODO(arjun): I think these hacks are necessary for eval to work. We either
 // do them here or we do them within the implementation of Stopify. I want
@@ -57,14 +58,11 @@ export class Sandbox {
     private console!: types.HasConsole; // bang is 'definite assignment'
     private mode: Mode;
     private modeListeners: ModeListener[];
-    // TODO(arjun): I'm not happy about this
-    private editorCode: string;
 
     constructor() {
         this.runner = emptyStopifyRunner();
         this.mode = 'stopped';
         this.modeListeners = []
-        this.editorCode = '';
     }
 
     setConsole(console: types.HasConsole) {
@@ -74,12 +72,6 @@ export class Sandbox {
     addModeListener(listener: ModeListener) {
         this.modeListeners.push(listener);
     }
-
-    setCode(code: string) {
-        this.editorCode = code;
-    }
-
-    getCode() { return this.editorCode; }
 
     private setMode(mode: Mode) {
         this.mode = mode;
@@ -151,7 +143,7 @@ export class Sandbox {
         }
         this.console.log(new Date().toLocaleString('en-us', {timeZoneName:'short'}));
         this.console.log('Compiling...');
-        const compiled = elementaryJS.compile(this.editorCode, true);
+        const compiled = elementaryJS.compile(state.currentProgram.getValue(), true);
         if (compiled.kind === 'error') {
             this.reportElementaryError(compiled);
             return;

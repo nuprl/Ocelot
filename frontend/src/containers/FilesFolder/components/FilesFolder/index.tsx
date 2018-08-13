@@ -10,18 +10,7 @@ import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles, Button } from '@material-ui/core';
 import * as state from '../../../../state';
 
-type FilesFolderProps = {
-    userFilesInfo: {
-        files: { name: string, content: string }[],
-        selectedFileIndex: number,
-    },
-
-    makeHandleDeleteFile: (fileIndex: number, name: string, loggedIn: boolean) => (() => void),
-    makeHandleClickFile: (fileIndex: number) => (() => void),
-    onCreateFile: (fileName: string, loggedIn: boolean) => void,
-};
-
-type Props = FilesFolderProps & WithStyles<ListItemStylesTypes>;
+type Props = WithStyles<ListItemStylesTypes>;
 
 type State = {
     loggedIn: boolean,
@@ -45,13 +34,7 @@ class FilesFolder extends React.Component<Props, State> {
     newFileField = () => { this.setState({ hasNewFileField: true }) };
 
     render() {
-        const { 
-            classes, 
-            userFilesInfo, 
-            makeHandleDeleteFile, 
-            makeHandleClickFile,
-            onCreateFile
-        } = this.props;
+        const { classes } = this.props;
 
         return (
             <div>
@@ -68,14 +51,8 @@ class FilesFolder extends React.Component<Props, State> {
                     </ListItem>
                 </div>
                 <List component="div" disablePadding dense >
-                    <UserFileItems 
-                        userFilesInfo={userFilesInfo}
-                        makeHandleClickFile={makeHandleClickFile}
-                        makeHandleDeleteFile={makeHandleDeleteFile}
-                    />
+                    <UserFileItems />
                     <NewFileField
-                        files={userFilesInfo.files}
-                        onCreateFile={onCreateFile}
                         newFile={this.state.hasNewFileField}
                         deleteFileField={() => { this.setState({ hasNewFileField: false }) }}
                     />

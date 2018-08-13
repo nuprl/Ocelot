@@ -12,7 +12,6 @@ import FormControl from '@material-ui/core/FormControl';
 import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles } from '@material-ui/core';
-import { UserFiles } from '../../../../store/userFiles/types';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import * as state from '../../../../state';
 
@@ -23,14 +22,13 @@ const isSimpleValidFileName = (fileName: string) => { // still incomplete but wi
 
 type Props = {
     newFile: boolean,
-    files: UserFiles,
-    deleteFileField: () => void,
-    onCreateFile: (fileName: string, loggedIn: boolean) => void,
+    deleteFileField: () => void
 } & WithStyles<ListItemStylesTypes>;
 
 type State = {
     loggedIn: boolean,
     newFileErrorMsg: '' | 'Duplicated file name' | 'File name must match regex [\w\-]+\.js',
+    files: state.UserFile[]
 };
 
 class NewFileField extends React.Component<Props, State> {
@@ -39,14 +37,15 @@ class NewFileField extends React.Component<Props, State> {
         super(props);
         this.state = {
             newFileErrorMsg: '',
-            loggedIn: false
+            loggedIn: false,
+            files: state.files.getValue()
         };
         this.listener = (event) => {
             if (event.keyCode !== 13 || event.target === null) {
                 return;
             }
             const name = (event.target as HTMLTextAreaElement).value;
-            const result = this.props.files.filter((elem) => elem.name === name);
+            const result = this.state.files.filter((elem) => elem.name === name);
             if (result.length !== 0) {
                 this.setState({ newFileErrorMsg: 'Duplicated file name' });
                 return;
@@ -58,12 +57,18 @@ class NewFileField extends React.Component<Props, State> {
 
             this.props.deleteFileField();
             this.setState({ newFileErrorMsg: '' });
-            this.props.onCreateFile(name, this.state.loggedIn);
+
+            const oldFiles = state.files.getValue();
+            const oldFileSaved = state.fileSaved.getValue();
+            state.files.next([...oldFiles, { name: name, content: '' }]);
+            state.fileSaved.next([...oldFileSaved, false]);
+            state.selectedFileIndex.next(oldFiles.length);
         };
     }
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
+        state.files.subscribe(x => this.setState({ files: x }));
     }
 
     componentDidUpdate(prevProps: Props) {

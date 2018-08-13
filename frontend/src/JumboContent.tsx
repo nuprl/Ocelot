@@ -12,9 +12,8 @@ import Button from '@material-ui/core/Button';
 import StopIcon from '@material-ui/icons/Stop';
 import DownloadIcon from '@material-ui/icons/ArrowDownward';
 import * as types from './types';
-import { connect } from 'react-redux';
 import { saveHistory } from './utils/api/saveHistory'
-import { isFailureResponse, FileChange } from './utils/api/apiHelpers';
+import { isFailureResponse } from './utils/api/apiHelpers';
 import SideDrawer from './components/SideDrawer';
 import Notification from './containers/Notification';
 import * as sandbox from './sandbox';
@@ -28,8 +27,6 @@ import Toolbar from '@material-ui/core/Toolbar';
 import FileIcon from '@material-ui/icons/FileCopy';
 import CanvasIcon from '@material-ui/icons/Wallpaper';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
-import { saveChanges } from './utils/api/saveFileChanges';
-import { Dispatch } from 'redux';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -61,7 +58,6 @@ const redTheme = createMuiTheme({
 });
 
 type Props = {
-  dispatch: Dispatch,
   classes: {
     root: string,
     jumboContent: string,
@@ -71,9 +67,9 @@ type Props = {
 }
 
 type ExecutionProps = {
-  sandbox: sandbox.Sandbox, 
-  filename: string
+  sandbox: sandbox.Sandbox
 }
+
 class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.Mode, loggedIn: boolean }> {
 
   constructor(props: ExecutionProps) {
@@ -93,7 +89,8 @@ class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.
   onRunOrTestClicked(mode: 'running' | 'testing') {
     if (this.state.loggedIn) {
       // TODO(arjun): MUST be more robust. Cannot suppress errors.
-      saveHistory(this.props.filename, this.props.sandbox.getCode()).then((res) => {
+      const filename = state.files.getValue()[state.selectedFileIndex.getValue()].name;
+      saveHistory(filename, state.currentProgram.getValue()).then((res) => {
         if (isFailureResponse(res)) {
           console.log('Something went wrong');
           console.log(res.data.message);
@@ -155,7 +152,6 @@ const MustLoginDialog: React.StatelessComponent<{open: boolean, onClose: () => v
 
 
 type JumboContentState = {
-  files: {name: string, content: string}[],
   selectedFileIndex: number,
   mustLoginDialogOpen: boolean,
 }
@@ -168,119 +164,27 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     super(props);
     this.sandbox = new sandbox.Sandbox();
     this.state = {
-      files: [ { name: 'HelloWorld.js', content: `// write your code here`}],
       selectedFileIndex: 0,
       mustLoginDialogOpen: false,
     }
   }
 
-  saveCode = (fileIndex: number, content: string) => {
-    this.setState((prevState) => {
-      const newFile = prevState.files.map((elem, index) => {
-        if (index === fileIndex) {
-          return { name: elem.name, content: content}
-        }
-        return elem;
-      });
-      return {files: newFile};
-    });
-  };
-
-  saveCodeCloud = (fileName: string, fileIndex: number, code: string, loggedIn: boolean) => {
-    if (!loggedIn) {
-      return;
-    }
-    console.log('Saving code to cloud!');
-    const change: FileChange[] = [
-      {
-        fileName: fileName,
-        type: 'create',
-        changes: code,
-      }
-    ];
-    saveChanges(change).then((response) => {
-      if (isFailureResponse(response)) {
-        console.log('Could not save to cloud');
-      }
-      console.log('Saved to cloud!');
-    }).catch((err) => console.log('An error occurred!', err));
-  };
-
-  makeHandleClickFile = (fileIndex: number) => (() => {
-    this.setState({ selectedFileIndex: fileIndex });
-  });
-
-  makeHandleDeleteFile = (fileIndex: number, name: string, loggedIn: boolean) => (() => {
-    const response = prompt("Are you sure you want to delete this file? Enter YES or NO");
-    if (response !== "YES") {
-      state.notification.next({ message: `Delete aborted: ${name}`, position: 'bottom-right' });
-      return;
-    }
-    this.setState((prevState) => {
-      let newFiles = [...prevState.files].filter((elem, index) => {
-        if (index === fileIndex) {
-          return false;
-        }
-        return true;
-      });
-      return { files: newFiles, selectedFileIndex: -1 }
-    });
-    if (!loggedIn) {
-      return;
-    }
-    saveChanges([{
-      fileName: name,
-      type: 'delete',
-    }]).then((response) => {
-      if (isFailureResponse(response)) {
-        console.log('Oh no! File not deleted!');
-      }
-      console.log('File delete!');
-    }).catch(error => console.log('cannot delete file', error));
-  });
-
-  onCreateFile = (fileName: string, loggedIn: boolean) => {
-    if (!loggedIn) {
-      return;
-    }
-    this.setState((prevState) => {
-      let newFiles = [...prevState.files, {name: fileName, content: ''}]
-      return {
-        files: newFiles,
-        selectedFileIndex: newFiles.length - 1,
-      };
-    });
-    saveChanges([{
-        fileName: fileName,
-        type: 'create',
-        changes: '',
-      }]).then((response) => {
-        if (isFailureResponse(response)) {
-          console.log('Oh no! File could not be created');
-        }
-        console.log('File created!');
-      }).catch(err => console.log('Could not create file!', err));
-
-  };
-
-  setFiles = (userFiles: {name: string, content: string}[]) => {
-    this.setState({
-      files: userFiles,
-      selectedFileIndex: -1,
-    })
-  };
+  componentDidMount() {
+    state.selectedFileIndex.subscribe(x => this.setState({ selectedFileIndex: x }));
+  }
 
   onDownload = () => {
     let element = document.createElement("a");
-    let file = new Blob([this.sandbox.getCode()], {type: 'application/javascript'});
+    let file = new Blob([state.currentProgram.getValue()], {type: 'application/javascript'});
     element.href = URL.createObjectURL(file);
-    element.download = this.state.files[this.state.selectedFileIndex].name;
+    element.download = state.currentFileName();
     element.style.display = 'none';
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
   };
 
+ 
   togglePanel = (elementId: string, 
     styleProperty: 'width' | 'height', 
     defaultSize: number | string, // if default size is number, it'll be in pixel
@@ -352,18 +256,8 @@ class JumboContent extends React.Component<Props, JumboContentState> {
 
   render() {
 
-    const { selectedFileIndex, files, mustLoginDialogOpen } = this.state;
+    const { selectedFileIndex, mustLoginDialogOpen } = this.state;
     const isSelected = selectedFileIndex !== -1;
-    const fileInfo = {
-      code: isSelected ? files[selectedFileIndex].content : '',
-      fileName: isSelected ? files[selectedFileIndex].name : '',
-      enabled: isSelected,
-      fileIndex: selectedFileIndex
-    }
-    const userFilesInfo = {
-      files: this.state.files,
-      selectedFileIndex: this.state.selectedFileIndex,
-    };
 
     return (
       <div className={this.props.classes.root}>
@@ -381,7 +275,6 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               Files
             </Button>
             <ExecutionButtons 
-              filename={fileInfo.fileName} 
               sandbox={this.sandbox} />
             <Button
               color="secondary"
@@ -402,19 +295,14 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               <CanvasIcon />
               Canvas
             </Button>
-            <HistoryButton fileName={fileInfo.fileName} code={fileInfo.code}/>
+            <HistoryButton />
             <div style={classes.flex} />
             <div style={{ display: 'inline-block', width: '0.5em' }} />
-            <UserLogin setFiles={this.setFiles}/>
+            <UserLogin/>
           </Toolbar>
         </AppBar>
         <SplitPane split="vertical" defaultSize={250} minSize={0}>
-          <SideDrawer 
-            userFilesInfo={userFilesInfo} 
-            makeHandleClickFile={this.makeHandleClickFile}
-            makeHandleDeleteFile={this.makeHandleDeleteFile}
-            onCreateFile={this.onCreateFile}
-          />
+          <SideDrawer />
           <div className={this.props.classes.jumboContainer}>
             <div className={this.props.classes.toolbar} style={{ minHeight: '48px' }} />
             {/* Gotta figure out a way to not override css with inline-style */}
@@ -434,10 +322,6 @@ class JumboContent extends React.Component<Props, JumboContentState> {
                   pane1Style={{ maxWidth: '100%' }}>
                   <div style={{ width: '100%', height: '100%', minWidth: '286px' }} id="codeEditor">
                     <CodeEditor 
-                      updateCode={(code) => this.sandbox.setCode(code)} 
-                      fileInfo={fileInfo}
-                      saveCode={this.saveCode}
-                      saveCodeCloud={this.saveCodeCloud}
                       openMustLogin={() => this.setState({mustLoginDialogOpen: true})}
                     />
                   </div>
@@ -458,8 +342,4 @@ class JumboContent extends React.Component<Props, JumboContentState> {
 
 }
 
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-  dispatch: dispatch
-});
-
-export const JumboContentDefault  = connect(mapDispatchToProps)(JumboContent);
+export const JumboContentDefault  = JumboContent;

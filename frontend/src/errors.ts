@@ -9,9 +9,17 @@ function traceError(message: { [key: string]: any}) {
         ocelotversion: OCELOTVERSION,
         ...message
     };
+    let body: string;
+    try {
+        body = JSON.stringify(err);
+    }
+    catch (exn) {
+        body = String(err);
+    }
+
     fetch('https://us-central1-arjunguha-research-group.cloudfunctions.net/paws/error', {
         method: 'POST',
-        body: JSON.stringify(err),
+        body: body,
         headers: { 'Content-Type': 'application/json' }
     }).catch(reason => {
         console.error('Failed to log error ', reason);

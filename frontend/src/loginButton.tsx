@@ -1,6 +1,3 @@
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
-import { resetDefaultFiles } from './store/userFiles/actions';
 import * as React from 'react';
 import { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import Typography from '@material-ui/core/Typography';
@@ -50,20 +47,15 @@ function GoogleLogoutButton(props: GoogleLogoutButtonProps): JSX.Element {
     );
 }
 
-type LoginLogoutProps = {
-    onLogout: () => void,
-    setFiles: (userFiles: {name: string, content: string}[]) => void,
-};
-
 type LoginLogoutState = {
     loggedIn: boolean,
     loading: boolean,
     email: string
 }
 
-class LoginLogout extends React.Component<LoginLogoutProps, LoginLogoutState> {
+class LoginLogout extends React.Component<{}, LoginLogoutState> {
 
-    constructor(props: LoginLogoutProps) {
+    constructor(props: {}) {
         super(props);
         this.state = {
             loggedIn: state.loggedIn.getValue(),
@@ -99,19 +91,24 @@ class LoginLogout extends React.Component<LoginLogoutProps, LoginLogoutState> {
                 console.log('Could not get files');
                 return;
             }
-            this.props.setFiles(response.data.userFiles);
+            state.files.next(response.data.userFiles);
+            state.selectedFileIndex.next(-1);
         });
     }
 
     onFailure = (response: { error: string }) => {
         state.notification.next({ message: response.error, position: 'top' });
-        this.props.onLogout();
+        this.onLogout();
     }
 
     onLogout() {
         state.loggedIn.next(false);
         state.email.next('');
-        this.props.onLogout(); // dispatch redux stuff
+        state.files.next([ state.emptyFile ]);
+        state.fileSaved.next([ true ]);
+        state.selectedFileIndex.next(1);
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('sessionId');
     }
 
     render() {
@@ -136,13 +133,5 @@ class LoginLogout extends React.Component<LoginLogoutProps, LoginLogoutState> {
 
 }
 
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-    onLogout: () => { 
-        dispatch(resetDefaultFiles());
-        // Not sure if I should put this here
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('sessionId');
-    }
-});
 
-export default connect(() => ({}), mapDispatchToProps)(LoginLogout);
+export default LoginLogout;

@@ -74,10 +74,7 @@ const monacoOptions: monacoEditor.editor.IDiffEditorConstructionOptions = {
     renderSideBySide: false
 };
 
-type Props = WithStyles<StyleClasses> & {
-    fileName: string,
-    code: string
-};
+type Props = WithStyles<StyleClasses>;
 
 type State = {
     loggedIn: boolean,
@@ -85,6 +82,7 @@ type State = {
     loading: boolean,
     history: FileHistory[],
     codeOpenIndex: number,
+    currentProgram: string
 };
 
 const truncateString = (str: string) => {
@@ -104,28 +102,19 @@ class HistoryButton extends React.Component<Props, State> {
             loading: false,
             history: [],
             codeOpenIndex: -1,
+            currentProgram: state.currentProgram.getValue()
         };
     }
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
-    }
-
-    shouldComponentUpdate(prevProps: Props) {
-        // this is not recommended, preventing component updates
-        // but I can't figure out how to prevent/delay the component
-        // from updating when the user selects a different file while
-        // the history list is still opened.
-        if (prevProps.code !== this.props.code) {
-            return false;
-        }
-        return true;
+        state.currentProgram.subscribe(x => this.setState({ currentProgram: x }));
     }
 
     onClick = () => {
         this.openHistory();
         this.setState({ loading: true });
-        getFileHistory(this.props.fileName).then(response => {
+        getFileHistory(state.currentFileName()).then(response => {
             this.setState({ loading: false, history: [] });
             if (isFailureResponse(response)) {
                 // tslint:disable-next-line:no-console
@@ -155,7 +144,7 @@ class HistoryButton extends React.Component<Props, State> {
     onRestore = (index: number, generation: number) => {
         return () => {
             this.setState({ open: false, codeOpenIndex: -1 });
-            saveHistory(this.props.fileName, this.state.history[index].code, generation)
+            saveHistory(state.currentFileName(), this.state.history[index].code, generation)
                 .then(() => {
                     console.log('Saved!');
                 }).catch((err) => {
@@ -191,8 +180,8 @@ class HistoryButton extends React.Component<Props, State> {
         if (!this.state.loggedIn) {
             return null;
         }
-        const { classes, code } = this.props;
-        const { open, loading, history, codeOpenIndex } = this.state;
+        const { classes } = this.props;
+        const { open, loading, history, codeOpenIndex, currentProgram } = this.state;
         let content: JSX.Element | JSX.Element[] = <CircularProgress
             size={50}
             style={{ marginTop: '125px', marginLeft: '175px' }}
@@ -203,7 +192,7 @@ class HistoryButton extends React.Component<Props, State> {
             content = history.map((elem, index) => (
                 <div
                     key={`${elem.timeCreated}${index}`}
-                    className={code === elem.code ? `${classes.sameCode}` : ''}
+                    className={currentProgram === elem.code ? `${classes.sameCode}` : ''}
                 >
                     <ListItem button onClick={() => this.toggleCode(index)}>
                         <ListItemIcon>
@@ -224,12 +213,12 @@ class HistoryButton extends React.Component<Props, State> {
                                     <MonacoDiffEditor
                                         language="elementaryjs"
                                         height={210}
-                                        original={this.props.code}
+                                        original={currentProgram}
                                         value={elem.code}
                                         options={monacoOptions}
                                     />
                                     {
-                                        code !== elem.code &&
+                                        currentProgram !== elem.code &&
                                         <Button
                                             variant="outlined"
                                             color="secondary"

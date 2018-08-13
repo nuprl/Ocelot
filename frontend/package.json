@@ -17,12 +17,8 @@
     "react-dom": "^16.4.1",
     "react-google-login": "^3.2.1",
     "react-monaco-editor": "^0.17.2",
-    "react-redux": "^5.0.7",
     "react-resize-detector": "^3.1.0",
-    "react-split-pane": "^0.1.82",
-    "redux": "^4.0.0",
-    "redux-logger": "^3.0.6",
-    "redux-saga": "^0.16.0"
+    "react-split-pane": "^0.1.82"
   },
   "devDependencies": {
     "@types/babel-traverse": "^6.25.4",
@@ -32,7 +28,6 @@
     "@types/lodash": "^4.14.115",
     "@types/material-ui": "^0.21.5",
     "@types/node": "^10.5.4",
-    "@types/react-redux": "^6.0.5",
     "@types/react-resize-detector": "^2.2.0",
     "@types/redux-logger": "^3.0.6",
     "copy-webpack-plugin": "^4.5.2",

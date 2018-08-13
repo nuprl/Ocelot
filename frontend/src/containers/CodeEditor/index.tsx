@@ -8,6 +8,8 @@ import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import PawIcon from '@material-ui/icons/Pets';
 import Typography from '@material-ui/core/Typography';
 import * as state from '../../state';
+import { isFailureResponse, FileChange } from '../../utils/api/apiHelpers';
+import { saveChanges } from '../../utils/api/saveFileChanges';
 
 const debounceWait = 500; // milliseconds;
 
@@ -43,23 +45,6 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
 };
 
 type Props = {
-    fileInfo: {
-        code: string,
-        fileName: string,
-        enabled: boolean,
-        fileIndex: number,
-    },
-    updateCode: (code: string) => void,
-    saveCode: (
-        fileIndex: number,
-        content: string,
-    ) => void,
-    saveCodeCloud: (
-        fileName: string,
-        fileIndex: number,
-        content: string,
-        loggedIn: boolean,
-    ) => void,
     openMustLogin: () => void,
 } & WithStyles<'emptyState' | 'pawIcon'>;
 
@@ -70,7 +55,12 @@ type FileEdit = {
     loggedIn: boolean
 };
 
-class CodeEditor extends React.Component<Props, { loggedIn: boolean }> {
+type CodeEditorState = {
+    loggedIn: boolean,
+    selectedFileIndex: number
+};
+
+class CodeEditor extends React.Component<Props, CodeEditorState> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
     fileEditsQueue: FileEdit[];
     constructor(props: Props) {
@@ -78,12 +68,14 @@ class CodeEditor extends React.Component<Props, { loggedIn: boolean }> {
         this.editor = undefined;
         this.fileEditsQueue = [];
         this.state = {
-            loggedIn: state.loggedIn.getValue()
+            loggedIn: state.loggedIn.getValue(),
+            selectedFileIndex: state.selectedFileIndex.getValue()
         };
     }
 
     componentDidMount() {
-        state.loggedIn.subscribe(x => this.setState({ loggedIn: x }));
+        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
+        state.selectedFileIndex.subscribe(x => this.setState({ selectedFileIndex: x }));
     }
 
     editorWillMount = (monaco: typeof monacoEditor) => {
@@ -141,24 +133,20 @@ class CodeEditor extends React.Component<Props, { loggedIn: boolean }> {
         }
     }
 
-    componentDidUpdate(prevProps: Props) {
+    componentDidUpdate(prevProps: Props, prevState: CodeEditorState) {
         if (this.editor === undefined) {
             return;
         }
-        if (prevProps.fileInfo.fileIndex !== this.props.fileInfo.fileIndex) {
-            this.props.updateCode(this.props.fileInfo.code);
-        }
-        const endingCriteria = prevProps.fileInfo.fileIndex === this.props.fileInfo.fileIndex
-            || prevProps.fileInfo.fileIndex === -1;
 
-        if (endingCriteria) {
-            return;
+        if (prevState.selectedFileIndex !== this.state.selectedFileIndex) {
+            this.editor.setValue(state.currentProgram.getValue());
         }
+
         this.fileEditsQueue.push({
             loggedIn: this.state.loggedIn,
-            fileName: prevProps.fileInfo.fileName,
-            fileIndex: prevProps.fileInfo.fileIndex,
-            code: prevProps.fileInfo.code,
+            fileName: state.currentFileName(),
+            fileIndex: this.state.selectedFileIndex,
+            code: this.editor.getValue()
         });
         this.editor.focus();
     }
@@ -170,49 +158,67 @@ class CodeEditor extends React.Component<Props, { loggedIn: boolean }> {
         this.editor.layout();
     }
 
-    saveCodeCloudWrapper = () => {
-        // tslint:disable-next-line:no-console
+    saveCodeCloud(fileName: string, fileIndex: number, code: string) {
+        console.log('Saving code to cloud!');
+        const change: FileChange[] = [
+          {
+            fileName: fileName,
+            type: 'create',
+            changes: code,
+          }
+        ];
+        saveChanges(change).then((response) => {
+          if (isFailureResponse(response)) {
+            console.log('Could not save to cloud');
+          }
+          console.log('Saved to cloud!');
+        }).catch((err) => console.log('An error occurred!', err));
+      };
+    
+    saveCodeCloudWrapper()  {
         let fileEdit: FileEdit;
         console.log('Saving code');
         while (this.fileEditsQueue.length > 0) {
             console.log('In loop');
             fileEdit = this.fileEditsQueue.shift() as FileEdit;
-            if (fileEdit.fileIndex === this.props.fileInfo.fileIndex) {
+            if (fileEdit.fileIndex === this.state.selectedFileIndex) {
                 continue;
             }
-            this.props.saveCodeCloud(
+            this.saveCodeCloud(
                 fileEdit.fileName,
                 fileEdit.fileIndex,
-                fileEdit.code,
-                this.state.loggedIn
-            );
+                fileEdit.code);
         }
-        this.props.saveCodeCloud(
-            this.props.fileInfo.fileName,
-            this.props.fileInfo.fileIndex,
-            this.props.fileInfo.code,
-            this.state.loggedIn
-        );
+        this.saveCodeCloud(
+            state.currentFileName(),
+            this.state.selectedFileIndex,
+            state.currentProgram.getValue());
 
     };
 
-    debouncedSaveCodeCloud = debounce(this.saveCodeCloudWrapper, debounceWait);
+    debouncedSaveCodeCloud = debounce(() => this.saveCodeCloudWrapper(), debounceWait);
 
-    onChange = (code: string) => {
+    onChange(code: string)  {
         if (this.state.loggedIn) {
             this.debouncedSaveCodeCloud();
         }
-        this.props.updateCode(code);
-        this.props.saveCode(this.props.fileInfo.fileIndex, code);
-
+        state.currentProgram.next(code);
+        const oldFiles = state.files.getValue();
+        const files = oldFiles.map((file, index) => {
+            if (index === this.state.selectedFileIndex) {
+                return { content: code, name: file.name }
+            }
+            else {
+                return file;
+            }
+        });
+        state.files.next(files);
     };
 
     render() {
-        const { fileInfo, classes } = this.props;
-        const loggedIn = this.state.loggedIn;
-        const { code, enabled } = fileInfo;
+        const { classes } = this.props;
 
-        if (!enabled) {
+        if (this.state.selectedFileIndex < 0) {
             return (
                 <div className={classes.emptyState}>
                     <PawIcon className={classes.pawIcon} />
@@ -223,14 +229,7 @@ class CodeEditor extends React.Component<Props, { loggedIn: boolean }> {
             );
         }
 
-        if (!loggedIn) {
-            const mustLogin = window.location.search !== '?anonymous';
-            monacoOptions.readOnly = mustLogin && !this.state.loggedIn;
-        }
-
-        if (loggedIn) {
-            monacoOptions.readOnly = false;
-        }
+        monacoOptions.readOnly = !this.state.loggedIn;
 
         return (
             <div style={{ height: '100%', width: '100%' }}>
@@ -238,9 +237,9 @@ class CodeEditor extends React.Component<Props, { loggedIn: boolean }> {
                 <MonacoEditor
                     language="elementaryjs"
                     theme="vs-dark"
-                    value={code}
+                    value={state.currentProgram.getValue()}
                     options={monacoOptions}
-                    onChange={this.onChange}
+                    onChange={(code) => this.onChange(code)}
                     editorDidMount={this.editorDidMount}
                     editorWillMount={this.editorWillMount}
                 />

@@ -51,6 +51,8 @@ import * as monacoEditor from 'monaco-editor';
 
  // import * as RxOps from 'rxjs/operators';
 
+export const currentProgram = new Rx.BehaviorSubject<string>('');
+
 export const loggedIn = new Rx.BehaviorSubject<boolean>(false);
 export const email = new Rx.BehaviorSubject<string>("");
 
@@ -75,3 +77,22 @@ export const editor = new Rx.BehaviorSubject<monacoEditor.editor.IStandaloneCode
 export type NotificationPosition = 'top' | 'bottom-right';
 export type Notification = { message: string, position: NotificationPosition };
 export const notification = new Rx.Subject<Notification>();
+
+export type UserFile = { name: string, content: string };
+
+export const emptyFile = {
+    name: 'untitled.js',
+    content: ''
+};
+
+export const files = new Rx.BehaviorSubject<UserFile[]>([emptyFile]);
+export const selectedFileIndex = new Rx.BehaviorSubject<number>(0);
+export const fileSaved = new Rx.BehaviorSubject<boolean[]>([true]);
+
+export function currentFileName(): string {
+    const ix = selectedFileIndex.getValue();
+    if (ix < 0) {
+        return '';
+    }
+    return files.getValue()[ix].name;
+}
