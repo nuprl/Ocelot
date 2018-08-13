@@ -141,7 +141,7 @@ const MustLoginDialog: React.StatelessComponent<{open: boolean, onClose: () => v
           <DialogTitle id="must-login">{"Login required"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              Login is required to use Ocelot.
+              Login is required and files need to be fully loaded to use Ocelot.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
