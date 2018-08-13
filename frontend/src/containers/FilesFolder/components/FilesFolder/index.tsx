@@ -53,21 +53,15 @@ class FilesFolder extends React.Component<Props, State> {
             onCreateFile
         } = this.props;
 
-        let loginDisabled = this.state.loggedIn;
-        if (!this.state.loggedIn) {
-            const mustLogin = window.location.search !== '?anonymous';
-            loginDisabled = mustLogin && !this.state.loggedIn;
-        }
-
         return (
             <div>
                 <div className="fileItem">
                     <ListItem
-                        disabled={loginDisabled}
+                        disabled={!this.state.loggedIn}
                         dense
                         classes={{ dense: classes.tinyPadding }}>
                         <Button
-                            disabled={loginDisabled}
+                            disabled={!this.state.loggedIn}
                             onClick={this.newFileField}>
                             New
                         </Button>

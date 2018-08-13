@@ -1,9 +1,7 @@
 import { combineReducers, Reducer } from 'redux';
 // -- States --
-import { NotificationState } from './notification/types';
 import { UserFilesState } from './userFiles/types';
 // -- Reducers --
-import notificationReducer from './notification/reducer';
 import userFilesReducer from './userFiles/reducer';
 // -- Redux Store --
 import { createStore, applyMiddleware } from 'redux';
@@ -22,13 +20,11 @@ import {
 
 // root state
 export interface RootState {
-    notification: NotificationState;
     userFiles: UserFilesState;
 }
 
 // combine all reducers
 const rootReducer: Reducer<RootState> = combineReducers<RootState>({
-    notification: notificationReducer,
     userFiles: userFilesReducer
 });
 

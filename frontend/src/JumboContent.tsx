@@ -29,7 +29,6 @@ import FileIcon from '@material-ui/icons/FileCopy';
 import CanvasIcon from '@material-ui/icons/Wallpaper';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
 import { saveChanges } from './utils/api/saveFileChanges';
-import { triggerNotification } from './store/notification/actions';
 import { Dispatch } from 'redux';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -214,7 +213,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
   makeHandleDeleteFile = (fileIndex: number, name: string, loggedIn: boolean) => (() => {
     const response = prompt("Are you sure you want to delete this file? Enter YES or NO");
     if (response !== "YES") {
-      this.props.dispatch(triggerNotification(`Delete aborted: ${name}`, 'bottom-right'));
+      state.notification.next({ message: `Delete aborted: ${name}`, position: 'bottom-right' });
       return;
     }
     this.setState((prevState) => {

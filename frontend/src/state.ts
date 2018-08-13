@@ -58,8 +58,20 @@ export const filesLoading = new Rx.BehaviorSubject<boolean>(false);
 
 export const uiActive = new Rx.BehaviorSubject<boolean>(false);
 
-loggedIn.subscribe(x => uiActive.next(x && !filesLoading.getValue()));
+function isUiActive(loggedIn: boolean, filesLoading: boolean): boolean {
+    if (window.location.search !== '?anonymous') {
+        return true;
+    }
+    return loggedIn && !filesLoading;
+}
 
-filesLoading.subscribe(y => uiActive.next(loggedIn.getValue() && !y));
+loggedIn.subscribe(x => uiActive.next(isUiActive(x, filesLoading.getValue())));
+
+filesLoading.subscribe(y => uiActive.next(isUiActive(loggedIn.getValue(), y)));
 
 export const editor = new Rx.BehaviorSubject<monacoEditor.editor.IStandaloneCodeEditor | undefined>(undefined);
+
+
+export type NotificationPosition = 'top' | 'bottom-right';
+export type Notification = { message: string, position: NotificationPosition };
+export const notification = new Rx.Subject<Notification>();

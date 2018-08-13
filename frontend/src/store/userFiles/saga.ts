@@ -1,9 +1,7 @@
 import { call, put, takeEvery } from 'redux-saga/effects';
 import * as t from './types';
-import { triggerNotification } from '../../store/notification/actions';
 import { loadFilesFailure, markFileSaved, } from '../../store/userFiles/actions';
-import { batchActions } from '../../store/batchActions';
-
+import * as state from '../../state';
 import { UserFilesResponse, getUserFiles } from '../../utils/api/getUserFiles';
 import { SaveFilesResponse, saveChanges } from '../../utils/api/saveFileChanges';
 import { isFailureResponse, FileChange } from '../../utils/api/apiHelpers';
@@ -11,11 +9,9 @@ import { isFailureResponse, FileChange } from '../../utils/api/apiHelpers';
 function* fetchFiles(action: t.LoadFilesRequestAction) {
     const response: UserFilesResponse = yield call(getUserFiles);
     if (isFailureResponse(response)) {
+        state.notification.next({ message: response.data.message, position: 'top' });
         yield put(
-            batchActions(
-                triggerNotification(response.data.message, 'top'),
                 loadFilesFailure()
-            )
         );
         return;
     }
@@ -45,7 +41,7 @@ function* makeFileChanges(action: t.ChangeFileActions) {
         }
     ];
     if (isDeleteFileAction(action)) {
-        yield put(triggerNotification('Removing file...'));
+        state.notification.next({ message: 'Removing file ...', position: 'top' });
         fileChangeRequest = [
             {
                 fileName: action.fileName,
@@ -63,29 +59,23 @@ function* makeFileChanges(action: t.ChangeFileActions) {
     }
     const response: SaveFilesResponse = yield call(saveChanges, fileChangeRequest);
     if (isEditFileAction(action) && isFailureResponse(response)) {
-        yield put(batchActions(
-            triggerNotification('Unabled to connect to the internet, retrying...', 'bottom-right'),
-            // have a loading icon of some sort.
-            // editFileFailure(),
-        ));
-        return;
+        state.notification.next({ message: 'Unable to connect to the Internet, retrying ...', position: 'top' });
+        return; // TODO(arjun): This was nothing but a notification. wtf?
     }
     if (isFailureResponse(response)) {
-        yield put(
-            triggerNotification(`Your session may be expired, try refreshing the page and try again`, 'top')
-            // A better way to handle this is best
-        );
+        // TODO(arjun): oops
+        state.notification.next({ message: 'Your session may be expired, try refreshing the page and try again', position: 'top' });
         return;
     }
     if (isDeleteFileAction(action)) {
-        yield put(triggerNotification(`File deleted: ${action.fileName}`, 'bottom-right'));
+        state.notification.next({ message: `Deleted ${action.fileName}`, position: 'top' });
         return;
     }
     if (isEditFileAction(action)) {
         yield put(markFileSaved(action.fileIndex));
         return;
     }
-    yield put(triggerNotification(`File created: ${action.fileName}`, 'bottom-right'));
+    state.notification.next({ message: `Created ${action.fileName}`, position: 'bottom-right' });
 }
 
 export function* watchCreateNewFile() {
