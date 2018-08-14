@@ -90,6 +90,7 @@ export class Sandbox {
             test: elementaryRTS.test,
             assert: elementaryRTS.assert,
             lib220: Object.freeze(lib220),
+            Array: elementaryRTS.Array,
             Math: Math
         };
 
