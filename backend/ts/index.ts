@@ -525,6 +525,9 @@ function downloadUrl(url: string):
   return new Promise<{errcode:string, data:string | Buffer}> ( resolve => {
     try {
       let responseCallback = (res: http.IncomingMessage) => {
+        if (res.statusCode !== undefined && res.statusCode !== 200) {
+          resolve({errcode: "error", data: "URL got redirected"})
+        }
         res.on('data', function (chunk : Buffer) {
           payload.push(chunk);
         });
