@@ -1,7 +1,7 @@
 import * as Rx from 'rxjs';
 import * as RxOps from 'rxjs/operators';
 import { saveChanges } from './utils/api/saveFileChanges';
-import { selectedFileIndex, currentProgram, loggedIn, isBufferSaved,
+import { selectedFileIndex, currentProgram, uiActive, isBufferSaved,
     notification, files } from './state';
 
 // Index and code to save, if a file is selected
@@ -30,7 +30,7 @@ function saveRequest({index, prog }: { index: number, prog: string }) {
     } ]));
 }
 
-loggedIn.pipe(
+uiActive.pipe(
     RxOps.switchMap(saveIfLoggedIn),
     RxOps.switchMap(saveRequest))
     .subscribe(response => {

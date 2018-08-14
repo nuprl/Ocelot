@@ -102,12 +102,6 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         state.editor.next(editor);
         editor.focus();
         editor.getModel().updateOptions({ tabSize: 2 }); // what if there are different models?
-        if (window.location.hostname === 'localhost') {
-            const code = window.localStorage.getItem('code');
-            if (code !== null) {
-                editor.setValue(code);
-            }
-        }
         this.editor = editor;
         const mustLogin = window.location.search !== '?anonymous';
         if (!this.state.loggedIn && mustLogin) {

@@ -47,7 +47,6 @@ class Index extends React.Component<WithStyles<WithStylesClasses>> {
 
       render() {
         const browser = detect();
-        console.log(this.props);
         switch (browser && browser.name) {
           case 'chrome':
           case 'firefox':
