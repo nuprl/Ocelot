@@ -23,6 +23,7 @@ function saveIfLoggedIn(isLoggedIn: boolean) {
 }
 
 function saveRequest({index, prog }: { index: number, prog: string }) {
+    isBufferSaved.next(false);
     return Rx.from(saveChanges([ { 
         fileName: files.getValue()[index].name, 
         type: 'create', 
@@ -38,6 +39,9 @@ uiActive.pipe(
     RxOps.mergeMap(saveRequest, 1))
     .subscribe(response => {
         if (response.status === 'SUCCESS') {
+            // Note that if there are other pending changes, then the buffer
+            // may not be saved. However, the next save request, which fires
+            // almost immediately, does isBufferSaved.next(false).
             isBufferSaved.next(true);
         }
         else {
