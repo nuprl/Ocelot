@@ -16,6 +16,7 @@ type Props = WithStyles<ListItemStylesTypes>;
 type State = {
     loggedIn: boolean,
     hasNewFileField: boolean,
+    isBufferSaved: boolean
 };
 
 class SavedIndicator extends React.Component<{}, { isBufferSaved: boolean }> {
@@ -44,11 +45,13 @@ class FilesFolder extends React.Component<Props, State> {
         this.state = {
             loggedIn: false,
             hasNewFileField: false,
+            isBufferSaved: state.isBufferSaved.getValue()
         };
     }
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
+        state.isBufferSaved.subscribe(x => this.setState({ isBufferSaved: x }));
     }
 
     newFileField = () => { this.setState({ hasNewFileField: true }) };
@@ -69,7 +72,7 @@ class FilesFolder extends React.Component<Props, State> {
                     <SavedIndicator />
                     <div style={{color: 'white', paddingLeft: '15px' }}>
                         <Button
-                                disabled={!this.state.loggedIn}
+                                disabled={!this.state.loggedIn || !this.state.isBufferSaved}
                                 onClick={this.newFileField}>
                             <NewIcon />
                             New
