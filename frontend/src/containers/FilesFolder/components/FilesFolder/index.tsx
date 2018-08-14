@@ -8,6 +8,7 @@ import 'static/styles/DrawerIconButton.css';
 import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles, Button } from '@material-ui/core';
+import NewIcon from '@material-ui/icons/Add';
 import * as state from '../../../../state';
 
 type Props = WithStyles<ListItemStylesTypes>;
@@ -32,7 +33,7 @@ class SavedIndicator extends React.Component<{}, { isBufferSaved: boolean }> {
 
     render() {
         const text = this.state.isBufferSaved ? 'All Changes Saved' : 'Saving ...';
-        return <div style={{color: 'white' }}>{text}</div>;
+        return <div style={{color: 'white', paddingLeft: '15px' }}>{text}</div>;
     }
 }
 
@@ -62,15 +63,18 @@ class FilesFolder extends React.Component<Props, State> {
                         disabled={!this.state.loggedIn}
                         dense
                         classes={{ dense: classes.tinyPadding }}>
-                        <Button
-                            disabled={!this.state.loggedIn}
-                            onClick={this.newFileField}>
-                            New
-                        </Button>
-                        <SavedIndicator />
                     </ListItem>
                 </div>
                 <List component="div" disablePadding dense >
+                    <SavedIndicator />
+                    <div style={{color: 'white', paddingLeft: '15px' }}>
+                        <Button
+                                disabled={!this.state.loggedIn}
+                                onClick={this.newFileField}>
+                            <NewIcon />
+                            New
+                        </Button>
+                    </div>
                     <UserFileItems />
                     <NewFileField
                         newFile={this.state.hasNewFileField}
