@@ -31,8 +31,11 @@ function saveRequest({index, prog }: { index: number, prog: string }) {
 }
 
 uiActive.pipe(
-    RxOps.switchMap(saveIfLoggedIn),
-    RxOps.switchMap(saveRequest))
+    // Concurrency is not an issue here.
+    RxOps.mergeMap(saveIfLoggedIn),
+    // Only 1 concurrent request at a time to ensure that we do not save out
+    // of order.
+    RxOps.mergeMap(saveRequest, 1))
     .subscribe(response => {
         if (response.status === 'SUCCESS') {
             isBufferSaved.next(true);
