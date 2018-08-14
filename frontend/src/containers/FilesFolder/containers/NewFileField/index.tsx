@@ -27,7 +27,7 @@ type Props = {
 
 type State = {
     loggedIn: boolean,
-    newFileErrorMsg: '' | 'Duplicated file name' | 'File name must match regex [\w\-]+\.js',
+    newFileErrorMsg: '' | 'Duplicated file name' | 'File name must match regex [\w\\\-]+\.js',
     files: state.UserFile[]
 };
 
@@ -51,7 +51,7 @@ class NewFileField extends React.Component<Props, State> {
                 return;
             }
             if (!isSimpleValidFileName(name)) {
-                this.setState({ newFileErrorMsg: 'File name must match regex [\w\-]+\.js' });
+                this.setState({ newFileErrorMsg: 'File name must match regex [\w\\-]+\.js' });
                 return;
             }
 
