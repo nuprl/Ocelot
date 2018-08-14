@@ -114,7 +114,7 @@ class  FileItem extends React.Component<Props, {selectedIndex: number, isBufferS
                                 classes={{
                                     root: classes.noButtonBackground
                                 }}
-                                disabled={disabled}
+                                disabled={isDisabled}
                             >
                                 <DeleteIcon color="inherit" />
                             </IconButton>
