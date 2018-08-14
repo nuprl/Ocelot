@@ -9,6 +9,7 @@ import ListItemStyles from '../../../../components/ListItemStyles';
 import { ListItemStylesTypes } from '../../../../components/ListItemStyles';
 import { WithStyles, Button } from '@material-ui/core';
 import NewIcon from '@material-ui/icons/Add';
+import Typography from '@material-ui/core/Typography';
 import * as state from '../../../../state';
 
 type Props = WithStyles<ListItemStylesTypes>;
@@ -34,7 +35,13 @@ class SavedIndicator extends React.Component<{}, { isBufferSaved: boolean }> {
 
     render() {
         const text = this.state.isBufferSaved ? 'All Changes Saved' : 'Saving ...';
-        return <div style={{color: 'white', paddingLeft: '15px' }}>{text}</div>;
+        return (
+            <div style={{color: 'white', paddingLeft: '15px' }}>
+                <Typography >
+                    {text}
+                </Typography>
+            </div>
+        );
     }
 }
 
