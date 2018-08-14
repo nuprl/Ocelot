@@ -49,8 +49,6 @@
 import * as Rx from 'rxjs';
 import * as monacoEditor from 'monaco-editor';
 
- // import * as RxOps from 'rxjs/operators';
-
 export const currentProgram = new Rx.BehaviorSubject<string>('');
 
 export const loggedIn = new Rx.BehaviorSubject<boolean>(false);
@@ -87,7 +85,7 @@ export const emptyFile = {
 
 export const files = new Rx.BehaviorSubject<UserFile[]>([emptyFile]);
 export const selectedFileIndex = new Rx.BehaviorSubject<number>(0);
-export const fileSaved = new Rx.BehaviorSubject<boolean[]>([true]);
+export const isBufferSaved = new Rx.BehaviorSubject<boolean>(true);
 
 export function currentFileName(): string {
     const ix = selectedFileIndex.getValue();

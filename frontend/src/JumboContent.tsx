@@ -20,6 +20,7 @@ import * as sandbox from './sandbox';
 import UserLogin from './loginButton';
 import HistoryButton from './containers/HistoryButton';
 import * as state from './state';
+import './autosave';
 
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';

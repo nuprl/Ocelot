@@ -17,6 +17,25 @@ type State = {
     hasNewFileField: boolean,
 };
 
+class SavedIndicator extends React.Component<{}, { isBufferSaved: boolean }> {
+
+    constructor(props: {}) {
+        super(props);
+        this.state = {
+            isBufferSaved: state.isBufferSaved.getValue()
+        };
+    }
+
+    componentDidMount() {
+        state.isBufferSaved.subscribe(x => this.setState({ isBufferSaved: x}));
+    }
+
+    render() {
+        const text = this.state.isBufferSaved ? 'All Changes Saved' : 'Saving ...';
+        return <div style={{color: 'white' }}>{text}</div>;
+    }
+}
+
 class FilesFolder extends React.Component<Props, State> {
 
     constructor(props: Props) {
@@ -48,6 +67,7 @@ class FilesFolder extends React.Component<Props, State> {
                             onClick={this.newFileField}>
                             New
                         </Button>
+                        <SavedIndicator />
                     </ListItem>
                 </div>
                 <List component="div" disablePadding dense >

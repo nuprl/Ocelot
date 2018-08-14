@@ -2,16 +2,11 @@ import * as React from 'react';
 import MonacoEditor from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import ReactResizeDetector from 'react-resize-detector';
-import { debounce } from 'lodash';
 import elemjshighlight from './elemjsHighlighter';
 import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import PawIcon from '@material-ui/icons/Pets';
 import Typography from '@material-ui/core/Typography';
 import * as state from '../../state';
-import { isFailureResponse, FileChange } from '../../utils/api/apiHelpers';
-import { saveChanges } from '../../utils/api/saveFileChanges';
-
-const debounceWait = 500; // milliseconds;
 
 const styles: StyleRulesCallback = theme => ({
     emptyState: {
@@ -48,13 +43,6 @@ type Props = {
     openMustLogin: () => void,
 } & WithStyles<'emptyState' | 'pawIcon'>;
 
-type FileEdit = {
-    fileName: string,
-    fileIndex: number,
-    code: string,
-    loggedIn: boolean
-};
-
 type CodeEditorState = {
     loggedIn: boolean,
     selectedFileIndex: number
@@ -62,11 +50,9 @@ type CodeEditorState = {
 
 class CodeEditor extends React.Component<Props, CodeEditorState> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
-    fileEditsQueue: FileEdit[];
     constructor(props: Props) {
         super(props);
         this.editor = undefined;
-        this.fileEditsQueue = [];
         this.state = {
             loggedIn: state.loggedIn.getValue(),
             selectedFileIndex: state.selectedFileIndex.getValue()
@@ -142,12 +128,6 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             this.editor.setValue(state.currentProgram.getValue());
         }
 
-        this.fileEditsQueue.push({
-            loggedIn: this.state.loggedIn,
-            fileName: state.currentFileName(),
-            fileIndex: this.state.selectedFileIndex,
-            code: this.editor.getValue()
-        });
         this.editor.focus();
     }
 
@@ -157,51 +137,9 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         }
         this.editor.layout();
     }
-
-    saveCodeCloud(fileName: string, fileIndex: number, code: string) {
-        console.log('Saving code to cloud!');
-        const change: FileChange[] = [
-          {
-            fileName: fileName,
-            type: 'create',
-            changes: code,
-          }
-        ];
-        saveChanges(change).then((response) => {
-          if (isFailureResponse(response)) {
-            console.log('Could not save to cloud');
-          }
-          console.log('Saved to cloud!');
-        }).catch((err) => console.log('An error occurred!', err));
-      };
     
-    saveCodeCloudWrapper()  {
-        let fileEdit: FileEdit;
-        console.log('Saving code');
-        while (this.fileEditsQueue.length > 0) {
-            console.log('In loop');
-            fileEdit = this.fileEditsQueue.shift() as FileEdit;
-            if (fileEdit.fileIndex === this.state.selectedFileIndex) {
-                continue;
-            }
-            this.saveCodeCloud(
-                fileEdit.fileName,
-                fileEdit.fileIndex,
-                fileEdit.code);
-        }
-        this.saveCodeCloud(
-            state.currentFileName(),
-            this.state.selectedFileIndex,
-            state.currentProgram.getValue());
-
-    };
-
-    debouncedSaveCodeCloud = debounce(() => this.saveCodeCloudWrapper(), debounceWait);
-
     onChange(code: string)  {
-        if (this.state.loggedIn) {
-            this.debouncedSaveCodeCloud();
-        }
+        state.isBufferSaved.next(false);
         state.currentProgram.next(code);
         const oldFiles = state.files.getValue();
         const files = oldFiles.map((file, index) => {

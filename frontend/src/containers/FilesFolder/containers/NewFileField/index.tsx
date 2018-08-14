@@ -59,9 +59,7 @@ class NewFileField extends React.Component<Props, State> {
             this.setState({ newFileErrorMsg: '' });
 
             const oldFiles = state.files.getValue();
-            const oldFileSaved = state.fileSaved.getValue();
             state.files.next([...oldFiles, { name: name, content: '' }]);
-            state.fileSaved.next([...oldFileSaved, false]);
             state.selectedFileIndex.next(oldFiles.length);
         };
     }

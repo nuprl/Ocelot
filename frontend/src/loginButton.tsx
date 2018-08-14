@@ -105,7 +105,6 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
         state.loggedIn.next(false);
         state.email.next('');
         state.files.next([ state.emptyFile ]);
-        state.fileSaved.next([ true ]);
         state.selectedFileIndex.next(1);
         localStorage.removeItem('userEmail');
         localStorage.removeItem('sessionId');

@@ -24,24 +24,27 @@ type FileItemProps = {
 
 type Props = FileItemProps & WithStyles<ListItemStylesTypes>;
 
-class  FileItem extends React.Component<Props, {selectedIndex: number}> {
+class  FileItem extends React.Component<Props, {selectedIndex: number, isBufferSaved: boolean}> {
 
-    private subscription: Rx.Subscription | undefined;
+    private subs: Rx.Subscription[] = [];
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            selectedIndex: state.selectedFileIndex.getValue()
+            selectedIndex: state.selectedFileIndex.getValue(),
+            isBufferSaved: state.isBufferSaved.getValue()
         };
     }
 
     componentDidMount() {
-        this.subscription = state.selectedFileIndex.subscribe(x => this.setState({ selectedIndex: x }));
+        this.subs.push(
+            state.selectedFileIndex.subscribe(x => this.setState({ selectedIndex: x })),
+            state.isBufferSaved.subscribe(x => this.setState({ isBufferSaved: x })));
     }
 
     componentWillUnmount() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
+        for (const sub of this.subs) {
+            sub.unsubscribe();
         }
     }
 
@@ -64,6 +67,7 @@ class  FileItem extends React.Component<Props, {selectedIndex: number}> {
 
     render() {
         const { classes, name, disabled, fileIndex } = this.props
+        const isDisabled = disabled || !this.state.isBufferSaved;
         const isSelected = fileIndex === this.state.selectedIndex;
         return (
             <ListItem
@@ -75,11 +79,11 @@ class  FileItem extends React.Component<Props, {selectedIndex: number}> {
                     dense: classes.tinyPadding,
                 }}
                 onClick={() => {
-                    state.currentProgram.next(state.files.getValue()[fileIndex].content);
                     state.selectedFileIndex.next(fileIndex);
+                    state.currentProgram.next(state.files.getValue()[fileIndex].content);
                 }}
                 dense
-                disabled={disabled}
+                disabled={isDisabled}
             >
                 <ListItemIcon>
                     <CodeIcon
