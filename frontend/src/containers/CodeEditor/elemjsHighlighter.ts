@@ -52,7 +52,7 @@ const crap = (): any => ({
             { include: '@whitespace' },
 
             // regular expression: ensure it is terminated before beginning (otherwise it is an opeator)
-            [/\/(?=([^\\\/]|\\.)+\/[^\d\w])/, { token: 'regexp.slash', bracket: '@open', next: '@regexp' }],
+            [/\/(?=([^\\\/]|\\.)+\/(?!\s*(\d|\w)))/, { token: 'regexp.slash', bracket: '@open', next: '@regexp' }],
 
             // delimiters and operators
             [/[{}()\[\]]/, '@brackets'],
