@@ -24,7 +24,7 @@ cd Stopify
 git checkout 220
 yarn install
 cd stopify-estimators && yarn run build && cd .. && \
-cd stopify-continuations && yarn run build && cd .. && \
+cd stopify-continuations && yarn run build && yarn link && cd .. && \
 cd stopify && yarn run build && yarn link && cd ..
 
 ```
@@ -42,7 +42,7 @@ yarn link
 To setup Ocelot frontend:
 
 ```bash
-cd Ocelot/frontend && yarn install && yarn link stopify && yarn link elementary-js && yarn run build
+cd Ocelot/frontend && yarn install && yarn link stopify && yarn link stopify-continuations && yarn link elementary-js && yarn run build
 ```
 
 To run Ocelot locally:
@@ -79,7 +79,7 @@ ln -s <path-to-local-220-library> lib220.js
   So, first run:
 
   ```
-  yarn unlink stopify && yarn unlink elementary-js
+  yarn unlink stopify && yarn unlink elementary-js && yarn link stopify-continuations
   ```
 
   Then run `yarn install` or `yarn add ...`:
@@ -87,5 +87,5 @@ ln -s <path-to-local-220-library> lib220.js
   then in `Ocelot/frontend`, run:
 
   ```
-  yarn link stopify && yarn link elementary-js
+  yarn link stopify && yarn link elementary-js && yarn link stopify-continuations
   ```

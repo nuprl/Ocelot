@@ -14,10 +14,14 @@ import * as state from './state';
 
 export type Mode = 'running' | 'testing' | 'stopped' | 'stopping';
 
+const compileOpts: Partial<stopify.CompilerOpts> = {
+    hofs: 'fill'
+};
+
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
 // function to create an AsyncRun that does not run any user code.
 function emptyStopifyRunner() {
-    const runner = stopify.stopifyLocally('');
+    const runner = stopify.stopifyLocally('', compileOpts);
     if (runner.kind === 'error') {
         // Panic situation!
         throw new Error('Could not create empty stopify.AsyncRun');
@@ -155,7 +159,7 @@ export class Sandbox {
         } else if (mode === 'testing') {
             this.console.log('Running tests...');
         }
-        const runner = stopify.stopifyLocallyFromAst(compiled.node);
+        const runner = stopify.stopifyLocallyFromAst(compiled.node, undefined, compileOpts);
         if (runner.kind === 'error') {
           this.console.error(runner.exception);
           return;
