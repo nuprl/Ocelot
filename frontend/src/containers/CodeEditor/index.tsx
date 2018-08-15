@@ -45,7 +45,8 @@ type Props = {
 
 type CodeEditorState = {
     loggedIn: boolean,
-    selectedFileIndex: number
+    selectedFileIndex: number,
+    loadProgram: string
 };
 
 class CodeEditor extends React.Component<Props, CodeEditorState> {
@@ -58,13 +59,15 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         this.maskChange = true;
         this.state = {
             loggedIn: state.loggedIn.getValue(),
-            selectedFileIndex: state.selectedFileIndex.getValue()
+            selectedFileIndex: state.selectedFileIndex.getValue(),
+            loadProgram: ''
         };
     }
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
         state.selectedFileIndex.subscribe(x => this.setState({ selectedFileIndex: x }));
+        state.loadProgram.subscribe(x => this.setState({ loadProgram: x }));
     }
 
     editorWillMount = (monaco: typeof monacoEditor) => {
@@ -102,7 +105,6 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
     };
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
-        state.editor.next(editor);
         editor.focus();
         editor.getModel().updateOptions({ tabSize: 2 }); // what if there are different models?
         this.editor = editor;
@@ -122,8 +124,13 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         }
 
         if (prevState.selectedFileIndex !== this.state.selectedFileIndex) {
-            this.maskChange = true;
-            this.editor.setValue(state.currentProgram.getValue());
+
+            if (this.state.selectedFileIndex !== -1) {
+                this.maskChange = true;
+                const content = state.files.getValue()[this.state.selectedFileIndex].content;
+                state.loadProgram.next(content);
+                state.currentProgram.next(content);
+            }
         }
 
         this.editor.focus();
@@ -177,7 +184,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
                 <MonacoEditor
                     language="elementaryjs"
                     theme="vs-dark"
-                    value={state.currentProgram.getValue()}
+                    value={this.state.loadProgram}
                     options={monacoOptions}
                     onChange={(code) => this.onChange(code)}
                     editorDidMount={this.editorDidMount}

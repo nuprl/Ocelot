@@ -47,9 +47,16 @@
  */
 
 import * as Rx from 'rxjs';
-import * as monacoEditor from 'monaco-editor';
 
+// This is the current program in the editor. It is set by the editor and should
+// not be set by any other component.
 export const currentProgram = new Rx.BehaviorSubject<string>('');
+
+// Send values to this subject to have the editor load a new program. Do not
+// send values when the code in the editor changes. This is not a
+// BehaviorSubject, because the last value it receives may not be the current
+// state of a file.
+export const loadProgram = new Rx.Subject<string>();
 
 export const loggedIn = new Rx.BehaviorSubject<boolean>(false);
 export const email = new Rx.BehaviorSubject<string>("");
@@ -68,9 +75,6 @@ function isUiActive(loggedIn: boolean, filesLoading: boolean): boolean {
 loggedIn.subscribe(x => uiActive.next(isUiActive(x, filesLoading.getValue())));
 
 filesLoading.subscribe(y => uiActive.next(isUiActive(loggedIn.getValue(), y)));
-
-export const editor = new Rx.BehaviorSubject<monacoEditor.editor.IStandaloneCodeEditor | undefined>(undefined);
-
 
 export type NotificationPosition = 'top' | 'bottom-right';
 export type Notification = { message: string, position: NotificationPosition };

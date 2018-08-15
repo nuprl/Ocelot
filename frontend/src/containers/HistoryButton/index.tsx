@@ -152,26 +152,12 @@ class HistoryButton extends React.Component<Props, State> {
                 });
             setTimeout(() => { // immediate state change causes the UI to update immediately
                 // The UI looks 'buggy' if I were to not setTimeout
-                const editor = state.editor.getValue();
+                const editor = state.currentProgram.getValue();
                 const { history } = this.state;
                 if (editor === undefined || history.length - 1 < index) {
                     return;
                 }
-                const numLines = editor.getModel().getLineCount();
-                const finalColumn = editor.getModel().getLineMaxColumn(numLines);
-                editor.executeEdits(
-                    'restore_from_revision', // just a made up name
-                    [{
-                        range: new monacoEditor.Range(
-                            1,
-                            1,
-                            numLines,
-                            finalColumn
-                        ),
-                        text: this.state.history[index].code,
-                        forceMoveMarkers: true
-                    }]
-                );
+                state.loadProgram.next(this.state.history[index].code);;
             }, 30);
         };
     }
