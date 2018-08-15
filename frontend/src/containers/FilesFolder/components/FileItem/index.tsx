@@ -55,7 +55,7 @@ class FileItem extends React.Component<Props, {selectedIndex: number, isBufferSa
           return;
         }
         saveChanges([{
-          fileName: this.name,
+          fileName: this.props.name,
           type: 'delete',
         }]).then((response) => {
           if (isFailureResponse(response)) {
