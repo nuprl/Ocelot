@@ -49,7 +49,7 @@ class FileItem extends React.Component<Props, {selectedIndex: number, isBufferSa
     }
 
     onDelete() {
-        const response = prompt("Are you sure you want to delete this file? Enter YES or NO");
+        const response = prompt(`Are you sure you want to permanently delete the file '${name}'? Enter YES to confirm.`);
         if (response !== "YES") {
           state.notification.next({ message: `Delete aborted: ${name}`, position: 'bottom-right' });
           return;
@@ -70,6 +70,7 @@ class FileItem extends React.Component<Props, {selectedIndex: number, isBufferSa
             console.log('Oh no! File not deleted!');
           }
           console.log('File delete!');
+          state.notification.next({ message: `File deleted: ${name}`, position: 'bottom-right' });
         }).catch(error => console.log('cannot delete file', error));
     }
 
