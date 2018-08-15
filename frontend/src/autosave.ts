@@ -24,6 +24,9 @@ function saveIfLoggedIn(isLoggedIn: boolean) {
 
 function saveRequest({index, prog }: { index: number, prog: string }) {
     isBufferSaved.next(false);
+    window.onbeforeunload = function() {
+        return true;
+    };
     return Rx.from(saveChanges([ { 
         fileName: files.getValue()[index].name, 
         type: 'create', 
@@ -43,6 +46,9 @@ uiActive.pipe(
             // may not be saved. However, the next save request, which fires
             // almost immediately, does isBufferSaved.next(false).
             isBufferSaved.next(true);
+            window.onbeforeunload = function() {
+                return null;
+            };
         }
         else {
             notification.next({ message: `Failed to save file`, position: 'top' });
