@@ -24,7 +24,7 @@ type FileItemProps = {
 
 type Props = FileItemProps & WithStyles<ListItemStylesTypes>;
 
-class  FileItem extends React.Component<Props, {selectedIndex: number, isBufferSaved: boolean}> {
+class FileItem extends React.Component<Props, {selectedIndex: number, isBufferSaved: boolean}> {
 
     private subs: Rx.Subscription[] = [];
 
@@ -55,7 +55,7 @@ class  FileItem extends React.Component<Props, {selectedIndex: number, isBufferS
           return;
         }
         saveChanges([{
-          fileName: name,
+          fileName: this.name,
           type: 'delete',
         }]).then((response) => {
           if (isFailureResponse(response)) {
