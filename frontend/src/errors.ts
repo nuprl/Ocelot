@@ -4,7 +4,7 @@ import { OCELOTVERSION } from './version';
 
 function traceError(message: { [key: string]: any}) {
     const err = {
-        username: state.email,
+        username: state.email.getValue(),
         ejsversion: EJSVERSION,
         ocelotversion: OCELOTVERSION,
         ...message
@@ -14,7 +14,15 @@ function traceError(message: { [key: string]: any}) {
         body = JSON.stringify(err);
     }
     catch (exn) {
-        body = String(err);
+        if (message.message) {
+            message = message;
+        }
+        body = JSON.stringify({
+            username: state.email,
+            ejsversion: EJSVERSION,
+            ocelotversion: OCELOTVERSION,
+            message: String(message)
+        });
     }
 
     fetch('https://us-central1-arjunguha-research-group.cloudfunctions.net/paws/error', {
