@@ -65,6 +65,7 @@ export class Sandbox {
 
     constructor() {
         this.runner = emptyStopifyRunner();
+        this.setGlobals();
         this.mode = 'stopped';
         this.modeListeners = []
     }
