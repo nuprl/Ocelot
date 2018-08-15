@@ -14,6 +14,14 @@ Be sure you're authenticated on Google Cloud and on your computer:
 gcloud auth login
 gcloud auth application-default login
 ```
+If this is the only GCloud project you are working on, set the project to PLASMA:
+```bash
+gcloud config set project arjunguha-research-group
+```
+Else, you will have to manually specify the project ID when deploying the backend:
+```bash
+yarn deploy --project arjunguha-research-group
+```
 
 Follow these instructions to use the bleeding-edge versions of Stopify, and ElementaryJS with Ocelot.
 
