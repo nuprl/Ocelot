@@ -58,6 +58,14 @@ class FileItem extends React.Component<Props, {selectedIndex: number, isBufferSa
           fileName: this.props.name,
           type: 'delete',
         }]).then((response) => {
+          const { fileIndex } = this.props;
+          const oldFiles = state.files.getValue();
+          const files = [
+            ...oldFiles.slice(0, fileIndex),
+            ...oldFiles.slice(fileIndex + 1)];
+          const newIndex = fileIndex < files.length ? fileIndex : files.length - 1;
+          state.files.next(files);
+          state.selectedFileIndex.next(newIndex);
           if (isFailureResponse(response)) {
             console.log('Oh no! File not deleted!');
           }
