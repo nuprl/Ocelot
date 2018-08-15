@@ -50,9 +50,12 @@ type CodeEditorState = {
 
 class CodeEditor extends React.Component<Props, CodeEditorState> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
+    maskChange: boolean;
+
     constructor(props: Props) {
         super(props);
         this.editor = undefined;
+        this.maskChange = true;
         this.state = {
             loggedIn: state.loggedIn.getValue(),
             selectedFileIndex: state.selectedFileIndex.getValue()
@@ -119,6 +122,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         }
 
         if (prevState.selectedFileIndex !== this.state.selectedFileIndex) {
+            this.maskChange = true;
             this.editor.setValue(state.currentProgram.getValue());
         }
 
@@ -133,6 +137,10 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
     }
     
     onChange(code: string)  {
+        if (this.maskChange) {
+            this.maskChange = false;
+            return;
+        }
         state.isBufferSaved.next(false);
         state.currentProgram.next(code);
         const oldFiles = state.files.getValue();
