@@ -164,15 +164,14 @@ class OutputPanel extends React.Component<Props, State> {
         const retrieveHistory = (event: monacoEditor.IKeyboardEvent, isDownkey: boolean) => {
             event.preventDefault();
             event.stopPropagation();
+            if (!isDownkey && this.state.historyLocation + 1 > this.state.commandHistory.length - 1) { // if at the top of history
+                return;
+            }
             let newHistoryLocation = Math.min(this.state.historyLocation + 1, this.state.commandHistory.length - 1);
             if (isDownkey) {
                 newHistoryLocation = Math.max(this.state.historyLocation - 1, -1);
             }
-            if (!isDownkey && this.state.historyLocation + 1 > newHistoryLocation) { // if at the top of history
-                return;
-            }
             editor.setValue(this.state.commandHistory[newHistoryLocation] || '');
-            console.log(this.state.commandHistory[newHistoryLocation] || '');
             const newLineCount = editor.getModel().getLineCount();
             const newColumn = editor.getModel().getLineMaxColumn(newLineCount)
             editor.setPosition({ lineNumber: newLineCount, column: newColumn });
@@ -184,7 +183,6 @@ class OutputPanel extends React.Component<Props, State> {
             const currentCursorLineNum = editor.getPosition().lineNumber;
             const totalNumLines = editor.getModel().getLineCount();
             if (event.keyCode === monaco.KeyCode.UpArrow && currentCursorLineNum === 1) { // if topmost line
-                console.log('Upp pressed');
                 retrieveHistory(event, false);
                 return;
             }
@@ -207,7 +205,6 @@ class OutputPanel extends React.Component<Props, State> {
                     historyLocation: -1,
                     commandHistory: [command, ...this.state.commandHistory]
                 });
-                console.log(this.state.commandHistory);
                 this.props.sandbox.onConsoleInput(command);
             }
         });
