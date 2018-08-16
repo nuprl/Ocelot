@@ -15,7 +15,9 @@ import { WithStyles } from '@material-ui/core';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import * as state from '../../../../state';
 
-// this is copied from backend
+// NOTE (Sam): If you make any changes for isSimpleValidFileName
+// You have to do the same for the backend, the backend has the exact
+// same function to validate file names. If these functions don't match, errors can happen.
 const isSimpleValidFileName = (fileName: string) => { // still incomplete but will do for now
     return /^[\w\-]+\.js$/.test(fileName);
 };
