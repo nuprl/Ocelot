@@ -17,24 +17,24 @@ type Props = WithStyles<ListItemStylesTypes>;
 type State = {
     loggedIn: boolean,
     hasNewFileField: boolean,
-    isBufferSaved: boolean
+    dirty: state.Dirty
 };
 
-class SavedIndicator extends React.Component<{}, { isBufferSaved: boolean }> {
+class SavedIndicator extends React.Component<{}, { dirty: state.Dirty }> {
 
     constructor(props: {}) {
         super(props);
         this.state = {
-            isBufferSaved: state.isBufferSaved.getValue()
+            dirty: state.dirty.getValue()
         };
     }
 
     componentDidMount() {
-        state.isBufferSaved.subscribe(x => this.setState({ isBufferSaved: x}));
+        state.dirty.subscribe(x => this.setState({ dirty: x}));
     }
 
     render() {
-        const text = this.state.isBufferSaved ? 'All Changes Saved' : 'Saving ...';
+        const text = this.state.dirty === 'saved' ? 'All Changes Saved' : 'Saving ...';
         return (
             <div style={{color: 'white', paddingLeft: '15px' }}>
                 <Typography >
@@ -52,13 +52,13 @@ class FilesFolder extends React.Component<Props, State> {
         this.state = {
             loggedIn: false,
             hasNewFileField: false,
-            isBufferSaved: state.isBufferSaved.getValue()
+            dirty: state.dirty.getValue()
         };
     }
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
-        state.isBufferSaved.subscribe(x => this.setState({ isBufferSaved: x }));
+        state.dirty.subscribe(x => this.setState({ dirty: x }));
     }
 
     newFileField = () => { this.setState({ hasNewFileField: true }) };
@@ -79,7 +79,7 @@ class FilesFolder extends React.Component<Props, State> {
                     <SavedIndicator />
                     <div style={{color: 'white', paddingLeft: '15px' }}>
                         <Button
-                                disabled={!this.state.loggedIn || !this.state.isBufferSaved}
+                                disabled={!this.state.loggedIn || this.state.dirty !== 'saved'}
                                 onClick={this.newFileField}>
                             <NewIcon />
                             New
