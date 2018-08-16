@@ -616,9 +616,13 @@ paws.post('/gethistory', wrapHandler(getFileHistory));
 paws.get('/geturl', getUrl);
 
 paws.post('/error', wrapHandler(async req => {
-  console.error(req.body);
   if (req.headers['content-type'] === 'application/json') {
-    await errorReporting.report(JSON.stringify(req.body));
+    const evt = errorReporting.event();
+    evt.setUser(req.body.username);
+    evt.setServiceContext('ocelot', req.body.version);
+    evt.setUserAgent(req.body.userAgent);
+    evt.setMessage(JSON.stringify(req.body.message));
+    await errorReporting.report(evt);
   }
   else {
     await errorReporting.report(String(req.body));
