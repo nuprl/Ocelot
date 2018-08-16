@@ -160,19 +160,36 @@ class OutputPanel extends React.Component<Props, State> {
                 currentLineCount = totalLineCount;
             }
         });
+
+        const retrieveHistory = (event: monacoEditor.IKeyboardEvent, isDownkey: boolean) => {
+            event.preventDefault();
+            event.stopPropagation();
+            let newHistoryLocation = Math.min(this.state.historyLocation + 1, this.state.commandHistory.length - 1);
+            if (isDownkey) {
+                newHistoryLocation = Math.max(this.state.historyLocation - 1, -1);
+            }
+            if (!isDownkey && this.state.historyLocation + 1 > newHistoryLocation) { // if at the top of history
+                return;
+            }
+            editor.setValue(this.state.commandHistory[newHistoryLocation] || '');
+            console.log(this.state.commandHistory[newHistoryLocation] || '');
+            const newLineCount = editor.getModel().getLineCount();
+            const newColumn = editor.getModel().getLineMaxColumn(newLineCount)
+            editor.setPosition({ lineNumber: newLineCount, column: newColumn });
+            this.setState({ historyLocation: newHistoryLocation });
+
+        };
+
         editor.onKeyDown(event => {
             const currentCursorLineNum = editor.getPosition().lineNumber;
             const totalNumLines = editor.getModel().getLineCount();
             if (event.keyCode === monaco.KeyCode.UpArrow && currentCursorLineNum === 1) { // if topmost line
-                const newHistoryLocation = Math.min(this.state.historyLocation + 1, this.state.commandHistory.length - 1);
-                editor.setValue(this.state.commandHistory[newHistoryLocation] || '');
-                this.setState({ historyLocation: newHistoryLocation });
+                console.log('Upp pressed');
+                retrieveHistory(event, false);
                 return;
             }
             if (event.keyCode === monaco.KeyCode.DownArrow && currentCursorLineNum === totalNumLines) { // if last line
-                const newHistoryLocation = Math.max(this.state.historyLocation - 1, -1);
-                editor.setValue(this.state.commandHistory[newHistoryLocation] || '');
-                this.setState({ historyLocation: newHistoryLocation });
+                retrieveHistory(event, true);
                 return;
             }
             if (event.keyCode === monaco.KeyCode.Enter && event.shiftKey) {
@@ -184,12 +201,13 @@ class OutputPanel extends React.Component<Props, State> {
                 const command = editor.getValue();
                 if (command.trim() === '') {
                     return;
-                } 
+                }
                 editor.setValue('');
                 this.setState({
                     historyLocation: -1,
                     commandHistory: [command, ...this.state.commandHistory]
                 });
+                console.log(this.state.commandHistory);
                 this.props.sandbox.onConsoleInput(command);
             }
         });
