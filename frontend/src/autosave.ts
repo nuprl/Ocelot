@@ -4,11 +4,19 @@ import { saveChanges } from './utils/api/saveFileChanges';
 import { currentProgram, currentFileName, dirty,
     notification } from './state';
 
+window.addEventListener('beforeunload', (event) => {
+    if (dirty.getValue() === 'saved') {
+        return null;
+    }
+    else {
+        // NOTE(arjun): It does not appear to actually show this message.
+        event.returnValue = `You may lose changes if you close the page.`;
+        return true;
+    }
+});
+
 function saveRequest() {
     dirty.next('saving');
-    window.onbeforeunload = function() {
-        return true;
-    };
     return Rx.from(saveChanges([ { 
         fileName: currentFileName(),
         type: 'create', 
@@ -26,9 +34,6 @@ dirty.pipe(
             // may not be saved. However, the next save request, which fires
             // almost immediately, does isBufferSaved.next(false).
             dirty.next('saved');
-            window.onbeforeunload = function() {
-                return null;
-            };
         }
         else {
             notification.next({ message: `Failed to save file`, position: 'top' });
