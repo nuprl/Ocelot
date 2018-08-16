@@ -17,7 +17,7 @@ import * as state from '../../../../state';
 
 // this is copied from backend
 const isSimpleValidFileName = (fileName: string) => { // still incomplete but will do for now
-    return /^[\w\-]+\.js/.test(fileName);
+    return /^[\w\-]+\.js$/.test(fileName);
 };
 
 type Props = {

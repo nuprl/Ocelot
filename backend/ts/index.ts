@@ -149,7 +149,7 @@ function isSimpleValidEmail(email: string) { // incomplete but will do for now
 }
 
 function isSimpleValidFileName(fileName: string) { // still incomplete but will do for now
-  return /^\w+\.\w+/.test(fileName);
+  return /^[\w\-]+\.js$/.test(fileName);
 }
 
 /**
@@ -256,7 +256,7 @@ async function changeFile(req: Request) {
     let fileExists, currentFile, currentFileChange: FileChange;
     for (currentFileChange of req.body.fileChanges) {
       if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid filename
-        continue;
+        return failureResponse(`Could not make changes to file: ${currentFileChange.fileName}, name not valid`);
       }
       currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
       if (currentFileChange.type === 'create') {
