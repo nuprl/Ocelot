@@ -24,7 +24,7 @@ type FileItemProps = {
 
 type Props = FileItemProps & WithStyles<ListItemStylesTypes>;
 
-class FileItem extends React.Component<Props, {selectedIndex: number, isBufferSaved: boolean}> {
+class FileItem extends React.Component<Props, {selectedIndex: number, dirty: state.Dirty}> {
 
     private subs: Rx.Subscription[] = [];
 
@@ -32,14 +32,14 @@ class FileItem extends React.Component<Props, {selectedIndex: number, isBufferSa
         super(props);
         this.state = {
             selectedIndex: state.selectedFileIndex.getValue(),
-            isBufferSaved: state.isBufferSaved.getValue()
+            dirty: state.dirty.getValue()
         };
     }
 
     componentDidMount() {
         this.subs.push(
             state.selectedFileIndex.subscribe(x => this.setState({ selectedIndex: x })),
-            state.isBufferSaved.subscribe(x => this.setState({ isBufferSaved: x })));
+            state.dirty.subscribe(x => this.setState({ dirty: x })));
     }
 
     componentWillUnmount() {
@@ -77,7 +77,7 @@ class FileItem extends React.Component<Props, {selectedIndex: number, isBufferSa
 
     render() {
         const { classes, name, disabled, fileIndex } = this.props
-        const isDisabled = disabled || !this.state.isBufferSaved;
+        const isDisabled = disabled || this.state.dirty !== 'saved';
         const isSelected = fileIndex === this.state.selectedIndex;
         return (
             <ListItem

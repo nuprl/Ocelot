@@ -58,6 +58,9 @@ export const currentProgram = new Rx.BehaviorSubject<string>('');
 // state of a file.
 export const loadProgram = new Rx.Subject<string>();
 
+export type Dirty = 'dirty' | 'saving' | 'saved';
+export const dirty = new Rx.BehaviorSubject<Dirty>('saved');
+
 export const loggedIn = new Rx.BehaviorSubject<boolean>(false);
 export const email = new Rx.BehaviorSubject<string>("");
 
@@ -89,7 +92,6 @@ export const emptyFile = {
 
 export const files = new Rx.BehaviorSubject<UserFile[]>([emptyFile]);
 export const selectedFileIndex = new Rx.BehaviorSubject<number>(0);
-export const isBufferSaved = new Rx.BehaviorSubject<boolean>(true);
 
 export function currentFileName(): string {
     const ix = selectedFileIndex.getValue();

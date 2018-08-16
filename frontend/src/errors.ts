@@ -2,27 +2,24 @@ import * as state from './state';
 import { EJSVERSION } from 'elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 
-function traceError(message: { [key: string]: any}) {
-    const err = {
-        username: state.email.getValue(),
-        ejsversion: EJSVERSION,
-        ocelotversion: OCELOTVERSION,
-        ...message
-    };
+function traceError(message: any) {
+    const version = `Ocelot ${OCELOTVERSION}, EJS ${EJSVERSION}`;
+    const username = state.email.getValue();
+    const userAgent = window.navigator.userAgent;
+    const err = { username, version, userAgent, message };
     let body: string;
     try {
         body = JSON.stringify(err);
     }
     catch (exn) {
+        // We could not turn message into JSON, see if it has a message ...
         if (message.message) {
-            message = message;
+            err.message = String(message.message);
         }
-        body = JSON.stringify({
-            username: state.email,
-            ejsversion: EJSVERSION,
-            ocelotversion: OCELOTVERSION,
-            message: String(message)
-        });
+        else {
+            err.message = String(message);
+        }
+        body = JSON.stringify(err);
     }
 
     fetch('https://us-central1-arjunguha-research-group.cloudfunctions.net/paws/error', {
@@ -38,6 +35,7 @@ function traceError(message: { [key: string]: any}) {
 window.addEventListener('error', (errorEvent) => {
     traceError({
         message: errorEvent.message,
+        userProgram: state.currentProgram.getValue(),
         line: errorEvent.lineno,
         column: errorEvent.colno
     });

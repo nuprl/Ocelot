@@ -51,12 +51,10 @@ type CodeEditorState = {
 
 class CodeEditor extends React.Component<Props, CodeEditorState> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
-    maskChange: boolean;
 
     constructor(props: Props) {
         super(props);
         this.editor = undefined;
-        this.maskChange = true;
         this.state = {
             loggedIn: state.loggedIn.getValue(),
             selectedFileIndex: state.selectedFileIndex.getValue(),
@@ -126,7 +124,6 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         if (prevState.selectedFileIndex !== this.state.selectedFileIndex) {
 
             if (this.state.selectedFileIndex !== -1) {
-                this.maskChange = true;
                 const content = state.files.getValue()[this.state.selectedFileIndex].content;
                 state.loadProgram.next(content);
                 state.currentProgram.next(content);
@@ -144,12 +141,8 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
     }
     
     onChange(code: string)  {
-        if (this.maskChange) {
-            this.maskChange = false;
-            return;
-        }
-        state.isBufferSaved.next(false);
         state.currentProgram.next(code);
+        state.dirty.next('dirty');
         const oldFiles = state.files.getValue();
         const files = oldFiles.map((file, index) => {
             if (index === this.state.selectedFileIndex) {
