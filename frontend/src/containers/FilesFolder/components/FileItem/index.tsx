@@ -66,6 +66,7 @@ class FileItem extends React.Component<Props, {selectedIndex: number, dirty: sta
           const newIndex = fileIndex < files.length ? fileIndex : files.length - 1;
           state.files.next(files);
           state.selectedFileIndex.next(newIndex);
+          state.loadProgram.next(files[newIndex].content);
           if (isFailureResponse(response)) {
             console.log('Oh no! File not deleted!');
             state.notification.next({ message: `Unable to delete '${this.props.name}'`, position: 'bottom-right' });
@@ -90,7 +91,7 @@ class FileItem extends React.Component<Props, {selectedIndex: number, dirty: sta
                 }}
                 onClick={() => {
                     state.selectedFileIndex.next(fileIndex);
-                    state.currentProgram.next(state.files.getValue()[fileIndex].content);
+                    state.loadProgram.next(state.files.getValue()[fileIndex].content);
                 }}
                 dense
                 disabled={isDisabled}
