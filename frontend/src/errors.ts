@@ -2,11 +2,21 @@ import * as state from './state';
 import { EJSVERSION } from 'elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 
+function getEmail() {
+    const v = state.loggedIn.getValue();
+
+    if (v.kind !== 'logged-out') {
+        return v.email;
+    }
+    else {
+        return '';
+    }
+}
+
 function traceError(message: any) {
     const version = `Ocelot ${OCELOTVERSION}, EJS ${EJSVERSION}`;
-    const username = state.email.getValue();
     const userAgent = window.navigator.userAgent;
-    const err = { username, version, userAgent, message };
+    const err = { username: getEmail(), version, userAgent, message };
     let body: string;
     try {
         body = JSON.stringify(err);

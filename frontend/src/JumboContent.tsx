@@ -71,7 +71,7 @@ type ExecutionProps = {
   sandbox: sandbox.Sandbox
 }
 
-class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.Mode, loggedIn: boolean }> {
+class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.Mode, loggedIn: state.LoggedIn }> {
 
   constructor(props: ExecutionProps) {
     super(props);
@@ -89,7 +89,7 @@ class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.
   }
 
   onRunOrTestClicked(mode: 'running' | 'testing') {
-    if (this.state.loggedIn) {
+    if (this.state.loggedIn.kind === 'logged-in') {
       // TODO(arjun): MUST be more robust. Cannot suppress errors.
       const filename = state.files.getValue()[state.selectedFileIndex.getValue()].name;
       saveHistory(filename, state.currentProgram.getValue()).then((res) => {

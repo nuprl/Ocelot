@@ -48,9 +48,8 @@ function GoogleLogoutButton(props: GoogleLogoutButtonProps): JSX.Element {
 }
 
 type LoginLogoutState = {
-    loggedIn: boolean,
+    loggedIn: state.LoggedIn,
     loading: boolean,
-    email: string
 }
 
 class LoginLogout extends React.Component<{}, LoginLogoutState> {
@@ -59,14 +58,12 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
         super(props);
         this.state = {
             loggedIn: state.loggedIn.getValue(),
-            loading: false,
-            email: state.email.getValue()
+            loading: false
         };
     }
     
     componentDidMount() {
         state.loggedIn.subscribe(x => this.setState({ loggedIn: x }));
-        state.email.subscribe(x => this.setState({ email: x }));
     }
 
     onSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
@@ -75,9 +72,10 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                 console.log(response.data.message)
                 return;
             }
-            state.loggedIn.next(true);
-            state.email.next(response.data.email);
-            state.filesLoading.next(true);
+            state.loggedIn.next({ 
+                kind: 'loading-files', 
+                email: response.data.email 
+            });
             this.loadFiles();
 
         }).catch(error => {
@@ -103,8 +101,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
     }
 
     onLogout() {
-        state.loggedIn.next(false);
-        state.email.next('');
+        state.loggedIn.next({ kind: 'logged-out' });
         state.files.next([ state.emptyFile ]);
         state.selectedFileIndex.next(-1);
         state.loadProgram.next(false);
@@ -113,7 +110,8 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
     }
 
     render() {
-        const { loggedIn, email } = this.state;
+        const loggedIn = this.state.loggedIn.kind !== 'logged-out';
+        const email = this.state.loggedIn.kind !== 'logged-out' ? this.state.loggedIn.email : '';
         return (
             <div>
                 <Typography style={{display: loggedIn ? "inline" : "none" }} variant="subheading" color="inherit">

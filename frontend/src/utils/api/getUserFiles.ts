@@ -25,6 +25,10 @@ export const getUserFiles = async (): Promise<UserFilesResponse> => {
     const userEmail = localStorage.getItem('userEmail');
     const sessionId = localStorage.getItem('sessionId');
 
+    if (userEmail === null) {
+        return failureResponse(`userEmail was not in Local Storage`);
+    }
+
     const data = { userEmail: userEmail, sessionId: sessionId };
 
     try {
@@ -48,7 +52,7 @@ export const getUserFiles = async (): Promise<UserFilesResponse> => {
         }
 
 
-        state.filesLoading.next(false);
+        state.loggedIn.next({ kind: 'logged-in', email: userEmail });
 
         // be sure to open this list (set state to open)
         return successResponse<{userFiles: UserFile[]}>({

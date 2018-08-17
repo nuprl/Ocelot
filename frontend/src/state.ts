@@ -48,9 +48,53 @@
 
 import * as Rx from 'rxjs';
 
+export type Dirty = 'dirty' | 'saving' | 'saved';
+export type NotificationPosition = 'top' | 'bottom-right';
+export type Notification = { message: string, position: NotificationPosition };
+export type UserFile = { name: string, content: string };
+
+export type LoggedIn = 
+    { kind: 'logged-out' }
+  | { kind: 'loading-files', email: string }
+  | { kind: 'logged-in', email: string };
+
+export const emptyFile = {
+    name: 'untitled.js',
+    content: ''
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// The state of the system
+
 // This is the current program in the editor. It is set by the editor and should
 // not be set by any other component.
 export const currentProgram = new Rx.BehaviorSubject<string>('');
+
+// This state is set in several places: (1) the editor sets it to dirty,
+// (2) the autosaver sets it to saving and saved.
+export const dirty = new Rx.BehaviorSubject<Dirty>('saved');
+
+// This is set by the login/logout button.
+export const loggedIn = new Rx.BehaviorSubject<LoggedIn>({ kind: 'logged-out' });
+
+// Derived from loggedIn
+export const uiActive = new Rx.BehaviorSubject<boolean>(false);
+
+// Loaded files
+export const files = new Rx.BehaviorSubject<UserFile[]>([emptyFile]);
+export const selectedFileIndex = new Rx.BehaviorSubject<number>(0);
+
+function isUiActive(loggedIn: LoggedIn): boolean {
+    if (window.location.search !== '?anonymous') {
+        return true;
+    }
+    return loggedIn.kind === 'logged-in';
+}
+
+loggedIn.subscribe(x => uiActive.next(isUiActive(x)));
+
+////////////////////////////////////////////////////////////////////////////////
+// Channels to communicate across components
 
 // Send values to this subject to have the editor load a new program. Do not
 // send values when the code in the editor changes. This is not a
@@ -58,40 +102,11 @@ export const currentProgram = new Rx.BehaviorSubject<string>('');
 // state of a file.
 export const loadProgram = new Rx.Subject<string | false>();
 
-export type Dirty = 'dirty' | 'saving' | 'saved';
-export const dirty = new Rx.BehaviorSubject<Dirty>('saved');
-
-export const loggedIn = new Rx.BehaviorSubject<boolean>(false);
-export const email = new Rx.BehaviorSubject<string>("");
-
-export const filesLoading = new Rx.BehaviorSubject<boolean>(false);
-
-export const uiActive = new Rx.BehaviorSubject<boolean>(false);
-
-function isUiActive(loggedIn: boolean, filesLoading: boolean): boolean {
-    if (window.location.search !== '?anonymous') {
-        return true;
-    }
-    return loggedIn && !filesLoading;
-}
-
-loggedIn.subscribe(x => uiActive.next(isUiActive(x, filesLoading.getValue())));
-
-filesLoading.subscribe(y => uiActive.next(isUiActive(loggedIn.getValue(), y)));
-
-export type NotificationPosition = 'top' | 'bottom-right';
-export type Notification = { message: string, position: NotificationPosition };
+// Send values to this subject to display a little notification.
 export const notification = new Rx.Subject<Notification>();
 
-export type UserFile = { name: string, content: string };
-
-export const emptyFile = {
-    name: 'untitled.js',
-    content: ''
-};
-
-export const files = new Rx.BehaviorSubject<UserFile[]>([emptyFile]);
-export const selectedFileIndex = new Rx.BehaviorSubject<number>(0);
+////////////////////////////////////////////////////////////////////////////////
+// Convenient functions
 
 export function currentFileName(): string {
     const ix = selectedFileIndex.getValue();

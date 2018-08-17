@@ -44,7 +44,7 @@ type Props = {
 } & WithStyles<'emptyState' | 'pawIcon'>;
 
 type CodeEditorState = {
-    loggedIn: boolean,
+    uiActive: boolean,
     loadProgram: string | false
 };
 
@@ -55,13 +55,13 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         super(props);
         this.editor = undefined;
         this.state = {
-            loggedIn: state.loggedIn.getValue(),
+            uiActive: state.uiActive.getValue(),
             loadProgram: ''
         };
     }
 
     componentDidMount() {
-        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
+        state.uiActive.subscribe(x => this.setState({ uiActive: x }));
         state.loadProgram.subscribe(x => this.setState({ loadProgram: x }));
     }
 
@@ -108,9 +108,9 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         this.editor = editor;
         
         const mustLogin = window.location.search !== '?anonymous';
-        if (!this.state.loggedIn && mustLogin) {
+        if (!this.state.uiActive && mustLogin) {
             editor.onKeyDown(event => {
-                if (mustLogin && !this.state.loggedIn) {
+                if (mustLogin && !this.state.uiActive) {
                     this.props.openMustLogin();
                 }
             });
@@ -166,7 +166,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             );
         }
 
-        monacoOptions.readOnly = !this.state.loggedIn;
+        monacoOptions.readOnly = !this.state.uiActive;
 
         return (
             <div style={{ height: '100%', width: '100%' }}>
