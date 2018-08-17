@@ -7,6 +7,9 @@ import {
     SuccessResponse
 } from './apiHelpers';
 
+import { EJSVERSION } from 'elementary-js/dist/version';
+import { OCELOTVERSION } from '../../version';
+
 export type SaveHistoryResponse = SuccessResponse<{ message: string }> | FailureResponse;
 
 export const saveHistory = async (fileName: string, code: string, generation?: number): Promise<SaveHistoryResponse> => {
@@ -27,7 +30,9 @@ export const saveHistory = async (fileName: string, code: string, generation?: n
             fileName: fileName,
             code: code,
             generation: generation
-        }
+        },
+        ejsVersion: EJSVERSION,
+        ocelotVersion: OCELOTVERSION
     };
 
     try {

@@ -7,6 +7,9 @@ import {
     SuccessResponse
 } from './apiHelpers';
 
+import { EJSVERSION } from 'elementary-js/dist/version';
+import { OCELOTVERSION } from '../../version';
+
 export type FileHistory = {
     generation: number,
     dateCreated: string,
@@ -29,7 +32,13 @@ export const getFileHistory = async (fileName: string): Promise<FileHistoryRespo
     const userEmail = localStorage.getItem('userEmail');
     const sessionId = localStorage.getItem('sessionId');
 
-    const data = { userEmail: userEmail, sessionId: sessionId, fileName: fileName };
+    const data = { 
+        userEmail: userEmail, 
+        sessionId: sessionId, 
+        fileName: fileName,
+        ejsVersion: EJSVERSION,
+        ocelotVersion: OCELOTVERSION
+    };
 
     try {
         const response = await fetch(url, { // send json data to specified URL

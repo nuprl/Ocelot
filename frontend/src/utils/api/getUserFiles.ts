@@ -7,6 +7,10 @@ import {
     SuccessResponse
  } from './apiHelpers';
 import * as state from '../../state';
+
+import { EJSVERSION } from 'elementary-js/dist/version';
+import { OCELOTVERSION } from '../../version';
+
 type UserFile = { name: string, content: string };
 
 export type UserFilesResponse = SuccessResponse<{userFiles: UserFile[]}> | FailureResponse;
@@ -29,7 +33,11 @@ export const getUserFiles = async (): Promise<UserFilesResponse> => {
         return failureResponse(`userEmail was not in Local Storage`);
     }
 
-    const data = { userEmail: userEmail, sessionId: sessionId };
+    const data = { userEmail: userEmail,
+        sessionId: sessionId, 
+        ejsVersion: EJSVERSION,
+        ocelotVersion: OCELOTVERSION 
+    };
 
     try {
         const response = await fetch(url, { // send json data to specified URL

@@ -8,6 +8,9 @@ import {
     successResponse
 } from './apiHelpers';
 
+import { EJSVERSION } from 'elementary-js/dist/version';
+import { OCELOTVERSION } from '../../version';
+
 export type SaveFilesResponse = SuccessResponse<{ message: string }> | FailureResponse;
 
 export const saveChanges = async (fileChanges: FileChange): Promise<SaveFilesResponse> => {
@@ -20,7 +23,12 @@ export const saveChanges = async (fileChanges: FileChange): Promise<SaveFilesRes
     const userEmail = localStorage.getItem('userEmail');
     const sessionId = localStorage.getItem('sessionId');
 
-    const data = { userEmail: userEmail, sessionId: sessionId, fileChanges: fileChanges};
+    const data = { userEmail: userEmail,
+        sessionId: sessionId,
+        fileChanges: fileChanges,
+        ejsVersion: EJSVERSION,
+        ocelotVersion: OCELOTVERSION
+    };
 
     try {
         const response = await fetch(url, { // send json data to specified URL

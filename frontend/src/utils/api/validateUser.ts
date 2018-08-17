@@ -2,6 +2,10 @@
 
 import { GoogleLoginResponse } from 'react-google-login';
 import { FailureResponse, getUrl, SuccessResponse, failureResponse, successResponse } from './apiHelpers';
+
+import { EJSVERSION } from 'elementary-js/dist/version';
+import { OCELOTVERSION } from '../../version';
+
 export type validateUserResponse = SuccessResponse<{ email: string }> | FailureResponse;
 
 export async function validateUser(googleUser: GoogleLoginResponse): Promise<validateUserResponse> {
@@ -11,7 +15,11 @@ export async function validateUser(googleUser: GoogleLoginResponse): Promise<val
     
     const url = getUrl('login');
 
-    let data: { token: string, sessionId: string | null } = { token: id_token, sessionId: null }; // data to be sent
+    let data: { token: string, sessionId: string | null, ejsVersion: string, ocelotVersion: string } = { 
+        token: id_token, sessionId: null, 
+        ejsVersion: EJSVERSION,
+        ocelotVersion: OCELOTVERSION 
+    }; // data to be sent
 
     const possibleSessionId = localStorage.getItem('sessionId');
     if (possibleSessionId !== null) {

@@ -576,8 +576,33 @@ async function getUrl(req: Request, res: Response) {
 }
 
 export const paws = express();
+morgan.token('username', function(req, res) {
+  if (req.body.userEmail) {
+    return req.body.userEmail;
+  }
+  const username = (new URLSearchParams(req.url)).get('user');
+  if (username) {
+    return username;
+  }
+  return 'notprovided'
+});
+
+morgan.token('ocelotversion', (req, res) => {
+  if (req.body.ocelotVersion) {
+    return req.body.ocelotVersion
+  }
+  return 'notprovided'
+});
+
+morgan.token('ejsversion', (req, res) => {
+  if (req.body.ejsVersion) {
+    return req.body.ejsVersion;
+  }
+  return 'notprovided'
+});
+
 paws.use(morgan(
-  ':method :url :status :res[content-length] - :response-time ms', 
+  ':method :url :status :username ocelot-:ocelotversion ejs-:ejsversion :res[content-length] - :response-time ms', 
   {
     stream: {
       write: (str: string) => console.log(str)

@@ -1,4 +1,3 @@
-
 export interface SuccessResponse<T> {
     status: 'SUCCESS';
     data: T;
