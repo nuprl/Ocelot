@@ -93,6 +93,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
             }
             state.files.next(response.data.userFiles);
             state.selectedFileIndex.next(-1);
+            state.loadProgram.next(false);
         });
     }
 
@@ -105,7 +106,8 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
         state.loggedIn.next(false);
         state.email.next('');
         state.files.next([ state.emptyFile ]);
-        state.selectedFileIndex.next(1);
+        state.selectedFileIndex.next(-1);
+        state.loadProgram.next(false);
         localStorage.removeItem('userEmail');
         localStorage.removeItem('sessionId');
     }

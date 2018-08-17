@@ -63,6 +63,7 @@ class NewFileField extends React.Component<Props, State> {
             const oldFiles = state.files.getValue();
             state.files.next([...oldFiles, { name: name, content: '' }]);
             state.selectedFileIndex.next(oldFiles.length);
+            state.loadProgram.next('');
         };
     }
 

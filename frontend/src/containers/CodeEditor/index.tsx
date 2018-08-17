@@ -45,8 +45,7 @@ type Props = {
 
 type CodeEditorState = {
     loggedIn: boolean,
-    selectedFileIndex: number,
-    loadProgram: string
+    loadProgram: string | false
 };
 
 class CodeEditor extends React.Component<Props, CodeEditorState> {
@@ -57,14 +56,12 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         this.editor = undefined;
         this.state = {
             loggedIn: state.loggedIn.getValue(),
-            selectedFileIndex: state.selectedFileIndex.getValue(),
             loadProgram: ''
         };
     }
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
-        state.selectedFileIndex.subscribe(x => this.setState({ selectedFileIndex: x }));
         state.loadProgram.subscribe(x => this.setState({ loadProgram: x }));
     }
 
@@ -124,14 +121,9 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         if (this.editor === undefined) {
             return;
         }
-
-        if (prevState.selectedFileIndex !== this.state.selectedFileIndex) {
-
-            if (this.state.selectedFileIndex !== -1) {
-                const content = state.files.getValue()[this.state.selectedFileIndex].content;
-                state.loadProgram.next(content);
-                state.currentProgram.next(content);
-            }
+        const program = this.state.loadProgram;
+        if (program !== false) {
+            state.currentProgram.next(program);
         }
 
         this.editor.focus();
@@ -148,8 +140,9 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         state.currentProgram.next(code);
         state.dirty.next('dirty');
         const oldFiles = state.files.getValue();
-        const files = oldFiles.map((file, index) => {
-            if (index === this.state.selectedFileIndex) {
+        const index = state.selectedFileIndex.getValue();
+        const files = oldFiles.map((file, i) => {
+            if (i === index) {
                 return { content: code, name: file.name }
             }
             else {
@@ -162,7 +155,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
     render() {
         const { classes } = this.props;
 
-        if (this.state.selectedFileIndex < 0) {
+        if (this.state.loadProgram === false) {
             return (
                 <div className={classes.emptyState}>
                     <PawIcon className={classes.pawIcon} />

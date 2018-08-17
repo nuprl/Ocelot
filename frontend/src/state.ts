@@ -56,7 +56,7 @@ export const currentProgram = new Rx.BehaviorSubject<string>('');
 // send values when the code in the editor changes. This is not a
 // BehaviorSubject, because the last value it receives may not be the current
 // state of a file.
-export const loadProgram = new Rx.Subject<string>();
+export const loadProgram = new Rx.Subject<string | false>();
 
 export type Dirty = 'dirty' | 'saving' | 'saved';
 export const dirty = new Rx.BehaviorSubject<Dirty>('saved');
