@@ -66,6 +66,50 @@ export const emptyFile = {
 ////////////////////////////////////////////////////////////////////////////////
 // The state of the system
 
+/*
+ Suggested structure to deal with multiple tabs better:
+
+New types:
+
+export type Program =
+       { kind: 'nothing' }
+     | { kind: 'loading' }
+     | { kind: 'program', filename: string, contents: string }
+
+
+ Change to state:
+ 
+export const currentProgram = new Rx.BehaviorSubject<Program>({ kind: 'nothing' });
+export const files = new Rx.BehaviorSubject<string[]>([]);
+
+Remove selectedFileIndex from the state.
+
+Change to channels:
+
+export const loadProgram = new Rx.Subject<Program>();
+
+Overview of changes:
+
+1. After login, request /listfiles to get the current list of files and set
+   state.files.next.
+
+2. When the user clicks a file name, we first loadProgram.next({ kind: 'loading' })
+   and request /getfile. The editor displays a new "Loading" message.
+
+3. When the file is retrieved, we loadProgram.next({ kind: 'program', ... })
+
+4. We update autosave and other mechanisms to filter out loading/nothing.
+   (There should not be a currentProgram when loading.) Autosave already
+   uses the currentProgram to determine what to save and not the arrray
+   of cached programs.
+
+Therefore, when a user switches between files, they will receive changes
+made on other machines. We could also periodically request /listfiles to
+pickup new files or deleted files from other machines. (NOTE: if the current
+file is deleted, we need to do something ...)
+
+
+*/
 // This is the current program in the editor. It is set by the editor and should
 // not be set by any other component.
 export const currentProgram = new Rx.BehaviorSubject<string>('');
