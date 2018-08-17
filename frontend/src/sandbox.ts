@@ -96,7 +96,9 @@ export class Sandbox {
             assert: elementaryRTS.assert,
             lib220: Object.freeze(lib220),
             Array: elementaryRTS.Array,
-            Math: Math
+            Math: Math,
+            undefined: undefined,
+            Object: Object // Needed for classes
         };
 
         // We can use .get and .set traps to intercept reads and writes to
