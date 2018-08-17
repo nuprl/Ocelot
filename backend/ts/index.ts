@@ -581,7 +581,13 @@ async function getUrl(req: Request, res: Response) {
 }
 
 export const paws = express();
-paws.use(morgan(':method :url :status :res[content-length] - :response-time ms')); // logging all http traffic
+paws.use(morgan(
+  ':method :url :status :res[content-length] - :response-time ms', 
+  {
+    stream: {
+      write: (str: string) => console.log(str)
+    }
+  })); // logging all http traffic
 
 paws.use(cors()); // TODO(arjun): Limit to trusted domains
 
