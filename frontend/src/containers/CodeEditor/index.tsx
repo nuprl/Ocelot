@@ -104,8 +104,12 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         editor.focus();
-        editor.getModel().updateOptions({ tabSize: 2 }); // what if there are different models?
+        editor.getModel().updateOptions({ tabSize: 2 });
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
+            // students can accidentally press ctrl/cmd + s, this prevents default action
+        }, '');
         this.editor = editor;
+        
         const mustLogin = window.location.search !== '?anonymous';
         if (!this.state.loggedIn && mustLogin) {
             editor.onKeyDown(event => {
