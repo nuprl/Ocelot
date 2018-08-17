@@ -13,7 +13,7 @@ export type APIResponse = SuccessResponse<any> | FailureResponse;
 
 export type FileChange = {
     fileName: string,
-    type: 'delete' | 'create' | 'rename',
+    type: 'delete' | 'create',
     changes?: string,
 };
 

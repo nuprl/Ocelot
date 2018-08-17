@@ -54,10 +54,10 @@ class FileItem extends React.Component<Props, {selectedIndex: number, dirty: sta
           state.notification.next({ message: `Delete aborted: ${this.props.name}`, position: 'bottom-right' });
           return;
         }
-        saveChanges([{
+        saveChanges({
           fileName: this.props.name,
           type: 'delete',
-        }]).then((response) => {
+        }).then((response) => {
           const { fileIndex } = this.props;
           const oldFiles = state.files.getValue();
           const files = [

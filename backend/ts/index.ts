@@ -227,7 +227,7 @@ async function getFile(req: Request) {
 
 interface FileChange {
   fileName: string;
-  type: 'delete' | 'create' | 'rename';
+  type: 'delete' | 'create';
   changes?: string;
 }
 
@@ -253,32 +253,35 @@ async function changeFile(req: Request) {
   }
 
   try {
-    let fileExists, currentFile, currentFileChange: FileChange;
-    for (currentFileChange of req.body.fileChanges) {
-      if (!isSimpleValidFileName(currentFileChange.fileName)) { // if it's not a 'simple' valid filename
-        return failureResponse(`Could not make changes to file: ${currentFileChange.fileName}, name not valid`);
-      }
-      currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
-      if (currentFileChange.type === 'create') {
-        // Non-null assertion of changes can be saved
-        await currentFile.save(currentFileChange.changes!, { resumable: false });
-        // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
-        /* There is some overhead when using a resumable upload that can cause noticeable performance 
-        degradation while uploading a series of small files. When uploading files less than 10MB, 
-        it is recommended that the resumable feature is disabled. */
-        await currentFile.setMetadata({ contentType: 'text/javascript' });
-        continue;
-      }
+    let fileExists, currentFile;
+    const currentFileChange: FileChange = req.body.fileChanges;
+    if (!isSimpleValidFileName(currentFileChange.fileName)) { 
+      // if it's not a 'simple' valid filename
+      return failureResponse(`Could not make changes to file: ${currentFileChange.fileName}, name not valid`);
+    }
+
+    currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
+    if (currentFileChange.type === 'create') {
+      // Non-null assertion of changes can be saved
+      await currentFile.save(currentFileChange.changes!, { resumable: false });
+      // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
+      /* There is some overhead when using a resumable upload that can cause noticeable performance 
+      degradation while uploading a series of small files. When uploading files less than 10MB, 
+      it is recommended that the resumable feature is disabled. */
+      await currentFile.setMetadata({ contentType: 'text/javascript' });
+    }
+    else if (currentFileChange.type === 'delete') {
       fileExists = await currentFile.exists();
       if (!fileExists[0]) {
-        continue;
+        return {
+          statusCode: 500,
+          body: { status: 'error', message: `${currentFileChange.fileName} does not exist` }
+        }
       }
-      if (currentFileChange.type === 'delete') {
-        await currentFile.delete();
-        continue
-      }
-      // guaranteed it's a rename
-      await currentFile.move(`${req.body.userEmail}/${currentFileChange.changes}`);
+      await currentFile.delete();
+    }
+    else {
+      return { statusCode: 500, body: { status: 'error', message: `Bad file operation` } };
     }
 
     return {

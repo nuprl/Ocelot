@@ -17,11 +17,11 @@ window.addEventListener('beforeunload', (event) => {
 
 function saveRequest() {
     dirty.next('saving');
-    return Rx.from(saveChanges([ { 
+    return Rx.from(saveChanges({ 
         fileName: currentFileName(),
         type: 'create', 
         changes: currentProgram.getValue()
-    } ]));
+    }));
 }
 
 dirty.pipe(

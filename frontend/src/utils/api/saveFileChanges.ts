@@ -10,7 +10,7 @@ import {
 
 export type SaveFilesResponse = SuccessResponse<{ message: string }> | FailureResponse;
 
-export const saveChanges = async (fileChanges: FileChange[]): Promise<SaveFilesResponse> => {
+export const saveChanges = async (fileChanges: FileChange): Promise<SaveFilesResponse> => {
 
     if (!validEmailSession()) {
         return failureResponse('Seems like your session expired, try logging in again');
