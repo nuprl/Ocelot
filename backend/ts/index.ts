@@ -185,10 +185,49 @@ async function checkValidFileRequest(userEmail: string, sessionId: string, ...ar
  * @param {Request} req with a userEmail attribute from JSON POST request
  * @returns statusCode and contents in body
  */
-async function getFile(req: Request) {
+async function listFiles(req: Request) {
   const valid = await checkValidFileRequest(req.body.userEmail, req.body.sessionId);
   if (valid.isFailure) {
     return failureResponse(valid.message);
+  }
+  
+  const [files] = await fileBucket.getFiles({ 
+    delimiter: '/',
+    prefix: req.body.userEmail + '/'
+  });
+  return { 
+    statusCode: 200,
+    body: {
+      status: 'success',
+      data: files.map(f => f.name)
+    }
+  };
+}
+
+async function fetchFile(req: Request) {
+  const email = req.body.userMail;
+  const filename = req.body.filename; // TODO(arjun): security???
+  const valid = await checkValidSession(req.body.email, req.body.sessionId);
+  if (!valid) {
+    return failureResponse('Invalid user');
+  }
+  const [buf] = await fileBucket.file(`/${email}/${filename}`).download();
+  return {
+    statusCode: 200,
+    body: {
+      status: 'success',
+      data: {
+        name: filename,
+        content: buf.toString()
+      }
+    }
+  }
+}
+
+async function getFile(req: Request) {
+  const valid = await checkValidSession(req.body.userMail, req.body.sessionId);
+  if (!valid) {
+    return failureResponse('Invalid user');
   }
 
   try {
@@ -610,6 +649,8 @@ function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, bo
 
 
 paws.post('/getfile', wrapHandler(getFile));
+paws.post('/listfiles', wrapHandler(listFiles));
+paws.post('/fetchfile', wrapHandler(fetchFile));
 paws.post('/login', wrapHandler(login));
 paws.post('/changefile', wrapHandler(changeFile));
 paws.post('/savehistory', wrapHandler(saveToHistory));
