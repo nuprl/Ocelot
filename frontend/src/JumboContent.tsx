@@ -85,6 +85,7 @@ class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.
     this.props.sandbox.addModeListener((mode) => {
       this.setState({ mode: mode });
     });
+    state.loggedIn.subscribe(x => this.setState({ loggedIn: x }));
   }
 
   onRunOrTestClicked(mode: 'running' | 'testing') {
