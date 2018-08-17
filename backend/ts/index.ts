@@ -253,14 +253,13 @@ async function changeFile(req: Request) {
   }
 
   try {
-    let fileExists, currentFile;
     const currentFileChange: FileChange = req.body.fileChanges;
     if (!isSimpleValidFileName(currentFileChange.fileName)) { 
       // if it's not a 'simple' valid filename
       return failureResponse(`Could not make changes to file: ${currentFileChange.fileName}, name not valid`);
     }
 
-    currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
+    const currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
     if (currentFileChange.type === 'create') {
       // Non-null assertion of changes can be saved
       await currentFile.save(currentFileChange.changes!, { resumable: false });
@@ -271,13 +270,6 @@ async function changeFile(req: Request) {
       await currentFile.setMetadata({ contentType: 'text/javascript' });
     }
     else if (currentFileChange.type === 'delete') {
-      fileExists = await currentFile.exists();
-      if (!fileExists[0]) {
-        return {
-          statusCode: 500,
-          body: { status: 'error', message: `${currentFileChange.fileName} does not exist` }
-        }
-      }
       await currentFile.delete();
     }
     else {
