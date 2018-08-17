@@ -35,7 +35,6 @@ const SideDrawer: React.StatelessComponent<WithStyles<Styles>> = (
             {/* Setting toolbar is so hacky, I don't know how to override it */}
             <List dense>
                 <FilesFolder />
-                />
             </List>
         </Drawer>
     );
