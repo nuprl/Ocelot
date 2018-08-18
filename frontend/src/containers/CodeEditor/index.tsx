@@ -7,6 +7,8 @@ import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import PawIcon from '@material-ui/icons/Pets';
 import Typography from '@material-ui/core/Typography';
 import * as state from '../../state';
+import EJSWorker = require('worker-loader?name=[name].js!./ejs.worker');
+import { debounce } from 'lodash';
 
 const styles: StyleRulesCallback = theme => ({
     emptyState: {
@@ -26,6 +28,7 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
+    contextmenu: false,
     selectOnLineNumbers: true,
     mouseWheelZoom: true,
     fontSize: 14,
@@ -35,7 +38,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     minimap: {
         enabled: false,
     },
-    renderIndentGuides: false
+    renderIndentGuides: false,
     // scrollBeyondLastLine: false,
 };
 
@@ -50,6 +53,7 @@ type CodeEditorState = {
 
 class CodeEditor extends React.Component<Props, CodeEditorState> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
+    worker: Worker
 
     constructor(props: Props) {
         super(props);
@@ -58,6 +62,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             uiActive: state.uiActive.getValue(),
             loadProgram: ''
         };
+        this.worker = new EJSWorker();
     }
 
     componentDidMount() {
@@ -105,6 +110,21 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
             // students can accidentally press ctrl/cmd + s, this prevents default action
         }, '');
+        editor.addCommand(monaco.KeyCode.F1, function() {
+            // override command palette shortcut;
+        }, '');
+
+        this.worker.addEventListener('message', event => {
+            let { markers } = event.data;
+            if (markers.length > 0 && markers[0].message.includes('Unexpected token')) {
+                let oldMarkers = monaco.editor.getModelMarkers({owner: 'ejs-compile'});
+                oldMarkers.push(...markers); // push new markers to old markers
+                markers = oldMarkers; // replace 
+            }
+            monaco.editor.setModelMarkers(editor.getModel(), 'ejs-compile', []);
+            monaco.editor.setModelMarkers(editor.getModel(), 'ejs-compile', markers);
+        });
+
         this.editor = editor;
         
         const mustLogin = window.location.search !== '?anonymous';
@@ -135,6 +155,12 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         }
         this.editor.layout();
     }
+
+    debouncedCompile = debounce(() => {
+        this.worker.postMessage({
+            code: state.currentProgram.getValue(),
+        });
+    }, 500);
     
     onChange(code: string)  {
         state.currentProgram.next(code);
@@ -150,6 +176,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             }
         });
         state.files.next(files);
+        this.debouncedCompile();
     };
 
     render() {
