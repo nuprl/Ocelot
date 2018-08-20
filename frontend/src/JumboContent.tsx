@@ -14,7 +14,7 @@ import DownloadIcon from '@material-ui/icons/ArrowDownward';
 import * as types from './types';
 import { saveHistory } from './utils/api/saveHistory'
 import { isFailureResponse } from './utils/api/apiHelpers';
-import SideDrawer from './components/SideDrawer';
+import SideDrawer from './SideDrawer';
 import Notification from './containers/Notification';
 import * as sandbox from './sandbox';
 import UserLogin from './loginButton';
