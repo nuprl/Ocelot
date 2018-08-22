@@ -641,18 +641,39 @@ paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
 paws.get('/geturl', getUrl);
 
+function str(x: any) {
+  if (typeof x === 'string') {
+    return x;
+  }
+  return JSON.stringify(x);
+}
+
 paws.post('/error', wrapHandler(async req => {
   if (req.headers['content-type'] === 'application/json') {
     const evt = errorReporting.event();
     evt.setUser(req.body.username);
     evt.setServiceContext('ocelot', req.body.version);
     evt.setUserAgent(req.body.userAgent);
+    let m = req.body.message;
     let message = '';
-    if (req.body.message) {
-      message = message + req.body.message + '\n';
+
+    if (typeof m === 'string') {
+      message = m;
     }
-    message = message + JSON.stringify(req.body.message);
-    evt.setMessage(message);
+    else if (typeof m === 'object') {
+
+      let keys = Object.keys(m);
+      if (keys.includes('message') && typeof m.message === 'string') {
+        message = String(m.message);
+        keys = keys.filter(k => k !== 'message');
+      }
+
+      for (const k in keys) {
+        message = message + k + ':\n\n' + str(m[k]) + '\n\n';
+      }
+    }
+    
+    evt.setMessage(message + JSON.stringify(m));
     await errorReporting.report(evt);
   }
   else {
