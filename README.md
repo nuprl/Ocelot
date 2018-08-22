@@ -29,7 +29,7 @@ To install Stopify:
 
 ```bash
 cd Stopify
-git checkout Aug22-220
+git checkout 220-Aug22
 yarn install
 cd stopify-estimators && yarn run build && cd .. && \
 cd stopify-continuations && yarn run build && yarn link && cd .. && \
