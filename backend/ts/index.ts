@@ -647,7 +647,12 @@ paws.post('/error', wrapHandler(async req => {
     evt.setUser(req.body.username);
     evt.setServiceContext('ocelot', req.body.version);
     evt.setUserAgent(req.body.userAgent);
-    evt.setMessage(JSON.stringify(req.body.message));
+    let message = '';
+    if (req.body.message) {
+      message = message + req.body.message + '\n';
+    }
+    message = message + JSON.stringify(req.body.message);
+    evt.setMessage(message);
     await errorReporting.report(evt);
   }
   else {
