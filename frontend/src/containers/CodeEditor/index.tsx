@@ -7,6 +7,7 @@ import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import PawIcon from '@material-ui/icons/Pets';
 import Typography from '@material-ui/core/Typography';
 import * as state from '../../state';
+import { console } from '../../errors';
 
 const styles: StyleRulesCallback = theme => ({
     emptyState: {
@@ -62,7 +63,21 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ uiActive: x }));
-        state.loadProgram.subscribe(x => this.setState({ loadProgram: x }));
+        state.loadProgram.subscribe(x => {
+            // TODO(arjun): remove logging
+            if (x === false) {
+                console.log('loadProgram received false');
+            }
+            else {
+                if (x.length === 0) {
+                    console.error(`Empty buffer loaded for file ${state.currentFileName()}`);
+                }
+                else {
+                    console.log(`Editor loading ${x.length} characters for file ${state.currentFileName()} (${x.slice(0, 20)})`);
+                }
+            }
+            this.setState({ loadProgram: x })
+        });
     }
 
     editorWillMount = (monaco: typeof monacoEditor) => {

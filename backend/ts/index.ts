@@ -663,17 +663,19 @@ paws.post('/error', wrapHandler(async req => {
     else if (typeof m === 'object') {
 
       let keys = Object.keys(m);
-      if (keys.includes('message') && typeof m.message === 'string') {
-        message = String(m.message);
+      if (keys.includes('message')) {
+        const strM =  str(m.message);
+        message = strM + '\n\n';
+        console.warn('Received error ', strM);
         keys = keys.filter(k => k !== 'message');
       }
 
-      for (const k in keys) {
+      for (const k of keys) {
         message = message + k + ':\n\n' + str(m[k]) + '\n\n';
       }
     }
     
-    evt.setMessage(message + JSON.stringify(m));
+    evt.setMessage(message);
     await errorReporting.report(evt);
   }
   else {
