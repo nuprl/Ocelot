@@ -62,7 +62,16 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ uiActive: x }));
-        state.loadProgram.subscribe(x => this.setState({ loadProgram: x }));
+        state.loadProgram.subscribe(x => {
+            // TODO(arjun): remove logging
+            if (x === false) {
+                console.log('loadProgram received false');
+            }
+            else {
+                console.log(`Editor loading ${x.length} characters (${x.slice(0, 100)})`);
+            }
+            this.setState({ loadProgram: x })
+        });
     }
 
     editorWillMount = (monaco: typeof monacoEditor) => {
