@@ -7,6 +7,7 @@ import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/st
 import PawIcon from '@material-ui/icons/Pets';
 import Typography from '@material-ui/core/Typography';
 import * as state from '../../state';
+import { console } from '../../errors';
 
 const styles: StyleRulesCallback = theme => ({
     emptyState: {
@@ -68,7 +69,12 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
                 console.log('loadProgram received false');
             }
             else {
-                console.log(`Editor loading ${x.length} characters (${x.slice(0, 100)})`);
+                if (x.length === 0) {
+                    console.error(`Empty buffer loaded for file ${state.currentFileName()}`);
+                }
+                else {
+                    console.log(`Editor loading ${x.length} characters for file ${state.currentFileName()} (${x.slice(0, 20)})`);
+                }
             }
             this.setState({ loadProgram: x })
         });

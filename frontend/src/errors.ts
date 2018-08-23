@@ -13,7 +13,7 @@ function getEmail() {
     }
 }
 
-function traceError(message: any) {
+function traceError(message: any, level: 'error' | 'log') {
     const version = `Ocelot ${OCELOTVERSION}, EJS ${EJSVERSION}`;
     const userAgent = window.navigator.userAgent;
     const err = { username: getEmail(), version, userAgent, message };
@@ -39,7 +39,12 @@ function traceError(message: any) {
     }).catch(reason => {
         console.error('Failed to log error ', reason);
     });
-    console.error(message);
+    if (level === 'error') {
+        console.error(message);
+    }
+    else {
+        console.log(message);
+    }
 }
 
 window.addEventListener('error', (errorEvent) => {
@@ -48,13 +53,17 @@ window.addEventListener('error', (errorEvent) => {
         userProgram: state.currentProgram.getValue(),
         line: errorEvent.lineno,
         column: errorEvent.colno
-    });
+    }, 'error');
 });
 
 const tracingConsole = {
     error: function(message: string) {
-        traceError({ message: message });
+        traceError({ message: message }, 'error');
+    },
+    log: function(message: string) {
+        traceError({ message: message }, 'log');
     }
+
 }
 
 export { tracingConsole as console };
