@@ -16,7 +16,14 @@ function getEmail() {
 function traceError(message: any) {
     const version = `Ocelot ${OCELOTVERSION}, EJS ${EJSVERSION}`;
     const userAgent = window.navigator.userAgent;
-    const err = { username: getEmail(), version, userAgent, message };
+    const err = { 
+        username: getEmail(), 
+        version, 
+        userAgent, 
+        message, 
+        ejsVersion: EJSVERSION,
+        ocelotVersion: OCELOTVERSION 
+    };
     let body: string;
     try {
         body = JSON.stringify(err);
