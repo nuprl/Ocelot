@@ -82,7 +82,7 @@ type State = {
     loading: boolean,
     history: FileHistory[],
     codeOpenIndex: number,
-    currentProgram: string
+    currentProgram: state.Program
 };
 
 const truncateString = (str: string) => {
@@ -150,14 +150,22 @@ class HistoryButton extends React.Component<Props, State> {
                 }).catch((err) => {
                     console.log('not saved', err);
                 });
+            // TODO(arjun): I suggest we not do this
             setTimeout(() => { // immediate state change causes the UI to update immediately
+                if (this.state.currentProgram.kind !== 'program') {
+                    return;
+                }
                 // The UI looks 'buggy' if I were to not setTimeout
                 const editor = state.currentProgram.getValue();
                 const { history } = this.state;
                 if (editor === undefined || history.length - 1 < index) {
                     return;
                 }
-                state.loadProgram.next(this.state.history[index].code);;
+                state.loadProgram.next({
+                    kind: 'program',
+                    name: this.state.currentProgram.name,
+                    content: this.state.history[index].code
+                });
             }, 30);
         };
     }
@@ -174,11 +182,11 @@ class HistoryButton extends React.Component<Props, State> {
             color="inherit"
 
         />
-        if (!loading) {
+        if (!loading && currentProgram.kind === 'program') {
             content = history.map((elem, index) => (
                 <div
                     key={`${elem.timeCreated}${index}`}
-                    className={currentProgram === elem.code ? `${classes.sameCode}` : ''}
+                    className={currentProgram.content === elem.code ? `${classes.sameCode}` : ''}
                 >
                     <ListItem button onClick={() => this.toggleCode(index)}>
                         <ListItemIcon>
@@ -199,12 +207,12 @@ class HistoryButton extends React.Component<Props, State> {
                                     <MonacoDiffEditor
                                         language="elementaryjs"
                                         height={210}
-                                        original={currentProgram}
+                                        original={currentProgram.content}
                                         value={elem.code}
                                         options={monacoOptions}
                                     />
                                     {
-                                        currentProgram !== elem.code &&
+                                        currentProgram.content !== elem.code &&
                                         <Button
                                             variant="outlined"
                                             color="secondary"

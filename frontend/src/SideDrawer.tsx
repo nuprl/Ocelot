@@ -26,6 +26,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Drawer from '@material-ui/core/Drawer';
 import { StyleRulesCallback, withStyles } from '@material-ui/core/styles';
+import * as utils from './utils';
+import { connect } from './reactrx';
 
 // NOTE (Sam): If you make any changes for isSimpleValidFileName
 // You have to do the same for the backend, the backend has the exact
@@ -42,7 +44,7 @@ type NewFileFieldProps = {
 type NewFileFieldState = {
     loggedIn: boolean,
     newFileErrorMsg: '' | 'Duplicated file name' | 'File name must match regex [\w\\\-]+\.js',
-    files: state.UserFile[]
+    files: string[]
 };
 
 const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldProps, NewFileFieldState> {
@@ -59,8 +61,7 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
                 return;
             }
             const name = (event.target as HTMLTextAreaElement).value;
-            const result = this.state.files.filter((elem) => elem.name === name);
-            if (result.length !== 0) {
+            if (this.state.files.indexOf(name) !== -1) {
                 this.setState({ newFileErrorMsg: 'Duplicated file name' });
                 return;
             }
@@ -72,10 +73,7 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
             this.props.deleteFileField();
             this.setState({ newFileErrorMsg: '' });
 
-            const oldFiles = state.files.getValue();
-            state.files.next([...oldFiles, { name: name, content: '' }]);
-            state.selectedFileIndex.next(oldFiles.length);
-            state.loadProgram.next('');
+            state.loadProgram.next({kind: 'program', name: name, content: '' });
         };
     }
 
@@ -182,34 +180,23 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
 type Props = WithStyles<ListItemStylesTypes>;
 
 type FileItemProps = {
-    fileIndex: number,
+    selectedFilename: Rx.BehaviorSubject<string | false>,
     name: string,
     disabled: boolean
 };
 
-const FileItem = ListItemStyles(class extends React.Component<Props & FileItemProps, {selectedIndex: number, dirty: state.Dirty}> {
-
-    private subs: Rx.Subscription[] = [];
+const FileItem = ListItemStyles(class extends React.Component<Props & FileItemProps, {selectedFilename: string | false, dirty: state.Dirty}> {
 
     constructor(props: Props & FileItemProps) {
         super(props);
         this.state = {
-            selectedIndex: state.selectedFileIndex.getValue(),
+            selectedFilename: props.selectedFilename.getValue(),
             dirty: state.dirty.getValue()
         };
+        connect(this, 'selectedFilename', props.selectedFilename);
+        connect(this, 'dirty', state.dirty);
     }
 
-    componentDidMount() {
-        this.subs.push(
-            state.selectedFileIndex.subscribe(x => this.setState({ selectedIndex: x })),
-            state.dirty.subscribe(x => this.setState({ dirty: x })));
-    }
-
-    componentWillUnmount() {
-        for (const sub of this.subs) {
-            sub.unsubscribe();
-        }
-    }
 
     onDelete() {
         const response = prompt(`Are you sure you want to permanently delete the file '${this.props.name}'? Enter YES to confirm.`);
@@ -221,15 +208,9 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
           fileName: this.props.name,
           type: 'delete',
         }).then((response) => {
-          const { fileIndex } = this.props;
-          const oldFiles = state.files.getValue();
-          const files = [
-            ...oldFiles.slice(0, fileIndex),
-            ...oldFiles.slice(fileIndex + 1)];
-          const newIndex = fileIndex < files.length ? fileIndex : files.length - 1;
-          state.files.next(files);
-          state.selectedFileIndex.next(newIndex);
-          state.loadProgram.next(files[newIndex].content);
+            if (this.state.selectedFilename === this.props.name) {
+                this.props.selectedFilename.next(false);
+            }
           if (isFailureResponse(response)) {
             console.log('Oh no! File not deleted!');
             state.notification.next({ message: `Unable to delete '${this.props.name}'`, position: 'bottom-right' });
@@ -240,9 +221,9 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
     }
 
     render() {
-        const { classes, name, disabled, fileIndex } = this.props
+        const { classes, name, disabled } = this.props
         const isDisabled = disabled || this.state.dirty !== 'saved';
-        const isSelected = fileIndex === this.state.selectedIndex;
+        const isSelected = name === this.state.selectedFilename;
         return (
             <ListItem
                 button
@@ -252,10 +233,7 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
                     root: `${isSelected && classes.selectedHighlight}`,
                     dense: classes.tinyPadding,
                 }}
-                onClick={() => {
-                    state.selectedFileIndex.next(fileIndex);
-                    state.loadProgram.next(state.files.getValue()[fileIndex].content);
-                }}
+                onClick={() =>this.props.selectedFilename.next(name)}
                 dense
                 disabled={isDisabled}
             >
@@ -300,10 +278,29 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
     }
 });
 
-const UserFileItems = ListItemStyles(class extends React.Component<Props, { files: state.UserFile[], loggedIn: boolean }> {
+const UserFileItems = ListItemStyles(class extends React.Component<Props, { files: string[], loggedIn: boolean }> {
+
+    private selectedFilename: Rx.BehaviorSubject<string | false>;
 
     constructor(props: Props) {
         super(props);
+        this.selectedFilename = new Rx.BehaviorSubject<string | false>(false);
+        this.selectedFilename.subscribe(name => {
+            const email = state.email();
+            if (name === false || email === false) {
+                state.loadProgram.next({ kind: 'nothing' });
+                return;
+            }
+            utils.postJson('read', { filename: name })
+                .then(content => {
+                    // NOTE(arjun): assumes that content is a string
+                    state.loadProgram.next({ kind: 'program', name, content });
+                })
+                .catch(reason => {
+                    state.notify(`Failed to load ${name}. Please try again`);
+                    this.selectedFilename.next(false);
+                })
+        });
         this.state = {
             loggedIn: false,
             files: state.files.getValue(),
@@ -318,21 +315,11 @@ const UserFileItems = ListItemStyles(class extends React.Component<Props, { file
     render() {
         const { files, loggedIn } = this.state;
         let disabled = !loggedIn;
-        return (
-            files.map((fileObj: { name: string, content: string }, index: number) => (
-                <div
-                    className="fileItem"
-                    key={`${fileObj.name}${index + 1}`}
-                >
-                    <FileItem
-                        fileIndex={index}
-                        name={fileObj.name}
-                        key={`${fileObj.name}${index + 2}`}
-                        disabled={disabled}
-                    />
-                </div>
-            ))
-        );
+        return files.map(name =>
+            <div className="fileItem" key={name}>
+                <FileItem name={name} disabled={disabled}
+                    selectedFilename={this.selectedFilename} />
+            </div>);
     }
 })
 

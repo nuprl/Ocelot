@@ -149,9 +149,14 @@ export class Sandbox {
             console.error(`Clicked Run while in mode ${this.mode}`);
             return;
         }
+        const program = state.currentProgram.getValue();
+        if (program.kind !== 'program') {
+            console.error(`Clicked Run/Test with currentProgram.kind === ${program.kind}`);
+            return;
+        }
         this.console.log(new Date().toLocaleString('en-us', {timeZoneName:'short'}));
         this.console.log('Compiling...');
-        const compiled = elementaryJS.compile(state.currentProgram.getValue(), true);
+        const compiled = elementaryJS.compile(program.content, true);
         if (compiled.kind === 'error') {
             this.reportElementaryError(compiled);
             return;

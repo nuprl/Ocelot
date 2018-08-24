@@ -20,6 +20,7 @@ import * as sandbox from './sandbox';
 import UserLogin from './loginButton';
 import HistoryButton from './containers/HistoryButton';
 import * as state from './state';
+import * as reactrx from './reactrx';
 import './autosave';
 
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
@@ -89,10 +90,10 @@ class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.
   }
 
   onRunOrTestClicked(mode: 'running' | 'testing') {
-    if (this.state.loggedIn.kind === 'logged-in') {
+    const program = state.currentProgram.getValue();
+    if (this.state.loggedIn.kind === 'logged-in' && program.kind === 'program') {
       // TODO(arjun): MUST be more robust. Cannot suppress errors.
-      const filename = state.files.getValue()[state.selectedFileIndex.getValue()].name;
-      saveHistory(filename, state.currentProgram.getValue()).then((res) => {
+      saveHistory(program.name, program.content).then((res) => {
         if (isFailureResponse(res)) {
           console.log('Something went wrong');
           console.log(res.data.message);
@@ -153,9 +154,42 @@ const MustLoginDialog: React.StatelessComponent<{open: boolean, onClose: () => v
   );
 
 
+class DownloadButton extends React.Component<{}, { currentProgram: state.Program }> {
+
+  constructor(props: {}) {
+    super(props);
+    this.state = { currentProgram: state.currentProgram.getValue() };
+    reactrx.connect(this, 'currentProgram', state.currentProgram);
+  }
+
+  onDownload() {
+    const p = state.currentProgram.getValue();
+    if (p.kind !== 'program') {
+      return;
+    }
+    let element = document.createElement("a");
+    let file = new Blob([p.content], {type: 'application/javascript'});
+    element.href = URL.createObjectURL(file);
+    element.download = p.name;
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
+
+  render() {
+    return <Button
+      color="secondary"
+      disabled={this.state.currentProgram.kind !== 'program'}
+      onClick={() => this.onDownload()}>
+      <DownloadIcon />
+      Download
+    </Button>;
+  }
+}
+
 type JumboContentState = {
-  selectedFileIndex: number,
-  mustLoginDialogOpen: boolean,
+  mustLoginDialogOpen: boolean
 }
 class JumboContent extends React.Component<Props, JumboContentState> {
 
@@ -166,26 +200,9 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     super(props);
     this.sandbox = new sandbox.Sandbox();
     this.state = {
-      selectedFileIndex: 0,
       mustLoginDialogOpen: false,
     }
   }
-
-  componentDidMount() {
-    state.selectedFileIndex.subscribe(x => this.setState({ selectedFileIndex: x }));
-  }
-
-  onDownload = () => {
-    let element = document.createElement("a");
-    let file = new Blob([state.currentProgram.getValue()], {type: 'application/javascript'});
-    element.href = URL.createObjectURL(file);
-    element.download = state.currentFileName();
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-  };
-
  
   togglePanel = (elementId: string, 
     styleProperty: 'width' | 'height', 
@@ -258,8 +275,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
 
   render() {
 
-    const { selectedFileIndex, mustLoginDialogOpen } = this.state;
-    const isSelected = selectedFileIndex !== -1;
+    const { mustLoginDialogOpen } = this.state;
 
     return (
       <div className={this.props.classes.root}>
@@ -278,13 +294,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             </Button>
             <ExecutionButtons 
               sandbox={this.sandbox} />
-            <Button
-              color="secondary"
-              disabled={!isSelected}
-              onClick={this.onDownload}>
-              <DownloadIcon />
-              Download
-            </Button>
+            <DownloadButton />
             <Button
               color="secondary"
               onClick={() => this.togglePanel('outputPanel', 'height', '25%', 0)}>

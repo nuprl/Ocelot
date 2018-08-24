@@ -51,7 +51,6 @@ import * as Rx from 'rxjs';
 export type Dirty = 'dirty' | 'saving' | 'saved';
 export type NotificationPosition = 'top' | 'bottom-right';
 export type Notification = { message: string, position: NotificationPosition };
-export type UserFile = { name: string, content: string };
 
 export type LoggedIn = 
     { kind: 'logged-out' }
@@ -66,53 +65,15 @@ export const emptyFile = {
 ////////////////////////////////////////////////////////////////////////////////
 // The state of the system
 
-/*
- Suggested structure to deal with multiple tabs better:
-
-New types:
+export type LoadedProgram = {  kind: 'program', name: string, content: string };
 
 export type Program =
        { kind: 'nothing' }
      | { kind: 'loading' }
-     | { kind: 'program', filename: string, contents: string }
+     | LoadedProgram;
 
-
- Change to state:
- 
 export const currentProgram = new Rx.BehaviorSubject<Program>({ kind: 'nothing' });
 export const files = new Rx.BehaviorSubject<string[]>([]);
-
-Remove selectedFileIndex from the state.
-
-Change to channels:
-
-export const loadProgram = new Rx.Subject<Program>();
-
-Overview of changes:
-
-1. After login, request /listfiles to get the current list of files and set
-   state.files.next.
-
-2. When the user clicks a file name, we first loadProgram.next({ kind: 'loading' })
-   and request /getfile. The editor displays a new "Loading" message.
-
-3. When the file is retrieved, we loadProgram.next({ kind: 'program', ... })
-
-4. We update autosave and other mechanisms to filter out loading/nothing.
-   (There should not be a currentProgram when loading.) Autosave already
-   uses the currentProgram to determine what to save and not the arrray
-   of cached programs.
-
-Therefore, when a user switches between files, they will receive changes
-made on other machines. We could also periodically request /listfiles to
-pickup new files or deleted files from other machines. (NOTE: if the current
-file is deleted, we need to do something ...)
-
-
-*/
-// This is the current program in the editor. It is set by the editor and should
-// not be set by any other component.
-export const currentProgram = new Rx.BehaviorSubject<string>('');
 
 // This state is set in several places: (1) the editor sets it to dirty,
 // (2) the autosaver sets it to saving and saved.
@@ -123,10 +84,6 @@ export const loggedIn = new Rx.BehaviorSubject<LoggedIn>({ kind: 'logged-out' })
 
 // Derived from loggedIn
 export const uiActive = new Rx.BehaviorSubject<boolean>(false);
-
-// Loaded files
-export const files = new Rx.BehaviorSubject<UserFile[]>([emptyFile]);
-export const selectedFileIndex = new Rx.BehaviorSubject<number>(0);
 
 function isUiActive(loggedIn: LoggedIn): boolean {
     if (window.location.search !== '?anonymous') {
@@ -144,7 +101,7 @@ loggedIn.subscribe(x => uiActive.next(isUiActive(x)));
 // send values when the code in the editor changes. This is not a
 // BehaviorSubject, because the last value it receives may not be the current
 // state of a file.
-export const loadProgram = new Rx.Subject<string | false>();
+export const loadProgram = new Rx.Subject<Program>();
 
 // Send values to this subject to display a little notification.
 export const notification = new Rx.Subject<Notification>();
@@ -153,9 +110,21 @@ export const notification = new Rx.Subject<Notification>();
 // Convenient functions
 
 export function currentFileName(): string {
-    const ix = selectedFileIndex.getValue();
-    if (ix < 0) {
+    const f = currentProgram.getValue();
+    if (f.kind !== 'program') {
         return '';
     }
-    return files.getValue()[ix].name;
+    return f.name;
+}
+
+export function email(): string | false {
+    const f = loggedIn.getValue();
+    if (f.kind === 'logged-out') {
+        return false;
+    }
+    return f.email;
+}
+
+export function notify(message: string) {
+    notification.next({ position: 'top', message });
 }

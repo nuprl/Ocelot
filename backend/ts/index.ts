@@ -109,6 +109,45 @@ async function checkValidSession(userEmail: string, sessionId: string): Promise<
   return false;
 }
 
+type AsyncResponse = Promise<{ statusCode: number, body: any }>;
+
+/**
+ * A simpler version of wrapHandler that allows the body to be any JSON value.
+ */
+function wrapHandler2(handler: (req: Request) => AsyncResponse) {
+  return (req: Request, res: Response) => {
+    handler(req).then(result => {
+      res.status(result.statusCode).json(result.body);
+    }).catch(reason => {
+      console.error(reason);
+      // TODO(arjun): In deployment, it may be unsafe to send the exception
+      // to the untrusted client.
+      res.status(500).send(reason.toString());
+    });
+  }
+}
+
+/**
+ * Calls 'handleAuthorized' only if the request is authorized to use Ocelot. Otherwise, responds with
+ * an error.
+ */
+async function authorize(req: Request,
+  handleAuthorized: (email: string) => AsyncResponse): Promise<{ statusCode: number, body: any }> {
+  const userEmail = req.body.userEmail;
+  const sessionId = req.body.sessionId;
+  if (typeof userEmail !== 'string' || typeof sessionId !== 'string') {
+    const msg = `authorization malformed (${userEmail}, ${sessionId})`;
+    console.error(msg);
+    return { statusCode: 403, body: msg };
+  }
+  if (!await checkValidSession(userEmail, sessionId)) {
+    const msg = `authorization failed (${userEmail}, ${sessionId})`;
+    console.error(msg);
+    return { statusCode: 403, body: msg };
+  }
+  return handleAuthorized(userEmail);
+}
+
 async function checkValidUser(userEmail: string): Promise<boolean> {
   const query = datastore
     .createQuery(datastoreKind)
@@ -132,24 +171,12 @@ async function updateSessionId(userEmail: string, sessionId: string): Promise<vo
 
 }
 
-async function getArrayOfFiles(userEmail: string): Promise<Storage.File[]> {
-  // specifiying the prefix of the directory to list files
-  const prefixAndDelimiter = {
-    delimiter: '/',
-    prefix: userEmail + '/'
-  }; // delimiter makes it so that we get only the direct child of prefix
-  const [files] = await fileBucket.getFiles(prefixAndDelimiter);
-  // get files for folder
-
-  return files;
-}
-
 function isSimpleValidEmail(email: string) { // incomplete but will do for now
   return /^\w[.\w]*@\w+\.[a-zA-Z]+$/.test(email);
 }
 
-function isSimpleValidFileName(fileName: string) { // still incomplete but will do for now
-  return /^[\w\-]+\.js$/.test(fileName);
+function isSimpleValidFileName(fileName: any): fileName is string {
+  return typeof fileName === 'string' && /^[\w\-]+\.js$/.test(fileName);
 }
 
 /**
@@ -176,53 +203,6 @@ async function checkValidFileRequest(userEmail: string, sessionId: string, ...ar
   }
 
   return { isFailure: false, message: 'ok' };
-}
-
-/**
- * Given the userEmail in req, get files of user accordingly
- * Otherwise, return unauthorized message if user is not authorized.
- * 
- * @param {Request} req with a userEmail attribute from JSON POST request
- * @returns statusCode and contents in body
- */
-async function getFile(req: Request) {
-  const valid = await checkValidFileRequest(req.body.userEmail, req.body.sessionId);
-  if (valid.isFailure) {
-    return failureResponse(valid.message);
-  }
-
-  try {
-    const files = await getArrayOfFiles(req.body.userEmail);
-
-    const filteredFiles = files.filter(({name}) => name.substr(name.length - 1, 1) !== '/');
-    // get only files and not directories
-    const userFilesPromises = filteredFiles.map(async (file) => { 
-      // downloading files asynchronously all at the same time is
-      // few hundred miliseconds faster
-      const [fileContents] = await file.download();
-      return {
-        name: path.basename(file.name),
-        content: fileContents.toString(),
-      }
-    });
-
-    const userFiles = await Promise.all(userFilesPromises);
-
-    return {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        data: {
-          userFiles: userFiles
-        }
-      }
-    };
-
-  } catch (e) {
-
-    return { statusCode: 500, body: { status: 'error', message: e } };
-  }
-
 }
 
 interface FileChange {
@@ -633,8 +613,25 @@ function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, bo
   }
 }
 
+paws.post('/listfiles', wrapHandler2(req =>
+  authorize(req, async email => {
+    const [files] = await fileBucket.getFiles({ prefix: `${email}/` });
+    return {
+      statusCode: 200,
+      body: files.map(file => path.basename(file.name))
+    };
+  })));
 
-paws.post('/getfile', wrapHandler(getFile));
+paws.post('/read', wrapHandler2(req =>
+  authorize(req, async email => {
+    const filename = req.body.filename;
+    if (!isSimpleValidFileName(filename)) {
+      return { statusCode: 400, body: 'invalid filename' };
+    }
+    const [buf] = await fileBucket.file(`${email}/${filename}`).download();
+    return { statusCode: 200, body: buf.toString() };
+  })));
+
 paws.post('/login', wrapHandler(login));
 paws.post('/changefile', wrapHandler(changeFile));
 paws.post('/savehistory', wrapHandler(saveToHistory));

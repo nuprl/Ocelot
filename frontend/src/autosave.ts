@@ -1,8 +1,7 @@
 import * as Rx from 'rxjs';
 import * as RxOps from 'rxjs/operators';
 import { saveChanges } from './utils/api/saveFileChanges';
-import { currentProgram, currentFileName, dirty,
-    notification } from './state';
+import { currentProgram, dirty, notification } from './state';
 
 window.addEventListener('beforeunload', (event) => {
     if (dirty.getValue() === 'saved') {
@@ -15,21 +14,30 @@ window.addEventListener('beforeunload', (event) => {
     }
 });
 
-function saveRequest() {
+function saveRequest(): Rx.Observable<boolean> {
     dirty.next('saving');
-    return Rx.from(saveChanges({ 
-        fileName: currentFileName(),
-        type: 'create', 
-        changes: currentProgram.getValue()
-    }));
+    const p = currentProgram.getValue();
+    if (p.kind !== 'program') {
+        dirty.next('saved');
+        return Rx.of(true);
+    }
+
+    const saveReq = saveChanges({
+        fileName: p.name,
+        type: 'create',
+        changes: p.content
+    });
+
+    return Rx.from(saveReq)
+        .pipe(RxOps.map(x => x.status === 'SUCCESS'));
 }
 
 dirty.pipe(
     RxOps.filter(x => x === 'dirty'),
     RxOps.debounceTime(1000),
     RxOps.mergeMap(saveRequest, 1))
-    .subscribe(response => {
-        if (response.status === 'SUCCESS') {
+    .subscribe(ok => {
+        if (ok) {
             // Note that if there are other pending changes, then the buffer
             // may not be saved. However, the next save request, which fires
             // almost immediately, does isBufferSaved.next(false).

@@ -3,8 +3,8 @@ import { GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-lo
 import Typography from '@material-ui/core/Typography';
 import { validateUser } from './utils/api/validateUser';
 import { isFailureResponse } from './utils/api/apiHelpers';
-import { getUserFiles } from './utils/api/getUserFiles';
 import * as state from './state';
+import * as utils from './utils';
 
 import Fade from '@material-ui/core/Fade';
 import { GoogleLogin, } from 'react-google-login';
@@ -84,15 +84,18 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
     }
 
     loadFiles = () => {
-        getUserFiles().then(response => {
-            if (isFailureResponse(response)) {
-                console.log('Could not get files');
-                return;
-            }
-            state.files.next(response.data.userFiles);
-            state.selectedFileIndex.next(-1);
-            state.loadProgram.next(false);
-        });
+        utils.postJson('listfiles', { })
+            .then(files => {
+                state.files.next(files);
+                const email = state.email();
+                if (email === false) {
+                    throw new Error('Race condition--immediate logout');
+                }
+                state.loggedIn.next({ kind: 'logged-in', email  });
+            })
+            .catch(reason =>
+                // TODO(arjun): Perhaps just retry?
+                state.notify(`Could not load files`));
     }
 
     onFailure = (response: { error: string }) => {
@@ -102,9 +105,8 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
 
     onLogout() {
         state.loggedIn.next({ kind: 'logged-out' });
-        state.files.next([ state.emptyFile ]);
-        state.selectedFileIndex.next(-1);
-        state.loadProgram.next(false);
+        state.files.next([ ]);
+        state.loadProgram.next({ kind: 'nothing' });
         localStorage.removeItem('userEmail');
         localStorage.removeItem('sessionId');
     }

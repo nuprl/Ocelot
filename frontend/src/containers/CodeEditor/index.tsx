@@ -46,7 +46,7 @@ type Props = {
 
 type CodeEditorState = {
     uiActive: boolean,
-    loadProgram: string | false
+    loadProgram: state.Program
 };
 
 class CodeEditor extends React.Component<Props, CodeEditorState> {
@@ -57,27 +57,14 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         this.editor = undefined;
         this.state = {
             uiActive: state.uiActive.getValue(),
-            loadProgram: ''
+            // On initialization, this will be nothing
+            loadProgram: state.currentProgram.getValue()
         };
     }
 
     componentDidMount() {
         state.uiActive.subscribe(x => this.setState({ uiActive: x }));
-        state.loadProgram.subscribe(x => {
-            // TODO(arjun): remove logging
-            if (x === false) {
-                console.log('loadProgram received false');
-            }
-            else {
-                if (x.length === 0) {
-                    console.error(`Empty buffer loaded for file ${state.currentFileName()}`);
-                }
-                else {
-                    console.log(`Editor loading ${x.length} characters for file ${state.currentFileName()} (${x.slice(0, 20)})`);
-                }
-            }
-            this.setState({ loadProgram: x })
-        });
+        state.loadProgram.subscribe(x => this.setState({ loadProgram: x }));
     }
 
     editorWillMount = (monaco: typeof monacoEditor) => {
@@ -136,11 +123,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         if (this.editor === undefined) {
             return;
         }
-        const program = this.state.loadProgram;
-        if (program !== false) {
-            state.currentProgram.next(program);
-        }
-
+        state.currentProgram.next(this.state.loadProgram);
         this.editor.focus();
     }
 
@@ -152,25 +135,22 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
     }
     
     onChange(code: string)  {
-        state.currentProgram.next(code);
-        state.dirty.next('dirty');
-        const oldFiles = state.files.getValue();
-        const index = state.selectedFileIndex.getValue();
-        const files = oldFiles.map((file, i) => {
-            if (i === index) {
-                return { content: code, name: file.name }
-            }
-            else {
-                return file;
-            }
+        if (this.state.loadProgram.kind !== 'program') {
+            console.error('editor received onChange without a loaded program');
+            return;
+        }
+        state.currentProgram.next({
+            kind: 'program',
+            name: this.state.loadProgram.name,
+            content: code
         });
-        state.files.next(files);
+        state.dirty.next('dirty');
     };
 
     render() {
         const { classes } = this.props;
 
-        if (this.state.loadProgram === false) {
+        if (this.state.loadProgram.kind !== 'program') {
             return (
                 <div className={classes.emptyState}>
                     <PawIcon className={classes.pawIcon} />
@@ -189,7 +169,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
                 <MonacoEditor
                     language="elementaryjs"
                     theme="vs-dark"
-                    value={this.state.loadProgram}
+                    value={this.state.loadProgram.content}
                     options={monacoOptions}
                     onChange={(code) => this.onChange(code)}
                     editorDidMount={this.editorDidMount}
