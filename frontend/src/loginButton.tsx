@@ -64,10 +64,11 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
         connect(this, 'loggedIn', state.loggedIn);
     }
 
-    onSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
+    onSuccess(response: GoogleLoginResponse | GoogleLoginResponseOffline) {
         validateUser(response as GoogleLoginResponse).then((response) => {
             if (isFailureResponse(response)) {
-                console.log(response.data.message)
+                state.notify(response.data.message);
+                this.onLogout();
                 return;
             }
             state.loggedIn.next({ 
@@ -77,7 +78,8 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
             this.loadFiles();
 
         }).catch(error => {
-            console.log('Could not validate user', error);
+            state.notify('Could not log in. Check again');
+            this.loadFiles();
         });
     }
 
@@ -121,7 +123,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                 <GoogleLogin
                         style={{display: loggedIn ? "none" : "" }}
                         clientId="692270598994-p92ku4bbjkvcddouh578eb1a07s8mghc.apps.googleusercontent.com"
-                        onSuccess={this.onSuccess}
+                        onSuccess={(resp) => this.onSuccess(resp)}
                         onFailure={this.onFailure}
                         prompt="select_account" // always prompts user to select a specific account
                         isSignedIn
