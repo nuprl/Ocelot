@@ -64,13 +64,6 @@ yarn install
 yarn run build && yarn run serve
 ```
 
-## To hack on the 220 library locally
-
-```bash
-cd Ocelot/frontend/build
-ln -s <path-to-local-220-library> lib220.js
-```
-
 ## Issues you will have
 
 - Delete this directory: `rm -rf Ocelot/node_modules`
