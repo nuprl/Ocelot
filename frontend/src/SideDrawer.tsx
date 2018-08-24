@@ -56,6 +56,9 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
             loggedIn: false,
             files: state.files.getValue()
         };
+        connect(this, 'loggedIn', state.uiActive);
+        connect(this, 'files', state.files);
+
         this.listener = (event) => {
             if (event.keyCode !== 13 || event.target === null) {
                 return;
@@ -75,11 +78,6 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
 
             state.loadProgram.next({kind: 'program', name: name, content: '' });
         };
-    }
-
-    componentDidMount() {
-        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
-        state.files.subscribe(x => this.setState({ files: x }));
     }
 
     componentDidUpdate(prevProps: NewFileFieldProps) {
@@ -305,11 +303,8 @@ const UserFileItems = ListItemStyles(class extends React.Component<Props, { file
             loggedIn: false,
             files: state.files.getValue(),
         };
-    }
-
-    componentDidMount() {
-        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
-        state.files.subscribe(x => this.setState({ files: x }));
+        connect(this, 'loggedIn', state.uiActive);
+        connect(this, 'files', state.files);
     }
 
     render() {
@@ -336,10 +331,7 @@ class SavedIndicator extends React.Component<{}, { dirty: state.Dirty }> {
         this.state = {
             dirty: state.dirty.getValue()
         };
-    }
-
-    componentDidMount() {
-        state.dirty.subscribe(x => this.setState({ dirty: x}));
+        connect(this, 'dirty', state.dirty);
     }
 
     render() {
@@ -363,11 +355,9 @@ const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
             hasNewFileField: false,
             dirty: state.dirty.getValue()
         };
-    }
+        connect(this, 'loggedIn', state.uiActive);
+        connect(this, 'dirty', state.dirty);
 
-    componentDidMount() {
-        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
-        state.dirty.subscribe(x => this.setState({ dirty: x }));
     }
 
     newFileField = () => { this.setState({ hasNewFileField: true }) };

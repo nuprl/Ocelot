@@ -40,9 +40,10 @@ class ErrorSnackbar extends React.Component<WithStyles<'close'>, State> {
         };
     }
 
+    // We need componentDidMount to setup a subscription that opens the
+    // notification bar on each message.
     componentDidMount() {
         state.notification.subscribe(next => {
-            console
             this.setState({
                 open: true,
                 message: next.message,

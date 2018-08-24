@@ -21,6 +21,7 @@ import { MonacoDiffEditor } from 'react-monaco-editor';
 import * as monacoEditor from 'monaco-editor';
 import { saveHistory } from '../../utils/api/saveHistory';
 import * as state from '../../state';
+import { connect } from '../../reactrx';
 
 const styles: StyleRulesCallback = theme => ({
     list: {
@@ -104,11 +105,8 @@ class HistoryButton extends React.Component<Props, State> {
             codeOpenIndex: -1,
             currentProgram: state.currentProgram.getValue()
         };
-    }
-
-    componentDidMount() {
-        state.uiActive.subscribe(x => this.setState({ loggedIn: x }));
-        state.currentProgram.subscribe(x => this.setState({ currentProgram: x }));
+        connect(this, 'loggedIn', state.uiActive);
+        connect(this, 'currentProgram', state.currentProgram);
     }
 
     onClick = () => {

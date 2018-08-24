@@ -8,6 +8,7 @@ import PawIcon from '@material-ui/icons/Pets';
 import Typography from '@material-ui/core/Typography';
 import * as state from '../../state';
 import { console } from '../../errors';
+import { connect } from '../../reactrx';
 
 const styles: StyleRulesCallback = theme => ({
     emptyState: {
@@ -60,11 +61,8 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             // On initialization, this will be nothing
             loadProgram: state.currentProgram.getValue()
         };
-    }
-
-    componentDidMount() {
-        state.uiActive.subscribe(x => this.setState({ uiActive: x }));
-        state.loadProgram.subscribe(x => this.setState({ loadProgram: x }));
+        connect(this, 'uiActive', state.uiActive);
+        connect(this, 'loadProgram', state.loadProgram);
     }
 
     editorWillMount = (monaco: typeof monacoEditor) => {

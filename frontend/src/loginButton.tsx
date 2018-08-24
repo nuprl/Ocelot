@@ -11,6 +11,7 @@ import { GoogleLogin, } from 'react-google-login';
 import Button from '@material-ui/core/Button';
 
 import { GoogleLogout } from 'react-google-login';
+import { connect } from './reactrx';
 
 const alternateLogoutButton = (onClickProp?: { onClick: () => void }) => {
     if (typeof onClickProp === 'undefined') {
@@ -60,10 +61,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
             loggedIn: state.loggedIn.getValue(),
             loading: false
         };
-    }
-    
-    componentDidMount() {
-        state.loggedIn.subscribe(x => this.setState({ loggedIn: x }));
+        connect(this, 'loggedIn', state.loggedIn);
     }
 
     onSuccess = (response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
