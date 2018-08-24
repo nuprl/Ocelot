@@ -30,11 +30,7 @@ To install Stopify:
 ```bash
 cd Stopify
 git checkout 220-Aug22
-yarn install
-cd stopify-estimators && yarn run build && cd .. && \
-cd stopify-continuations && yarn run build && yarn link && cd .. && \
-cd stopify && yarn run build && yarn link && cd ..
-
+./make_220.sh
 ```
 
 To install ElementaryJS:
