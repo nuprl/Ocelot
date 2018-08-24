@@ -86,7 +86,7 @@ export const loggedIn = new Rx.BehaviorSubject<LoggedIn>({ kind: 'logged-out' })
 export const uiActive = new Rx.BehaviorSubject<boolean>(false);
 
 function isUiActive(loggedIn: LoggedIn): boolean {
-    if (window.location.search !== '?anonymous') {
+    if (window.location.search === '?anonymous') {
         return true;
     }
     return loggedIn.kind === 'logged-in';

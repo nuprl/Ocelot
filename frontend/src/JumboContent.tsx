@@ -72,21 +72,29 @@ type ExecutionProps = {
   sandbox: sandbox.Sandbox
 }
 
-class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.Mode, loggedIn: state.LoggedIn }> {
+type ExecutionButtonsState = {
+  mode : sandbox.Mode,
+  uiActive: boolean,
+  currentProgram: state.Program
+}
+
+class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsState> {
 
   constructor(props: ExecutionProps) {
     super(props);
     this.state = { 
       mode: this.props.sandbox.mode.getValue(),
-      loggedIn: state.loggedIn.getValue()
+      uiActive: state.uiActive.getValue(),
+      currentProgram: state.currentProgram.getValue()
     };
-    reactrx.connect(this, 'loggedIn', state.loggedIn);
+    reactrx.connect(this, 'uiActive', state.uiActive);
     reactrx.connect(this, 'mode', this.props.sandbox.mode);
+    reactrx.connect(this, 'currentProgram', state.currentProgram);
   }
 
   onRunOrTestClicked(mode: 'running' | 'testing') {
     const program = state.currentProgram.getValue();
-    if (this.state.loggedIn.kind === 'logged-in' && program.kind === 'program') {
+    if (this.state.uiActive && program.kind === 'program') {
       // TODO(arjun): MUST be more robust. Cannot suppress errors.
       saveHistory(program.name, program.content).then((res) => {
         if (isFailureResponse(res)) {
@@ -100,16 +108,19 @@ class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.
   }
 
   render() {
+    const { currentProgram, uiActive, mode } = this.state;
+    const mayRun = uiActive && currentProgram.kind === 'program' && mode === 'stopped';
+    const mayStop = uiActive && (mode === 'running' || mode === 'testing');
     return [
       <Button key="run-button" color="secondary"
         onClick={() => this.onRunOrTestClicked('running')}
-        disabled={this.state.mode !== 'stopped'}>
+        disabled={!mayRun}>
         <PlayIcon color="inherit" />
         Run
       </Button>,
       <Button key="test-button" color="secondary"
         onClick={() => this.onRunOrTestClicked('testing')}
-        disabled={this.state.mode !== 'stopped'}>
+        disabled={!mayRun}>
         <ExploreIcon color="inherit" />
         Test
       </Button>,
@@ -117,7 +128,7 @@ class ExecutionButtons extends React.Component<ExecutionProps, { mode : sandbox.
         <Button
           color="primary"
           onClick={() => this.props.sandbox.onStopClicked()}
-          disabled={this.state.mode === 'stopped' || this.state.mode === 'stopping'}>
+          disabled={!mayStop}>
           <StopIcon color="inherit" />
           Stop
       </Button>

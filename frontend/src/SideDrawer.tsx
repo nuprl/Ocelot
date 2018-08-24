@@ -378,7 +378,7 @@ const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
                     <SavedIndicator />
                     <div style={{color: 'white', paddingLeft: '15px' }}>
                         <Button
-                                disabled={!this.state.loggedIn || this.state.dirty !== 'saved'}
+                                disabled={!(this.state.loggedIn && this.state.dirty === 'saved')}
                                 onClick={this.newFileField}>
                             <NewIcon />
                             New
