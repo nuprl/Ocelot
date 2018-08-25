@@ -38,7 +38,8 @@ const isSimpleValidFileName = (fileName: string) => {
 
 type NewFileFieldProps = {
     newFile: boolean,
-    deleteFileField: () => void
+    deleteFileField: () => void,
+    selectedFilename: Rx.BehaviorSubject<string | false>
 } & WithStyles<ListItemStylesTypes>;
 
 type NewFileFieldState = {
@@ -75,7 +76,18 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
 
             this.props.deleteFileField();
             this.setState({ newFileErrorMsg: '' });
-
+            saveChanges({ fileName: name, type: 'create', changes: '' })
+                .then(result => {
+                    if (result.status !== 'SUCCESS') {
+                        throw 'failure response from server';
+                    }
+                    state.files.next([name, ...state.files.getValue()]);
+                    this.props.selectedFilename.next(name);
+                })
+                .catch(reason => {
+                    state.notify('Could not create file');
+                    console.error(`failed to create file (reason: ${reason}`);
+                });
             state.loadProgram.next({kind: 'program', name: name, content: '' });
         };
     }
@@ -276,29 +288,10 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
     }
 });
 
-const UserFileItems = ListItemStyles(class extends React.Component<Props, { files: string[], loggedIn: boolean }> {
+const UserFileItems = ListItemStyles(class extends React.Component<Props & { selectedFilename: Rx.BehaviorSubject<string | false> }, { files: string[], loggedIn: boolean }> {
 
-    private selectedFilename: Rx.BehaviorSubject<string | false>;
-
-    constructor(props: Props) {
+    constructor(props: Props & { selectedFilename: Rx.BehaviorSubject<string | false> }) {
         super(props);
-        this.selectedFilename = new Rx.BehaviorSubject<string | false>(false);
-        this.selectedFilename.subscribe(name => {
-            const email = state.email();
-            if (name === false || email === false) {
-                state.loadProgram.next({ kind: 'nothing' });
-                return;
-            }
-            utils.postJson('read', { filename: name })
-                .then(content => {
-                    // NOTE(arjun): assumes that content is a string
-                    state.loadProgram.next({ kind: 'program', name, content });
-                })
-                .catch(reason => {
-                    state.notify(`Failed to load ${name}. Please try again`);
-                    this.selectedFilename.next(false);
-                })
-        });
         this.state = {
             loggedIn: false,
             files: state.files.getValue(),
@@ -313,7 +306,7 @@ const UserFileItems = ListItemStyles(class extends React.Component<Props, { file
         return files.map(name =>
             <div className="fileItem" key={name}>
                 <FileItem name={name} disabled={disabled}
-                    selectedFilename={this.selectedFilename} />
+                    selectedFilename={this.props.selectedFilename} />
             </div>);
     }
 })
@@ -348,6 +341,8 @@ class SavedIndicator extends React.Component<{}, { dirty: state.Dirty }> {
 
 const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
 
+    private selectedFilename: Rx.BehaviorSubject<string | false>;
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -357,6 +352,23 @@ const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
         };
         connect(this, 'loggedIn', state.uiActive);
         connect(this, 'dirty', state.dirty);
+        this.selectedFilename = new Rx.BehaviorSubject<string | false>(false);
+        this.selectedFilename.subscribe(name => {
+            const email = state.email();
+            if (name === false || email === false) {
+                state.loadProgram.next({ kind: 'nothing' });
+                return;
+            }
+            utils.postJson('read', { filename: name })
+                .then(content => {
+                    // NOTE(arjun): assumes that content is a string
+                    state.loadProgram.next({ kind: 'program', name, content });
+                })
+                .catch(reason => {
+                    state.notify(`Failed to load ${name}. Please try again`);
+                    this.selectedFilename.next(false);
+                })
+        });
 
     }
 
@@ -384,8 +396,9 @@ const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
                             New
                         </Button>
                     </div>
-                    <UserFileItems />
+                    <UserFileItems selectedFilename={this.selectedFilename} />
                     <NewFileField
+                        selectedFilename={this.selectedFilename}
                         newFile={this.state.hasNewFileField}
                         deleteFileField={() => { this.setState({ hasNewFileField: false }) }}
                     />
