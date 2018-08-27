@@ -6,6 +6,9 @@ import * as types from './types';
 import * as lib220 from 'elementary-js/dist/lib220';
 import { console } from './errors';
 import * as state from './state';
+import { OCELOTVERSION } from './version';
+import { EJSVERSION } from 'elementary-js/dist/version';
+import { STOPIFY220VERSION } from 'stopify/dist/src/version';
 
 // TODO(arjun): I think these hacks are necessary for eval to work. We either
 // do them here or we do them within the implementation of Stopify. I want
@@ -18,6 +21,14 @@ export type Mode = 'running' | 'testing' | 'stopped' | 'stopping';
 const compileOpts: Partial<stopify.CompilerOpts> = {
     hofs: 'fill'
 };
+
+export function version() {
+    return {
+        stopify: STOPIFY220VERSION,
+        elementaryJS: EJSVERSION,
+        ocelot: OCELOTVERSION
+    };
+}
 
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
 // function to create an AsyncRun that does not run any user code.
@@ -80,6 +91,7 @@ export class Sandbox {
             test: elementaryRTS.test,
             assert: elementaryRTS.assert,
             lib220: Object.freeze(lib220),
+            version: version,
             Array: elementaryRTS.Array,
             Math: Math,
             undefined: undefined,
