@@ -303,11 +303,15 @@ const UserFileItems = ListItemStyles(class extends React.Component<Props & { sel
     render() {
         const { files, loggedIn } = this.state;
         let disabled = !loggedIn;
-        return files.map(name =>
+        return (
+          <div style={{height:'100%', overflowY:'scroll'}}>
+           {files.map(name =>
             <div className="fileItem" key={name}>
                 <FileItem name={name} disabled={disabled}
                     selectedFilename={this.props.selectedFilename} />
-            </div>);
+            </div>)}
+          </div>
+        );
     }
 })
 
@@ -375,18 +379,9 @@ const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
     newFileField = () => { this.setState({ hasNewFileField: true }) };
 
     render() {
-        const { classes } = this.props;
-
         return (
-            <div>
-                <div className="fileItem">
-                    <ListItem
-                        disabled={!this.state.loggedIn}
-                        dense
-                        classes={{ dense: classes.tinyPadding }}>
-                    </ListItem>
-                </div>
-                <List component="div" disablePadding dense >
+            <div style={{height:'100%'}}>
+                <List style={{height:'100%'}} component="div" disablePadding dense >
                     <SavedIndicator />
                     <div style={{color: 'white', paddingLeft: '15px' }}>
                         <Button
@@ -396,7 +391,9 @@ const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
                             New
                         </Button>
                     </div>
-                    <UserFileItems selectedFilename={this.selectedFilename} />
+                    <div style={{height:'calc(100% - 108px'}}>
+                      <UserFileItems selectedFilename={this.selectedFilename} />
+                    </ div>
                     <NewFileField
                         selectedFilename={this.selectedFilename}
                         newFile={this.state.hasNewFileField}
@@ -434,11 +431,12 @@ const SideDrawer: React.StatelessComponent<WithStyles<SideDrawerStylesType>> = (
                 paper: classes.drawerPaper,
                 paperAnchorDockedLeft: classes.noBorder
             }}
+            style={{height:'100%'}}
             id="sideDrawer"
         >
             <div className={classes.toolbar} style={{minHeight: '48px'}}/>
             {/* Setting toolbar is so hacky, I don't know how to override it */}
-            <List dense>
+            <List style={{height:'100%'}} dense>
                 <FilesFolder />
             </List>
         </Drawer>

@@ -319,7 +319,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             <UserLogin/>
           </Toolbar>
         </AppBar>
-        <SplitPane split="vertical" defaultSize={250} minSize={0}>
+        <SplitPane split="vertical" style={{height:'100%'}} defaultSize={250} minSize={0}>
           <SideDrawer />
           <div className={this.props.classes.jumboContainer}>
             <div className={this.props.classes.toolbar} style={{ minHeight: '48px' }} />
