@@ -112,8 +112,14 @@ class OutputPanel extends React.Component<Props, State> {
         };
     }
 
-    error(...message: any[]) {
-        this.appendLogMessage({ method: 'error', data: message });
+    error(message: string) {
+        this.appendLogMessage({
+            method: 'log',
+           data: [
+             `%c${message}`,
+            'color: #ff0000; font-weight: bold'
+           ]
+        });
     }
 
     log(...message: any[]) {
@@ -142,7 +148,12 @@ class OutputPanel extends React.Component<Props, State> {
 
     command = (command: string, result: any, isError: boolean) => {
         this.appendLogMessage({ method: 'command', data: [command] });
-        this.appendLogMessage({ method: isError ? 'error' : 'result', data: [result] });
+        if (isError) {
+            this.error(result);
+        }
+        else {
+            this.log(result);
+        }
     };
 
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;

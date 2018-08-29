@@ -76,19 +76,21 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
 
             this.props.deleteFileField();
             this.setState({ newFileErrorMsg: '' });
+            state.notify('Creating new file ...');
             saveChanges({ fileName: name, type: 'create', changes: '' })
                 .then(result => {
                     if (result.status !== 'SUCCESS') {
                         throw 'failure response from server';
                     }
-                    state.files.next([name, ...state.files.getValue()]);
+                    state.files.next([...state.files.getValue(), name]);
                     this.props.selectedFilename.next(name);
+                    state.loadProgram.next({kind: 'program', name: name, content: '' });
+                    state.notify('File created.');
                 })
                 .catch(reason => {
                     state.notify('Could not create file');
                     console.error(`failed to create file (reason: ${reason}`);
                 });
-            state.loadProgram.next({kind: 'program', name: name, content: '' });
         };
     }
 
@@ -220,6 +222,8 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
         }).then((response) => {
             if (this.state.selectedFilename === this.props.name) {
                 this.props.selectedFilename.next(false);
+                state.files.next(state.files.getValue()
+                    .filter(x => x !== this.props.name));
             }
           if (isFailureResponse(response)) {
             console.log('Oh no! File not deleted!');
