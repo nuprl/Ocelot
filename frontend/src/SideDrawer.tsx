@@ -82,7 +82,7 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
                     if (result.status !== 'SUCCESS') {
                         throw 'failure response from server';
                     }
-                    state.files.next([...state.files.getValue(), name]);
+                    state.files.next([name, ...state.files.getValue()]);
                     this.props.selectedFilename.next(name);
                     state.loadProgram.next({kind: 'program', name: name, content: '' });
                     state.notify('File created.');
@@ -395,14 +395,14 @@ const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
                             New
                         </Button>
                     </div>
-                    <div style={{height:'calc(100% - 108px'}}>
-                      <UserFileItems selectedFilename={this.selectedFilename} />
-                    </ div>
                     <NewFileField
                         selectedFilename={this.selectedFilename}
                         newFile={this.state.hasNewFileField}
                         deleteFileField={() => { this.setState({ hasNewFileField: false }) }}
                     />
+                    <div style={{height:'calc(100% - 108px'}}>
+                      <UserFileItems selectedFilename={this.selectedFilename} />
+                    </ div>
                 </List>
             </div>
         );
