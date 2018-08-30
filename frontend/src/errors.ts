@@ -13,7 +13,7 @@ function getEmail() {
     }
 }
 
-function traceError(message: any, level: 'error' | 'log') {
+function traceError(message: string) {
     const version = `Ocelot ${OCELOTVERSION}, EJS ${EJSVERSION}`;
     const userAgent = window.navigator.userAgent;
     const err = { 
@@ -21,21 +21,14 @@ function traceError(message: any, level: 'error' | 'log') {
         version, 
         userAgent, 
         message, 
-        ejsVersion: EJSVERSION,
-        ocelotVersion: OCELOTVERSION 
+        userProgram: state.currentProgram.getValue(),
     };
     let body: string;
     try {
         body = JSON.stringify(err);
     }
     catch (exn) {
-        // We could not turn message into JSON, see if it has a message ...
-        if (message.message) {
-            err.message = String(message.message);
-        }
-        else {
-            err.message = String(message);
-        }
+        err.message = String(err.message);
         body = JSON.stringify(err);
     }
 
@@ -46,29 +39,22 @@ function traceError(message: any, level: 'error' | 'log') {
     }).catch(reason => {
         console.error('Failed to log error ', reason);
     });
-    if (level === 'error') {
-        console.error(message);
-    }
-    else {
-        console.log(message);
-    }
 }
 
 window.addEventListener('error', (errorEvent) => {
-    traceError({
-        message: errorEvent.message,
-        userProgram: state.currentProgram.getValue(),
-        line: errorEvent.lineno,
-        column: errorEvent.colno
-    }, 'error');
+    console.error(errorEvent.message);
+    traceError(
+      `${errorEvent.message} at line ${errorEvent.lineno}, column ${errorEvent.colno}, file ${errorEvent.filename}`);
 });
 
 const tracingConsole = {
     error: function(message: string) {
-        traceError({ message: message }, 'error');
+        console.error(message);
+        traceError(message);
     },
     log: function(message: string) {
-        traceError({ message: message }, 'log');
+        console.log(message);
+        traceError(message);
     }
 
 }

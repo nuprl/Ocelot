@@ -36,7 +36,7 @@ function reportError(req: Request, message: string) {
   evt.setUser(req.body.username);
   evt.setServiceContext('ocelot', req.body.version);
   evt.setUserAgent(req.body.userAgent);
-  evt.setMessage(message);
+  evt.setMessage(message.replace(/[^A-Za-z]/g,'_') + ': ' + message);
   errorReporting.report(evt);
   console.error(message);
 }
@@ -637,14 +637,7 @@ paws.post('/error', wrapHandler(async req => {
     message.push(req.body.message);
   }
 
-  const otherFields = Object.keys(req.body).filter(key => key !== 'message');
-  for (const key of otherFields) {
-    message.push(`${key}:`);
-    message.push(str(req.body[key]));
-    message.push('');
-  }
-
-  reportError(req, message.join('\n'))
+  reportError(req, str(req.body.message));
 
   return { statusCode: 200, body: { status: 'ok' } };
 }));
