@@ -54,7 +54,7 @@ function emptyStopifyRunner(opts: elementaryJS.CompilerOpts) {
 export class Sandbox {
 
     private runner: elementaryJS.CompileOK;
-    private console!: types.HasConsole; // bang is 'definite assignment'
+    private repl!: types.HasConsole; // bang is 'definite assignment'
     public mode: Rx.BehaviorSubject<Mode>;
 
     constructor() {
@@ -63,7 +63,7 @@ export class Sandbox {
     }
 
     setConsole(console: types.HasConsole) {
-        this.console = console;
+        this.repl = console;
     }
 
 
@@ -72,31 +72,31 @@ export class Sandbox {
             let message = result.value instanceof Error ?
               result.value.message : String(result.value);
             if (result.stack.length === 0) {
-                this.console.error(message);
+                this.repl.error(message);
                 return;
             }
             message = message + ' at ' + result.stack[0];
             if (result.stack.length === 1) {
-                this.console.error(message);
+                this.repl.error(message);
                 return;
             }
-            this.console.error(message + '\n... ' +
+            this.repl.error(message + '\n... ' +
                 result.stack.slice(1).join('\n... '));
         }
         else if (result.type === 'normal' && showNormal) {
-            this.console.log(result.value);
+            this.repl.log(result.value);
         }
     }
 
     private reportElementaryError(error: elementaryJS.CompileError) {
         for (const err of error.errors) {
-            this.console.error(`Line ${err.line}: ${err.message}`);
+            this.repl.error(`Line ${err.line}: ${err.message}`);
         }
     }
 
     opts() {
         return {
-            consoleLog: (message: string) => this.console!.log(message),
+            consoleLog: (message: string) => this.repl!.log(message),
             version: version
         }
     }
@@ -111,18 +111,18 @@ export class Sandbox {
             console.error(`Clicked Run/Test with currentProgram.kind === ${program.kind}`);
             return;
         }
-        this.console.log(new Date().toLocaleString('en-us', {timeZoneName:'short'}));
-        this.console.log('Compiling...');
+        this.repl.log(new Date().toLocaleString('en-us', {timeZoneName:'short'}));
+        this.repl.log('Compiling...');
         const runner = elementaryJS.compile(program.content, this.opts());
         if (runner.kind === 'error') {
             this.reportElementaryError(runner);
             return;
         }
-        this.console.log('Compilation succesful.');
+        this.repl.log('Compilation succesful.');
         if (mode === 'running') {
-            this.console.log('Starting program...');
+            this.repl.log('Starting program...');
         } else if (mode === 'testing') {
-            this.console.log('Running tests...');
+            this.repl.log('Running tests...');
         }
         this.runner = runner;
         elementaryRTS.enableTests(mode === 'testing');
@@ -132,10 +132,10 @@ export class Sandbox {
             this.onResult(result, false);
             if (currentMode === 'testing' && result.type !== 'exception') {
               const summary = elementaryRTS.summary(true);
-              this.console.log(summary.output, ...summary.style);
+              this.repl.log(summary.output, ...summary.style);
             }
             if (currentMode !== 'testing' && result.type === 'normal') {
-                this.console.log('Program terminated normally.');
+                this.repl.log('Program terminated normally.');
             }
             this.mode.next('stopped');
         });
@@ -147,7 +147,7 @@ export class Sandbox {
             console.error(`called onConsoleInput with mode = ${this.mode}`);
             return;
         }
-        this.console.echo(userInputLine);
+        this.repl.echo(userInputLine);
         this.mode.next('running');
         this.runner.eval(
             userInputLine, (result: elementaryJS.Result) => {
