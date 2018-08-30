@@ -31,6 +31,16 @@ let sessionDuration: number | undefined = undefined; // hours
 type Settings = { clientID: string, sessionDuration: number };
 let settings: Settings | undefined = undefined;
 
+function reportError(req: Request, message: string) {
+  const evt = errorReporting.event();
+  evt.setUser(req.body.username);
+  evt.setServiceContext('ocelot', req.body.version);
+  evt.setUserAgent(req.body.userAgent);
+  evt.setMessage(message);
+  errorReporting.report(evt);
+  console.error(message);
+}
+
 async function getSettings() {
   if (settings !== undefined) {
     return settings;
@@ -119,10 +129,8 @@ function wrapHandler2(handler: (req: Request) => AsyncResponse) {
     handler(req).then(result => {
       res.status(result.statusCode).json(result.body);
     }).catch(reason => {
-      console.error(reason);
-      // TODO(arjun): In deployment, it may be unsafe to send the exception
-      // to the untrusted client.
-      res.status(500).send(reason.toString());
+      reportError(req, String(reason));
+      res.status(500).send('An exception was raised on the server');
     });
   }
 }
@@ -137,12 +145,12 @@ async function authorize(req: Request,
   const sessionId = req.body.sessionId;
   if (typeof userEmail !== 'string' || typeof sessionId !== 'string') {
     const msg = `authorization malformed (${userEmail}, ${sessionId})`;
-    console.error(msg);
+    reportError(req, msg);
     return { statusCode: 403, body: msg };
   }
   if (!await checkValidSession(userEmail, sessionId)) {
     const msg = `authorization failed (${userEmail}, ${sessionId})`;
-    console.error(msg);
+    reportError(req, msg);
     return { statusCode: 403, body: msg };
   }
   return handleAuthorized(userEmail);
@@ -232,48 +240,38 @@ async function changeFile(req: Request) {
     return failureResponse(valid.message);
   }
 
-  try {
-    const currentFileChange: FileChange = req.body.fileChanges;
-    if (!isSimpleValidFileName(currentFileChange.fileName)) { 
-      // if it's not a 'simple' valid filename
-      return failureResponse(`Could not make changes to file: ${currentFileChange.fileName}, name not valid`);
-    }
+  const currentFileChange: FileChange = req.body.fileChanges;
+  if (!isSimpleValidFileName(currentFileChange.fileName)) { 
+    // if it's not a 'simple' valid filename
+    return failureResponse(`Could not make changes to file: ${currentFileChange.fileName}, name not valid`);
+  }
 
-    const currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
-    if (currentFileChange.type === 'create') {
-      // Non-null assertion of changes can be saved
-      await currentFile.save(currentFileChange.changes!, { resumable: false });
-      // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
-      /* There is some overhead when using a resumable upload that can cause noticeable performance 
-      degradation while uploading a series of small files. When uploading files less than 10MB, 
-      it is recommended that the resumable feature is disabled. */
-      await currentFile.setMetadata({ contentType: 'text/javascript' });
-    }
-    else if (currentFileChange.type === 'delete') {
-      await currentFile.delete();
-    }
-    else {
-      return { statusCode: 500, body: { status: 'error', message: `Bad file operation` } };
-    }
+  const currentFile = fileBucket.file(`${req.body.userEmail}/${currentFileChange.fileName}`);
+  if (currentFileChange.type === 'create') {
+    // Non-null assertion of changes can be saved
+    await currentFile.save(currentFileChange.changes!, { resumable: false });
+    // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
+    /* There is some overhead when using a resumable upload that can cause noticeable performance 
+    degradation while uploading a series of small files. When uploading files less than 10MB, 
+    it is recommended that the resumable feature is disabled. */
+    await currentFile.setMetadata({ contentType: 'text/javascript' });
+  }
+  else if (currentFileChange.type === 'delete') {
+    await currentFile.delete();
+  }
+  else {
+    return { statusCode: 500, body: { status: 'error', message: `Bad file operation` } };
+  }
 
-    return {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'Files have been updated.'
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    return {
-      statusCode: 500,
-      body: {
-        status: 'error',
-        message: error
-      }
+  return {
+    statusCode: 200,
+    body: {
+      status: 'success',
+      message: 'Files have been updated.'
     }
   }
 }
+
 /**
  * Given:
  * userEmail: string
@@ -307,57 +305,46 @@ async function saveToHistory(req: Request) {
     return failureResponse(`${snapshot.fileName} is not a valid file name`);
   }
 
-  try {
-    const fullFileName = `${req.body.userEmail}/${snapshot.fileName}`;
-    const fileExists = (await fileBucket.file(fullFileName).exists())[0]
-    if (!fileExists) { // checks if file exists in paws-student-files
-      return failureResponse('History not updated, file does not exist');
-    }
-    if (snapshot.code.length === 0) {
-      return {
-        statusCode: 200,
-        body: { status: 'success', message: 'No code, update not necessary'}
-      };
-    }
-    if (snapshot.generation !== undefined) {
-      const restoreFile = historyBucket.file(
-        `${req.body.userEmail}/${snapshot.fileName}`,
-        { generation: snapshot.generation }
-      );
-      await restoreFile.delete();
-    }
-    const newestHistoryExists = (await historyBucket.file(fullFileName).exists())[0];
-    let newestFile: Buffer | undefined = undefined;
-    if (newestHistoryExists) {
-      newestFile = (await historyBucket.file(fullFileName).download())[0];
-    }
-    if (newestHistoryExists && newestFile !== undefined && newestFile.toString() === snapshot.code) {
-      // why can't typescript figure this out? I need to put in newestFile !== undefined...
-      return {
-        statusCode: 200,
-        body: { status: 'success', message: 'Code is the same, update not necessary'}
-      };
-    }
-    const file = historyBucket.file(`${req.body.userEmail}/${snapshot.fileName}`);
-    await file.save(snapshot.code, { resumable: false });
-    await file.setMetadata({ contentType: 'text/javascript' });
+  const fullFileName = `${req.body.userEmail}/${snapshot.fileName}`;
+  const fileExists = (await fileBucket.file(fullFileName).exists())[0]
+  if (!fileExists) { // checks if file exists in paws-student-files
+    return failureResponse('History not updated, file does not exist');
+  }
+  if (snapshot.code.length === 0) {
     return {
       statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'History updated'
-      }
-    };
-  } catch (error) {
-    console.log(error);
-    return {
-      statusCode: 500,
-      body: {
-        status: 'error',
-        message: error.message
-      }
+      body: { status: 'success', message: 'No code, update not necessary'}
     };
   }
+  if (snapshot.generation !== undefined) {
+    const restoreFile = historyBucket.file(
+      `${req.body.userEmail}/${snapshot.fileName}`,
+      { generation: snapshot.generation }
+    );
+    await restoreFile.delete();
+  }
+  const newestHistoryExists = (await historyBucket.file(fullFileName).exists())[0];
+  let newestFile: Buffer | undefined = undefined;
+  if (newestHistoryExists) {
+    newestFile = (await historyBucket.file(fullFileName).download())[0];
+  }
+  if (newestHistoryExists && newestFile !== undefined && newestFile.toString() === snapshot.code) {
+    // why can't typescript figure this out? I need to put in newestFile !== undefined...
+    return {
+      statusCode: 200,
+      body: { status: 'success', message: 'Code is the same, update not necessary'}
+    };
+  }
+  const file = historyBucket.file(`${req.body.userEmail}/${snapshot.fileName}`);
+  await file.save(snapshot.code, { resumable: false });
+  await file.setMetadata({ contentType: 'text/javascript' });
+  return {
+    statusCode: 200,
+    body: {
+      status: 'success',
+      message: 'History updated'
+    }
+  };
 }
 
 /**
@@ -383,49 +370,38 @@ async function getFileHistory(req: Request) {
     return failureResponse(`${req.body.fileName} is not a valid file name`);
   }
 
-  try {
-    const options = {
-      delimiter: '/',
-      prefix: req.body.userEmail + '/' + req.body.fileName,
-      versions: true
-    };
+  const options = {
+    delimiter: '/',
+    prefix: req.body.userEmail + '/' + req.body.fileName,
+    versions: true
+  };
 
-    const [files] = await historyBucket.getFiles(options);
-    const filteredFiles = files.filter(
-      (elem) => (elem.name.substr(elem.name.length - 1, 1) !== '/')
-    );
-    const promises = filteredFiles.map(async (elem, index) => {
-      const metadata = (await elem.getMetadata())[0]
-      const date = new Date(metadata.timeCreated!);
-      return {
-        generation: metadata.generation!,
-        dateCreated: date.toLocaleDateString(),
-        timeCreated: date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        code: (await elem.download()).toString(),
-      }
-    });
-    const historyArray = await Promise.all(promises);
-
+  const [files] = await historyBucket.getFiles(options);
+  const filteredFiles = files.filter(
+    (elem) => (elem.name.substr(elem.name.length - 1, 1) !== '/')
+  );
+  const promises = filteredFiles.map(async (elem, index) => {
+    const metadata = (await elem.getMetadata())[0]
+    const date = new Date(metadata.timeCreated!);
     return {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        data: {
-          history: historyArray
-        }
-      }
-    };
+      generation: metadata.generation!,
+      dateCreated: date.toLocaleDateString(),
+      timeCreated: date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+      code: (await elem.download()).toString(),
+    }
+  });
+  const historyArray = await Promise.all(promises);
 
-  } catch (error) {
-    console.log(error);
-    return {
-      statusCode: 500,
-      body: {
-        status: 'error',
-        message: error.message
+  return {
+    statusCode: 200,
+    body: {
+      status: 'success',
+      data: {
+        history: historyArray
       }
-    };
-  }
+    }
+  };
+
 }
 
 /**
@@ -589,7 +565,9 @@ paws.use(morgan(
     }
   })); // logging all http traffic
 
-paws.use(cors()); // TODO(arjun): Limit to trusted domains
+paws.use(cors({
+  origin: [ 'https://www.ocelot-ide.org', 'http://localhost:8080' ]
+}));
 
 paws.use(bodyParser.json()); // parse all incoming json data
 
@@ -605,10 +583,8 @@ function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, bo
     handler(req).then(result => {
       res.status(result.statusCode).json(result.body);
     }).catch(reason => {
-      console.error(reason);
-      // TODO(arjun): In deployment, it may be unsafe to send the exception
-      // to the untrusted client.
-      res.status(500).send(reason.toString());
+      reportError(req, String(reason));
+      res.status(500).send('An exception was raised on the server');
     });
   }
 }
@@ -642,41 +618,33 @@ function str(x: any) {
   if (typeof x === 'string') {
     return x;
   }
-  return JSON.stringify(x);
+  try {
+    return JSON.stringify(x);
+  }
+  catch (exn) {
+    return 'could not stringify';
+  }
 }
 
 paws.post('/error', wrapHandler(async req => {
-  if (req.headers['content-type'] === 'application/json') {
-    const evt = errorReporting.event();
-    evt.setUser(req.body.username);
-    evt.setServiceContext('ocelot', req.body.version);
-    evt.setUserAgent(req.body.userAgent);
-    let m = req.body.message;
-    let message = '';
-
-    if (typeof m === 'string') {
-      message = m;
-    }
-    else if (typeof m === 'object') {
-
-      let keys = Object.keys(m);
-      if (keys.includes('message')) {
-        const strM =  str(m.message);
-        message = strM + '\n\n';
-        console.warn('Received error ', strM);
-        keys = keys.filter(k => k !== 'message');
-      }
-
-      for (const k of keys) {
-        message = message + k + ':\n\n' + str(m[k]) + '\n\n';
-      }
-    }
-    
-    evt.setMessage(message);
-    await errorReporting.report(evt);
+  if (req.headers['content-type'] !== 'application/json') {
+    reportError(req, str(req.body));
   }
-  else {
-    await errorReporting.report(String(req.body));
+
+  const message: string[] = [];
+
+  if (typeof req.body.message === 'string') {
+    message.push(req.body.message);
   }
+
+  const otherFields = Object.keys(req.body).filter(key => key !== 'message');
+  for (const key of otherFields) {
+    message.push(`${key}:`);
+    message.push(str(req.body[key]));
+    message.push('');
+  }
+
+  reportError(req, message.join('\n'))
+
   return { statusCode: 200, body: { status: 'ok' } };
 }));
