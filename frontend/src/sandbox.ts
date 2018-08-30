@@ -162,7 +162,7 @@ export class Sandbox {
             console.error(`Clicked Stop while in mode ${this.mode}`);
             return;
         }
-        if (currentMode) {
+        if (currentMode === 'stopping') {
             // NOTE(arjun): I think this can happen and is less surprising.
             // E.g., a student may click a button several times
             return;
