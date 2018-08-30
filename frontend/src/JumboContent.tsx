@@ -22,6 +22,7 @@ import HistoryButton from './containers/HistoryButton';
 import * as state from './state';
 import * as reactrx from './reactrx';
 import './autosave';
+import { console } from './errors';
 
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -95,14 +96,13 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
   onRunOrTestClicked(mode: 'running' | 'testing') {
     const program = state.currentProgram.getValue();
     if (this.state.uiActive && program.kind === 'program') {
-      // TODO(arjun): MUST be more robust. Cannot suppress errors.
       saveHistory(program.name, program.content).then((res) => {
         if (isFailureResponse(res)) {
-          console.log('Something went wrong');
-          console.log(res.data.message);
+          state.notify('Failed to save history');
           return;
         }
-      }).catch(err => console.log(err)); // will do for now
+      })
+      .catch(err => console.log(err));
     }
     this.props.sandbox.onRunOrTestClicked(mode);
   }

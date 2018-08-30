@@ -22,6 +22,7 @@ import * as monacoEditor from 'monaco-editor';
 import { saveHistory } from '../../utils/api/saveHistory';
 import * as state from '../../state';
 import { connect } from '../../reactrx';
+import { console } from '../../errors';
 
 const styles: StyleRulesCallback = theme => ({
     list: {
@@ -143,11 +144,6 @@ class HistoryButton extends React.Component<Props, State> {
         return () => {
             this.setState({ open: false, codeOpenIndex: -1 });
             saveHistory(state.currentFileName(), this.state.history[index].code, generation)
-                .then(() => {
-                    console.log('Saved!');
-                }).catch((err) => {
-                    console.log('not saved', err);
-                });
             // TODO(arjun): I suggest we not do this
             setTimeout(() => { // immediate state change causes the UI to update immediately
                 if (this.state.currentProgram.kind !== 'program') {

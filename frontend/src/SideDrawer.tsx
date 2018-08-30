@@ -28,6 +28,7 @@ import Drawer from '@material-ui/core/Drawer';
 import { StyleRulesCallback, withStyles } from '@material-ui/core/styles';
 import * as utils from './utils';
 import { connect } from './reactrx';
+import { console } from './errors';
 
 // NOTE (Sam): If you make any changes for isSimpleValidFileName
 // You have to do the same for the backend, the backend has the exact
@@ -226,12 +227,10 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
             state.files.next(state.files.getValue()
                     .filter(x => x !== this.props.name));
           if (isFailureResponse(response)) {
-            console.log('Oh no! File not deleted!');
             state.notification.next({ message: `Unable to delete '${this.props.name}'`, position: 'bottom-right' });
           }
-          console.log('File delete!');
-          state.notification.next({ message: `File deleted: ${this.props.name}`, position: 'bottom-right' });
-        }).catch(error => console.log('cannot delete file', error));
+          state.notify(`Deleted ${this.props.name}`);
+        }).catch(reason => console.log(`Delete failed: ${reason}`));
     }
 
     render() {

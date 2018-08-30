@@ -45,8 +45,6 @@ export const saveHistory = async (fileName: string, code: string, generation?: n
         });
 
         const jsonResponse = await response.json(); // get json response\
-        // tslint:disable-next-line:no-console
-        // console.log(jsonResponse);
 
         if (jsonResponse.status === 'error') {
             return failureResponse('Something went wrong, try refreshing the page');

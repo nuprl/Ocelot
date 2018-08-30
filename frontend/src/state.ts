@@ -24,7 +24,7 @@
  * 
  * RxJS lets us subscribe to updates:
  * 
- *   myVariable.observe(nextValue => console.log('Updated to ', nextValue);
+ *   myVariable.observe(nextValue => print('Updated to ', nextValue);
  * 
  * Therefore, if some portion of the view depends on myVariable, we can update
  * the view within callback passed to .observe. Unfortunately, we are using React,
