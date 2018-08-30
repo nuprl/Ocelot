@@ -1,30 +1,16 @@
 import * as Rx from 'rxjs';
-import * as stopify from 'stopify';
 import * as elementaryJS from 'elementary-js';
 import * as elementaryRTS from 'elementary-js/dist/runtime';
 import * as types from './types';
-import * as lib220 from 'elementary-js/dist/lib220';
 import { console } from './errors';
 import * as state from './state';
 import { OCELOTVERSION } from './version';
 import { EJSVERSION } from 'elementary-js/dist/version';
-import { STOPIFY220VERSION } from 'stopify/dist/src/version';
-
-// TODO(arjun): I think these hacks are necessary for eval to work. We either
-// do them here or we do them within the implementation of Stopify. I want
-// them here for now until I'm certain there isn't a cleaner way.
-(window as any).stopify = stopify;
-(window as any).elementaryjs = elementaryRTS;
 
 export type Mode = 'running' | 'testing' | 'stopped' | 'stopping';
 
-const compileOpts: Partial<stopify.CompilerOpts> = {
-    hofs: 'fill'
-};
-
 export function version() {
     return {
-        stopify: STOPIFY220VERSION,
         elementaryJS: EJSVERSION,
         ocelot: OCELOTVERSION
     };
@@ -33,25 +19,28 @@ export function version() {
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
 // function to create an AsyncRun that does not run any user code.
 function emptyStopifyRunner() {
-    const runner = stopify.stopifyLocally('', compileOpts);
+    const runner = elementaryJS.compile('', {
+        consoleLog: (message) => console!.log(message),
+        version: version
+    });
     if (runner.kind === 'error') {
         // Panic situation!
-        throw new Error('Could not create empty stopify.AsyncRun');
+        throw new Error('Could not create empty ElementaryJS.AsyncRun');
     }
     // In theory, this is a race condition. In practice, Stopify is not going
     // to yield control, so the callback will run before the function returns.
     runner.run((result) => {
         if (result.type === 'exception') {
             // Panic situation!
-            throw new Error('Could not evaluate empty program with Stopify');
+            throw new Error('Could not evaluate empty program with ElementaryJS');
         }
     });
     return runner;
 }
 
 /**
- * Implements the web-based sandbox that uses both Stopify and ElementaryJS.
- * The rest of the program should not have to use Stopify or ElementaryJS.
+ * Implements the web-based sandbox that uses ElementaryJS.
+ * The rest of the program should not have to use ElementaryJS.
  *
  * To initialize the sandbox, the following methods must be invoked after
  * construction:
@@ -67,13 +56,12 @@ function emptyStopifyRunner() {
  */
 export class Sandbox {
 
-    private runner: stopify.AsyncRun & stopify.AsyncEval;
+    private runner: elementaryJS.CompileOK;
     private console!: types.HasConsole; // bang is 'definite assignment'
     public mode: Rx.BehaviorSubject<Mode>;
 
     constructor() {
         this.runner = emptyStopifyRunner();
-        this.setGlobals();
         this.mode = new Rx.BehaviorSubject<Mode>('stopped');
     }
 
@@ -81,40 +69,8 @@ export class Sandbox {
         this.console = console;
     }
 
-    private setGlobals() {
-        // These are the globals passed to ElementaryJS.
-        const globals = {
-            elementaryjs: elementaryRTS,
-            console: Object.freeze({
-                log: (...message: any[]) => this.console.log(...message)
-            }),
-            test: elementaryRTS.test,
-            assert: elementaryRTS.assert,
-            lib220: Object.freeze(lib220),
-            version: version,
-            Array: elementaryRTS.Array,
-            Math: Math,
-            undefined: undefined,
-            Object: Object // Needed for classes
-        };
 
-        // We can use .get and .set traps to intercept reads and writes to
-        // global variables. Any other trap is useless (I think), since Stopify
-        // does not use the global object in any other way.
-        const globalProxy = new Proxy(globals, {
-            get: (o, k) => {
-                if (!Object.hasOwnProperty.call(o, k)) {
-                    const msg = `${String(k)} is not defined`;
-                    throw new elementaryRTS.ElementaryRuntimeError(msg);
-                }
-                return (o as any)[k];
-            }
-        });
-
-        this.runner.g = globalProxy;
-    }
-
-    private onResult(result: stopify.Result, showNormal: boolean) {
+    private onResult(result: elementaryJS.Result, showNormal: boolean) {
         if (result.type === 'exception') {
             let message = result.value instanceof Error ?
               result.value.message : String(result.value);
@@ -154,9 +110,12 @@ export class Sandbox {
         }
         this.console.log(new Date().toLocaleString('en-us', {timeZoneName:'short'}));
         this.console.log('Compiling...');
-        const compiled = elementaryJS.compile(program.content, true);
-        if (compiled.kind === 'error') {
-            this.reportElementaryError(compiled);
+        const runner = elementaryJS.compile(program.content, {
+            consoleLog: (message) => console!.log(message),
+            version: version
+        });
+        if (runner.kind === 'error') {
+            this.reportElementaryError(runner);
             return;
         }
         this.console.log('Compilation succesful.');
@@ -165,15 +124,8 @@ export class Sandbox {
         } else if (mode === 'testing') {
             this.console.log('Running tests...');
         }
-        const runner = stopify.stopifyLocallyFromAst(compiled.node, undefined, compileOpts);
-        if (runner.kind === 'error') {
-          this.console.error(runner.exception);
-          return;
-        }
         this.runner = runner;
-        this.setGlobals();
-        elementaryRTS.setRunner(runner);
-        elementaryRTS.enableTests(mode === 'testing', runner);
+        elementaryRTS.enableTests(mode === 'testing');
         this.mode.next(mode);
         runner.run(result => {
             const currentMode = this.mode.getValue();
@@ -196,14 +148,9 @@ export class Sandbox {
             return;
         }
         this.console.echo(userInputLine);
-        const elementaryResult = elementaryJS.compile(userInputLine, true);
-        if (elementaryResult.kind === 'error') {
-            this.reportElementaryError(elementaryResult);
-            return;
-        }
         this.mode.next('running');
-        this.runner.evalAsyncFromAst(
-            elementaryResult.node, (result: stopify.Result) => {
+        this.runner.eval(
+            userInputLine, (result: elementaryJS.Result) => {
             this.mode.next('stopped');
             this.onResult(result, true);
         });
@@ -221,9 +168,9 @@ export class Sandbox {
             return;
         }
         this.mode.next('stopping');
-        this.runner.pause((line?: number) => {
+        this.runner.stop(() => {
           // NOTE: We do *not* remove the asyncRun object. This will allow
-          // a user to continue mucking around in the console after killing a 
+          // a user to continue mucking around in the console after killing a
           // running program.
           this.mode.next('stopped');
         });
