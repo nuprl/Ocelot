@@ -18,11 +18,8 @@ export function version() {
 
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
 // function to create an AsyncRun that does not run any user code.
-function emptyStopifyRunner() {
-    const runner = elementaryJS.compile('', {
-        consoleLog: (message) => console!.log(message),
-        version: version
-    });
+function emptyStopifyRunner(opts: elementaryJS.CompilerOpts) {
+    const runner = elementaryJS.compile('', opts);
     if (runner.kind === 'error') {
         // Panic situation!
         throw new Error('Could not create empty ElementaryJS.AsyncRun');
@@ -61,7 +58,7 @@ export class Sandbox {
     public mode: Rx.BehaviorSubject<Mode>;
 
     constructor() {
-        this.runner = emptyStopifyRunner();
+        this.runner = emptyStopifyRunner(this.opts());
         this.mode = new Rx.BehaviorSubject<Mode>('stopped');
     }
 
@@ -97,6 +94,12 @@ export class Sandbox {
         }
     }
 
+    opts() {
+        return {
+            consoleLog: (message: string) => this.console!.log(message),
+            version: version
+        }
+    }
     onRunOrTestClicked(mode: 'testing' | 'running') {
         const currentMode = this.mode.getValue();
         if (currentMode === 'testing' || currentMode === 'running') {
@@ -110,10 +113,7 @@ export class Sandbox {
         }
         this.console.log(new Date().toLocaleString('en-us', {timeZoneName:'short'}));
         this.console.log('Compiling...');
-        const runner = elementaryJS.compile(program.content, {
-            consoleLog: (message) => console!.log(message),
-            version: version
-        });
+        const runner = elementaryJS.compile(program.content, this.opts());
         if (runner.kind === 'error') {
             this.reportElementaryError(runner);
             return;
