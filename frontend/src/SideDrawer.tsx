@@ -222,9 +222,9 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
         }).then((response) => {
             if (this.state.selectedFilename === this.props.name) {
                 this.props.selectedFilename.next(false);
-                state.files.next(state.files.getValue()
-                    .filter(x => x !== this.props.name));
             }
+            state.files.next(state.files.getValue()
+                    .filter(x => x !== this.props.name));
           if (isFailureResponse(response)) {
             console.log('Oh no! File not deleted!');
             state.notification.next({ message: `Unable to delete '${this.props.name}'`, position: 'bottom-right' });
