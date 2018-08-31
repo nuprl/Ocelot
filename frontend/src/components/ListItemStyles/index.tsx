@@ -29,6 +29,7 @@ const styles: StyleRulesCallback<ListItemStylesTypes> = theme => ({
     },
     textField: {
         color: theme.palette.primary.contrastText,
+        fontSize: 14
     },
     formControl: {
         width: '100%'
