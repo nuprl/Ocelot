@@ -67,6 +67,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     ariaLabel: 'ConsoleInput',
     fontFamily: 'Fira Mono',
     fontSize: 16,
+    autoClosingBrackets: false,
 };
 
 const s1 = {
@@ -231,6 +232,30 @@ class OutputPanel extends React.Component<Props, State> {
         window.removeEventListener('resize', this.resizeEditor);
     }
 
+    editorWillMount = (monaco: typeof monacoEditor) => {
+        monaco.languages.register({ id: 'elementaryjs' });
+        monaco.languages.setLanguageConfiguration('elementaryjs', {
+            comments: {
+                lineComment: '//',
+                blockComment: ['/*', '*/']
+            },
+            indentationRules: {
+                increaseIndentPattern: /^.*\{[^}\"']*$/,
+                decreaseIndentPattern: /^(.*\*\/)?\s*\}[;\s]*$/
+            },
+        });
+        monaco.languages.registerCompletionItemProvider('elementaryjs', {
+            // A hacky way to get rid of autocomplete suggestions completely.
+            // returning an empty array will not 'override' the autocomplete
+            // but giving my own autocomplete items can override it it seems.
+            provideCompletionItems(model, position) {
+                return [{
+                    label: '',
+                    kind: monaco.languages.CompletionItemKind.Text
+                }];
+            }
+        });
+    };
 
     render() {
         const { classes,  } = this.props;
@@ -252,6 +277,7 @@ class OutputPanel extends React.Component<Props, State> {
                                 language="elementaryjs"
                                 options={monacoOptions}
                                 editorDidMount={this.editorDidMount}
+                                editorWillMount={this.editorWillMount}
                             />
                         </div>
                     </div>
