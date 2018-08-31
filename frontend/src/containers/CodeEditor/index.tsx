@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import * as state from '../../state';
 import { console } from '../../errors';
 import { connect } from '../../reactrx';
+import { Sandbox } from '../../sandbox';
 
 const styles: StyleRulesCallback = theme => ({
     emptyState: {
@@ -42,6 +43,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
 };
 
 type Props = {
+    sandbox: Sandbox,
     openMustLogin: () => void,
 } & WithStyles<'emptyState' | 'pawIcon'>;
 
@@ -98,12 +100,21 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             }
         });
     };
-
+    
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         editor.focus();
         editor.getModel().updateOptions({ tabSize: 2 });
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
             // students can accidentally press ctrl/cmd + s, this prevents default action
+        }, '');
+        let codeEditor = this;
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, function() {
+            // Ctrl + Enter: Run code
+            codeEditor.props.sandbox.onRunOrTestClicked('running');
+        }, '');
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter, function() {
+            // Ctrl + Shift + Enter: Run tests
+            codeEditor.props.sandbox.onRunOrTestClicked('testing');
         }, '');
         this.editor = editor;
         

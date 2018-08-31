@@ -341,6 +341,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
                   <div style={{ width: '100%', height: '100%', minWidth: '286px' }} id="codeEditor">
                     <CodeEditor 
                       openMustLogin={() => this.setState({mustLoginDialogOpen: true})}
+                      sandbox={this.sandbox}
                     />
                   </div>
                   <CanvasOutput />
