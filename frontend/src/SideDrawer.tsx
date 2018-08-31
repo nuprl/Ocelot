@@ -307,7 +307,7 @@ const UserFileItems = ListItemStyles(class extends React.Component<Props & { sel
         const { files, loggedIn } = this.state;
         let disabled = !loggedIn;
         return (
-          <div style={{height:'100%', overflowY:'scroll'}}>
+          <div className="fileList scrollbars" style={{height:'100%', overflowY:'scroll'}}>
            {files.map(name =>
             <div className="fileItem" key={name}>
                 <FileItem name={name} disabled={disabled}
