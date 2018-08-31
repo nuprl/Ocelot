@@ -50,6 +50,7 @@ export async function validateUser(googleUser: GoogleLoginResponse): Promise<val
 
     } catch (error) {
         googleUser.disconnect();
+        console.error(error);
         return failureResponse('The authentication server seems to be down. Try again in a bit.');
     }
 }
