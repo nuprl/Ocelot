@@ -38,7 +38,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     minimap: {
         enabled: false,
     },
-    renderIndentGuides: false
+    renderIndentGuides: true
     // scrollBeyondLastLine: false,
 };
 
@@ -100,7 +100,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             }
         });
     };
-    
+
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
         editor.focus();
         editor.getModel().updateOptions({ tabSize: 2 });
