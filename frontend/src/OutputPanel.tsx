@@ -11,6 +11,7 @@ import { Console } from 'console-feed';
 import { inspectorTheme } from './static/styles/consoleStyle';
 import 'static/styles/Scrollbar.css';
 import { Sandbox } from './sandbox';
+const stringifyObject: any = require('./stringifyObject');
 
 class ConsoleOutput extends React.Component<{ logs: FullMessage[] }> {
     logRef: HTMLDivElement | null = null;
@@ -124,6 +125,15 @@ class OutputPanel extends React.Component<Props, State> {
     }
 
     log(...message: any[]) {
+        for (let i = 0; i < message.length; ++i) {
+            if (typeof(message[i]) === 'object') {
+                const stringRep = stringifyObject(message[i], {
+                    indent: '  ',
+                    singleQuotes: false
+                });
+                message[i] = stringRep;
+            }
+        }
         this.appendLogMessage({ method: 'log', data: message });
     }
 
