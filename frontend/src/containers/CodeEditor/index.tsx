@@ -10,6 +10,8 @@ import * as state from '../../state';
 import { console } from '../../errors';
 import { connect } from '../../reactrx';
 import { Sandbox } from '../../sandbox';
+import { saveHistory } from '../../utils/api/saveHistory'
+import { isFailureResponse } from '../../utils/api/apiHelpers';
 
 const styles: StyleRulesCallback = theme => ({
     emptyState: {
@@ -108,12 +110,25 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             // students can accidentally press ctrl/cmd + s, this prevents default action
         }, '');
         let codeEditor = this;
+        let saveCode = function() {
+            const program = state.currentProgram.getValue();
+            if (program.kind !== 'program') return;
+            saveHistory(program.name, program.content).then((res) => {
+                if (isFailureResponse(res)) {
+                  state.notify('Failed to save history');
+                  return;
+                }
+              })
+              .catch(err => console.log(err));
+        }
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, function() {
             // Ctrl + Enter: Run code
+            saveCode();
             codeEditor.props.sandbox.onRunOrTestClicked('running');
         }, '');
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter, function() {
             // Ctrl + Shift + Enter: Run tests
+            saveCode();
             codeEditor.props.sandbox.onRunOrTestClicked('testing');
         }, '');
         this.editor = editor;
