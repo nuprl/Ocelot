@@ -434,6 +434,7 @@ async function login(req: Request) {
 
   const isValidUser: boolean = await checkValidUser(userEmail);
   if (!isValidUser) {
+    console.error(`Unauthorized login attempt by ${userEmail} (${payload.name})`);
     return { statusCode: 200, body: { status: 'failure', 'message': 'Unauthorized' } };
   }
   // at this point the user is CS220 student/teacher of some sort.
@@ -640,4 +641,17 @@ paws.post('/error', wrapHandler(async req => {
   reportError(req, str(req.body.message));
 
   return { statusCode: 200, body: { status: 'ok' } };
+}));
+
+// NOTE(arjun): Experimental. Do not use
+paws.post('/exception', wrapHandler(async req => {
+  const contentType = req.headers['content-type'];
+  if (contentType !== 'application/json') {
+    errorReporting.report('BadRequest:', req, 
+    `Content-type: ${contentType}`);
+    return { statusCode: 400, body: { status: 'failure' } };
+  }
+
+  return { statusCode: 200, body: { status: 'ok' } };
+
 }));
