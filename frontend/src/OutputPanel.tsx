@@ -104,6 +104,8 @@ type State = {
 
 class OutputPanel extends React.Component<Props, State> {
 
+    editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -167,9 +169,8 @@ class OutputPanel extends React.Component<Props, State> {
         }
     };
 
-    editor: monacoEditor.editor.IStandaloneCodeEditor | undefined = undefined;
-
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
+        this.editor = editor;
         window.addEventListener('resize', this.resizeEditor);
         let currentLineCount = 1;
         editor.onDidChangeModelContent(() => { // when code changes
