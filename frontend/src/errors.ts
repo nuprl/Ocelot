@@ -1,5 +1,5 @@
 import * as state from './state';
-import { EJSVERSION } from 'elementary-js/dist/version';
+import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 
 function getEmail() {

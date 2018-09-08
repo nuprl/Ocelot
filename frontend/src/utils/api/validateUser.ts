@@ -3,7 +3,7 @@
 import { GoogleLoginResponse } from 'react-google-login';
 import { FailureResponse, getUrl, SuccessResponse, failureResponse, successResponse } from './apiHelpers';
 
-import { EJSVERSION } from 'elementary-js/dist/version';
+import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 import { OCELOTVERSION } from '../../version';
 
 export type validateUserResponse = SuccessResponse<{ email: string }> | FailureResponse;

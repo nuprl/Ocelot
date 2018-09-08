@@ -1,4 +1,4 @@
-import { EJSVERSION } from 'elementary-js/dist/version';
+import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 import { getUrl } from './utils/api/apiHelpers';
 
