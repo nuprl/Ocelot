@@ -101,6 +101,14 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
                 }];
             }
         });
+        monaco.editor.defineTheme('sudoTheme', {
+            base: 'vs-dark', // can also be vs-dark or hc-black
+            inherit: true, // can also be false to completely replace the builtin rules
+            rules: [],
+            colors: {
+                ["editor.background"]: '#400000',
+            }
+        } as monacoEditor.editor.IStandaloneThemeData);
     };
 
     editorDidMount = (editor: monacoEditor.editor.IStandaloneCodeEditor, monaco: typeof monacoEditor) => {
@@ -192,7 +200,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
                 <ReactResizeDetector handleWidth handleHeight onResize={this.handleResize} />
                 <MonacoEditor
                     language="elementaryjs"
-                    theme="vs-dark"
+                    theme="vs-dark" // Change to sudoTheme when state.isSudo is true.
                     value={this.state.loadProgram.content}
                     options={monacoOptions}
                     onChange={(code) => this.onChange(code)}
