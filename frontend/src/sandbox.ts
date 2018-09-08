@@ -1,11 +1,11 @@
 import * as Rx from 'rxjs';
-import * as elementaryJS from 'elementary-js';
-import * as elementaryRTS from 'elementary-js/dist/runtime';
+import * as elementaryJS from '@stopify/elementary-js';
+import * as elementaryRTS from '@stopify/elementary-js/dist/runtime';
 import * as types from './types';
 import { console } from './errors';
 import * as state from './state';
 import { OCELOTVERSION } from './version';
-import { EJSVERSION } from 'elementary-js/dist/version';
+import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 
 export type Mode = 'running' | 'testing' | 'stopped' | 'stopping';
 
