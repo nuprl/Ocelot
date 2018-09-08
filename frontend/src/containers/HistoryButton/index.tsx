@@ -238,6 +238,7 @@ class HistoryButton extends React.Component<Props, State> {
         return (
             <div>
                 <Button
+                        disabled={currentProgram.kind !== 'program'}
                         color="secondary"
                         onClick={this.onClick}>
                     <HistoryIcon />
