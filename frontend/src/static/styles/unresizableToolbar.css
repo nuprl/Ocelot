@@ -1,0 +1,23 @@
+#topToolbar * {
+  font-size: 1.85vh;
+}
+
+#topToolbar button {
+  padding: 1vh 1vh;
+  min-width: 1vh;
+  min-height: 1vh;
+}
+
+#topToolbar {
+  min-height: 6vh;
+  padding-left: 1vh;
+  padding-right: 1vh;
+}
+
+#sideDrawerToolbar {
+  min-height: 6vh;
+}
+
+#indexToolbar {
+  min-height: 6vh;
+}
