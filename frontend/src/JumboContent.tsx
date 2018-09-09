@@ -2,7 +2,7 @@ import * as React from 'react';
 import SplitPane from 'react-split-pane';
 import CanvasOutput from './components/CanvasOutput';
 import OutputPanel from './OutputPanel';
-import 'static/styles/SplitPane.css';
+import './static/styles/SplitPane.css';
 import red from '@material-ui/core/colors/red';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import PlayIcon from '@material-ui/icons/PlayArrow';
@@ -23,6 +23,7 @@ import * as state from './state';
 import * as reactrx from './reactrx';
 import './autosave';
 import { console } from './errors';
+import './static/styles/unresizableToolbar.css';
 
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -291,7 +292,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
           onClose={() => this.setState({ mustLoginDialogOpen: false})}
         />
         <AppBar position="absolute">
-          <Toolbar variant="dense">
+          <Toolbar variant="dense" id="topToolbar">
             <Button
               color="secondary"
               onClick={() => this.togglePanel('sideDrawer', 'width', 250, 0)}>
@@ -322,7 +323,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
         <SplitPane split="vertical" style={{height:'100%'}} defaultSize={250} minSize={0}>
           <SideDrawer />
           <div className={this.props.classes.jumboContainer}>
-            <div className={this.props.classes.toolbar} style={{ minHeight: '48px' }} />
+            <div className={this.props.classes.toolbar} id="indexToolbar"/>
             {/* Gotta figure out a way to not override css with inline-style */}
             <div className={this.props.classes.jumboContent}>
               <SplitPane

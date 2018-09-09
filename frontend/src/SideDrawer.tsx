@@ -29,6 +29,7 @@ import { StyleRulesCallback, withStyles } from '@material-ui/core/styles';
 import * as utils from './utils';
 import { connect } from './reactrx';
 import { console } from './errors';
+import './static/styles/unresizableToolbar.css';
 
 // NOTE (Sam): If you make any changes for isSimpleValidFileName
 // You have to do the same for the backend, the backend has the exact
@@ -437,7 +438,7 @@ const SideDrawer: React.StatelessComponent<WithStyles<SideDrawerStylesType>> = (
             style={{height:'100%'}}
             id="sideDrawer"
         >
-            <div className={classes.toolbar} style={{minHeight: '48px'}}/>
+            <div className={classes.toolbar} id="sideDrawerToolbar"/>
             {/* Setting toolbar is so hacky, I don't know how to override it */}
             <List style={{height:'100%'}} dense>
                 <FilesFolder />
