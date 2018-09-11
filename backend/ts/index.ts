@@ -489,9 +489,13 @@ function downloadUrl(url: string):
         })
       }
       if (isHTTP(url)) {
-        http.get(url, responseCallback);
+        http.get(url, responseCallback).on('error', (e) => {
+          resolve({errcode: "error", data: "Invalid URL"});
+        });
       } else if (isHTTPS(url)) {
-        https.get(url, responseCallback);
+        https.get(url, responseCallback).on('error', (e) => {
+          resolve({errcode: "error", data: "Invalid URL"});
+        });
       } else {
         resolve({errcode: "error", data: "URL not supported"});
       }
