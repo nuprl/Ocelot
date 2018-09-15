@@ -23,7 +23,6 @@ import * as state from './state';
 import * as reactrx from './reactrx';
 import './autosave';
 import { console } from './errors';
-import './static/styles/unresizableToolbar.css';
 
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -292,7 +291,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
           onClose={() => this.setState({ mustLoginDialogOpen: false})}
         />
         <AppBar position="absolute">
-          <Toolbar variant="dense" id="topToolbar">
+          <Toolbar variant="dense">
             <Button
               color="secondary"
               onClick={() => this.togglePanel('sideDrawer', 'width', 250, 0)}>
@@ -323,7 +322,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
         <SplitPane split="vertical" style={{height:'100%'}} defaultSize={250} minSize={0}>
           <SideDrawer />
           <div className={this.props.classes.jumboContainer}>
-            <div className={this.props.classes.toolbar} id="indexToolbar"/>
+            <div className={this.props.classes.toolbar} style={{ minHeight: '48px' }} />
             {/* Gotta figure out a way to not override css with inline-style */}
             <div className={this.props.classes.jumboContent}>
               <SplitPane
