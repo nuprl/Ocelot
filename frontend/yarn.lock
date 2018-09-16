@@ -109,16 +109,15 @@
     "@babel/runtime" "^7.0.0-beta.42"
     recompose "^0.27.0"
 
-"@stopify/elementary-js@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.0.tgz#dc273c9a4a84a4b27e5188fae25817ed7c6af4d7"
+"@stopify/elementary-js@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.3.tgz#2aa1717510de56bfbedd8481318024e6b00d25c6"
   dependencies:
     "@types/babel-types" "^6.7.16"
     babel-core "^6.26.3"
     babel-plugin-transform-es2015-classes "^6.24.1"
     babel-types "^6.26.0"
-    stopify "0.5.1-elementaryJS"
-    stopify-continuations "0.5.0-elementaryJS"
+    stopify "0.5.2-elementaryJS"
 
 "@types/babel-core@^6.25.5":
   version "6.25.5"
@@ -4816,9 +4815,9 @@ stopify-continuations@0.5.0:
     tslint "^5.9.1"
     which "^1.3.0"
 
-stopify-continuations@0.5.0-elementaryJS:
-  version "0.5.0-elementaryJS"
-  resolved "https://registry.yarnpkg.com/stopify-continuations/-/stopify-continuations-0.5.0-elementaryJS.tgz#fed47bef076a6bf986ca523085fa24cbd7018d8a"
+stopify-continuations@0.5.2-elementaryJS:
+  version "0.5.2-elementaryJS"
+  resolved "https://registry.yarnpkg.com/stopify-continuations/-/stopify-continuations-0.5.2-elementaryJS.tgz#ce0d1e8ea61ea1ed79d9b8a65a48efe517208ae9"
   dependencies:
     babel-core "^6.26.3"
     babel-plugin-transform-es2015-arrow-functions "^6.22.0"
@@ -4837,9 +4836,9 @@ stopify-estimators@^0.5.0:
   dependencies:
     detect-browser "^1.12.0"
 
-stopify@0.5.1-elementaryJS:
-  version "0.5.1-elementaryJS"
-  resolved "https://registry.yarnpkg.com/stopify/-/stopify-0.5.1-elementaryJS.tgz#c52fdbe7c8a4d603a427702f94ba1c86a461ca90"
+stopify@0.5.2-elementaryJS:
+  version "0.5.2-elementaryJS"
+  resolved "https://registry.yarnpkg.com/stopify/-/stopify-0.5.2-elementaryJS.tgz#4aeca992d861addd2f353f015ee977a7bed216ec"
   dependencies:
     babel-core "^6.26.3"
     babel-loader "^7.1.2"
@@ -4855,7 +4854,7 @@ stopify@0.5.1-elementaryJS:
     source-map "^0.6.0"
     source-map-support "^0.5.6"
     sprintf "^0.1.5"
-    stopify-continuations "0.5.0-elementaryJS"
+    stopify-continuations "0.5.2-elementaryJS"
     stopify-estimators "^0.5.0"
     tmp "0.0.31"
     trie "^0.2.1"
