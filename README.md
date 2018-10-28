@@ -51,7 +51,7 @@ yarn run build && yarn run serve
 
 Occasionally, you will want to hack on ElementaryJS (EJS), and will want to test out your changes before deploying them. To do so:
 
-1. Clone EJS: github.com/plasma-umass/elementaryJS/
+1. Clone EJS: https://github.com/plasma-umass/elementaryJS/
 1. Install dependencies of EJS and build it (from within the EJS dir):
     ```
     yarn install
@@ -59,7 +59,7 @@ Occasionally, you will want to hack on ElementaryJS (EJS), and will want to test
     yarn test
     ```
 1. Hack on EJS code, and re-build.
-1. Tell yarn to make the local version of EJS available to other projects:
+1. Tell yarn to make the local version of EJS available to other projects (still within the EJS dir):
     ```
     yarn link
     ```
@@ -70,8 +70,9 @@ Occasionally, you will want to hack on ElementaryJS (EJS), and will want to test
     info You can now run `yarn link "@stopify/elementary-js"` in the projects where you want to use this package and it will be used instead.
     Done in 0.03s.
     ```
-1. Change to the Ocelot frontend dir, and tell yarn to use the local version of EJS:
+1. Change to the Ocelot frontend dir, delete any cached EJS libs, and tell yarn to use the local version of EJS:
     ```
+    rm -rf node_modules/@stopify/elementary-js
     yarn link "@stopify/elementary-js"
     ```
     Yarn should tell you:
@@ -85,12 +86,17 @@ Occasionally, you will want to hack on ElementaryJS (EJS), and will want to test
     yarn build && yarn serve-local
     ```
 1. Further changes to EJS will not require you to run the "link" steps again. Yarn remembers that you told it to use the local versions. Just recompile both EJS and the Ocelot frontend.
-1. Once you are done hacking on the local EJS changes, push a PR, and once merged, you can `npm publish` a version update of EJS, and then create an Ocelot PR to use the newly deployed version of EJS.
+
+Once you are done hacking on the local EJS changes:
+1. Push a PR to EJS with the updates and the version number updated in `package.json` for EJS.
+1. Run `npm publish` to update the published version of EJS
+1. Create an Ocelot PR to use the newly deployed version of EJS by editing the EJS version number in `package.json` in `Ocelot/frontend`
 1. To tell yarn to go back to the published version of EJS:
-    In the `Ocelot/frontend` directory:
-    ```
-    yarn unlink "@stopify/elementary-js"
-    ```
+In the `Ocelot/frontend` directory:
+```
+yarn unlink "@stopify/elementary-js"
+yarn install
+```
 
 ## Issues you may have
 
