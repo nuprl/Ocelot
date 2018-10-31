@@ -5,7 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^1.4.2",
     "@material-ui/icons": "^2.0.0",
-    "@stopify/elementary-js": "^1.0.9",
+    "@stopify/elementary-js": "^1.0.10",
     "@types/babel-core": "^6.25.5",
     "@types/react": "^16.4.7",
     "@types/react-dom": "^16.0.6",
