@@ -109,20 +109,22 @@
     "@babel/runtime" "^7.0.0-beta.42"
     recompose "^0.27.0"
 
-"@stopify/elementary-js@^1.0.12":
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.12.tgz#43a7a9f7922f39149808b06762817803744573d0"
+"@stopify/elementary-js@^1.0.17":
+  version "1.0.17"
+  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.17.tgz#7bf155b81fe9fd28a0f820c75ea9093b93c4a30c"
+  integrity sha512-zeV5WGJml2Px9ujxmt0O4SS9g3VKvXBOlHyruOOJ3dazByqnFckR7ZjjHOuaGEovzDAiUgRdBCLgzaEqa3i9Hg==
   dependencies:
-    "@stopify/project-interpreter" "1.1.0"
+    "@stopify/project-interpreter" "1.1.3"
     "@types/babel-types" "^6.7.16"
     babel-core "^6.26.3"
     babel-plugin-transform-es2015-classes "^6.24.1"
     babel-types "^6.26.0"
     stopify "0.5.3-elementaryJS"
 
-"@stopify/project-interpreter@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@stopify/project-interpreter/-/project-interpreter-1.1.0.tgz#ff54865f72878d9845bf7d70a55fbbfa82fa00a5"
+"@stopify/project-interpreter@1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@stopify/project-interpreter/-/project-interpreter-1.1.3.tgz#3cec09820e279571df3a3750bf958d2e095befc1"
+  integrity sha512-b0eSJiQI7DRqQ5uYEl6ohSk+h7mcGsO3hSztD9EO7dQIwzUIQqjx9XmJ0umUNagGK9TxxX/eCcn48moYR3615w==
   dependencies:
     immutable "^4.0.0-rc.12"
     parsimmon "^1.12.0"
