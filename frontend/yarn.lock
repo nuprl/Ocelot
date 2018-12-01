@@ -109,22 +109,22 @@
     "@babel/runtime" "^7.0.0-beta.42"
     recompose "^0.27.0"
 
-"@stopify/elementary-js@^1.0.17":
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.17.tgz#7bf155b81fe9fd28a0f820c75ea9093b93c4a30c"
-  integrity sha512-zeV5WGJml2Px9ujxmt0O4SS9g3VKvXBOlHyruOOJ3dazByqnFckR7ZjjHOuaGEovzDAiUgRdBCLgzaEqa3i9Hg==
+"@stopify/elementary-js@^1.0.18":
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.18.tgz#20282456801bb04965785ecd03f43d9014db8282"
+  integrity sha512-NVqHyuhpj+yEzTSKgFMscGo2otgQY4fTDdObiMcqVKZApz+yO3OAu/OMGpGpph0CP9Ecl+iGOzJWEnpsnpH7ew==
   dependencies:
-    "@stopify/project-interpreter" "1.1.3"
+    "@stopify/project-interpreter" "1.1.4"
     "@types/babel-types" "^6.7.16"
     babel-core "^6.26.3"
     babel-plugin-transform-es2015-classes "^6.24.1"
     babel-types "^6.26.0"
     stopify "0.5.3-elementaryJS"
 
-"@stopify/project-interpreter@1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@stopify/project-interpreter/-/project-interpreter-1.1.3.tgz#3cec09820e279571df3a3750bf958d2e095befc1"
-  integrity sha512-b0eSJiQI7DRqQ5uYEl6ohSk+h7mcGsO3hSztD9EO7dQIwzUIQqjx9XmJ0umUNagGK9TxxX/eCcn48moYR3615w==
+"@stopify/project-interpreter@1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@stopify/project-interpreter/-/project-interpreter-1.1.4.tgz#6b07d1373aec2ab2250b3607e6472e8b2cfcd61a"
+  integrity sha512-a1a0Ou8FFekiFDaHDIqnO1+HUGPaslg1cqXpfBRqRCzaiQ6gRI2uugILoMhtpYpskRXTjfPVVBaf8uYhwIiHtQ==
   dependencies:
     immutable "^4.0.0-rc.12"
     parsimmon "^1.12.0"
