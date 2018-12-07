@@ -14,6 +14,12 @@ function getEmail() {
 }
 
 function traceError(message: string) {
+    if (window.location.hostname === 'localhost') {
+      console.log('WARNING: Cloud error reporting disabled for localhost');
+      console.error(`Caught the following error:`);
+      console.error(message);
+      return;
+    }
     const version = `Ocelot ${OCELOTVERSION}, EJS ${EJSVERSION}`;
     const userAgent = window.navigator.userAgent;
     const err = { 

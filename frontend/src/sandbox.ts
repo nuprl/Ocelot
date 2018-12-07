@@ -144,15 +144,16 @@ export class Sandbox {
     onConsoleInput(userInputLine: string) {
         const currentMode = this.mode.getValue();
         if (currentMode !== 'stopped') {
-            console.error(`called onConsoleInput with mode = ${this.mode}`);
+            console.error(`ERROR: called onConsoleInput with mode = ${currentMode}`);
             return;
         }
         this.repl.echo(userInputLine);
         this.mode.next('running');
         this.runner.eval(
-            userInputLine, (result: elementaryJS.Result) => {
-            this.mode.next('stopped');
-            this.onResult(result, true);
+            userInputLine, 
+            (result: elementaryJS.Result) => {
+              this.mode.next('stopped');
+              this.onResult(result, true);
         });
     }
 

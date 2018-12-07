@@ -219,6 +219,10 @@ class OutputPanel extends React.Component<Props, State> {
             if (event.keyCode === monaco.KeyCode.Enter && !event.shiftKey) {
                 event.preventDefault();
                 event.stopPropagation();
+                if (this.props.sandbox.mode.getValue() !== 'stopped') {
+                  window.console.log('Ignoring console command, program running');
+                  return;
+                }
                 const command = editor.getValue();
                 if (command.trim() === '') {
                     return;

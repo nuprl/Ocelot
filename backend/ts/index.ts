@@ -571,8 +571,11 @@ paws.use(morgan(
   })); // logging all http traffic
 
 paws.use(cors({
-  origin: [ 'https://www.ocelot-ide.org', 'http://localhost:8080' ]
-}));
+origin: [
+  'https://www.ocelot-ide.org', 
+  'http://localhost:8080',
+  'http://localhost:8081',
+]}));
 
 paws.use(bodyParser.json()); // parse all incoming json data
 
