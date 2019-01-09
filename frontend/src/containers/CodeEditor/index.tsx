@@ -140,15 +140,6 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             codeEditor.props.sandbox.onRunOrTestClicked('testing');
         }, '');
         this.editor = editor;
-        
-        const mustLogin = window.location.search !== '?anonymous';
-        if (!this.state.uiActive && mustLogin) {
-            editor.onKeyDown(event => {
-                if (mustLogin && !this.state.uiActive) {
-                    this.props.openMustLogin();
-                }
-            });
-        }
     }
 
     componentDidUpdate(prevProps: Props, prevState: CodeEditorState) {
@@ -176,6 +167,9 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             name: this.state.loadProgram.name,
             content: code
         });
+        if (state.loggedIn.getValue().kind === 'logged-out') {
+            return;
+        }
         state.dirty.next('dirty');
     };
 
@@ -193,7 +187,6 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
             );
         }
 
-        monacoOptions.readOnly = !this.state.uiActive;
 
         return (
             <div style={{ height: '100%', width: '100%' }}>
