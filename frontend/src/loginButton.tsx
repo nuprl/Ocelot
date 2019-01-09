@@ -92,6 +92,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                     throw new Error('Race condition--immediate logout');
                 }
                 state.loggedIn.next({ kind: 'logged-in', email  });
+                state.loadProgram.next({ kind: "nothing"});
             })
             .catch(reason =>
                 // TODO(arjun): Perhaps just retry?
@@ -105,8 +106,8 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
 
     onLogout() {
         state.loggedIn.next({ kind: 'logged-out' });
-        state.files.next([ ]);
-        state.loadProgram.next({ kind: 'nothing' });
+        state.files.next([ state.emptyFile.name ]);
+        state.loadProgram.next({ kind: "program", ...state.emptyFile });
         localStorage.removeItem('userEmail');
         localStorage.removeItem('sessionId');
     }
