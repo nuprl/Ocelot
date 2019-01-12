@@ -1,3 +1,5 @@
+import { CLD_FN_BASE_URL } from '../../secrets';
+
 export interface SuccessResponse<T> {
     status: 'SUCCESS';
     data: T;
@@ -40,5 +42,5 @@ export const validEmailSession = (): boolean => {
 };
 
 export const getUrl = (path: string): string => {
-    return `https://us-central1-arjunguha-research-group.cloudfunctions.net/paws/${path}`;
+    return `${CLD_FN_BASE_URL}${path}`;
 };
