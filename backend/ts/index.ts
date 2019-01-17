@@ -465,7 +465,7 @@ async function login(req: Request) {
 async function downloadUrl(url: string) {
   const urlStart = url.slice(0, 8);
   return (urlStart === 'https://' || urlStart.startsWith('http://')) ?
-    await rpn.get(url) : 'URL not supported';
+    await rpn.get(url, {encoding: null}) : 'URL not supported';
 }
 
 async function getUrl(req: Request, res: Response) {
