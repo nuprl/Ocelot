@@ -5,6 +5,7 @@ import { validateUser } from './utils/api/validateUser';
 import { isFailureResponse } from './utils/api/apiHelpers';
 import * as state from './state';
 import * as utils from './utils';
+import { LOGIN_CLIENT_ID } from './secrets';
 
 import Fade from '@material-ui/core/Fade';
 import { GoogleLogin, } from 'react-google-login';
@@ -25,7 +26,7 @@ const alternateLogoutButton = (onClickProp?: { onClick: () => void }) => {
 };
 
 type GoogleLogoutButtonProps = {
-    show: boolean, // whether to show it or not 
+    show: boolean, // whether to show it or not
     onClick: () => void, // when they press log out button
 };
 /**
@@ -71,9 +72,9 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                 this.onLogout();
                 return;
             }
-            state.loggedIn.next({ 
-                kind: 'loading-files', 
-                email: response.data.email 
+            state.loggedIn.next({
+                kind: 'loading-files',
+                email: response.data.email
             });
             this.loadFiles();
 
@@ -92,6 +93,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                     throw new Error('Race condition--immediate logout');
                 }
                 state.loggedIn.next({ kind: 'logged-in', email  });
+                state.loadProgram.next({ kind: "nothing"});
             })
             .catch(reason =>
                 // TODO(arjun): Perhaps just retry?
@@ -105,8 +107,8 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
 
     onLogout() {
         state.loggedIn.next({ kind: 'logged-out' });
-        state.files.next([ ]);
-        state.loadProgram.next({ kind: 'nothing' });
+        state.files.next([ state.emptyFile.name ]);
+        state.loadProgram.next({ kind: "program", ...state.emptyFile });
         localStorage.removeItem('userEmail');
         localStorage.removeItem('sessionId');
     }
@@ -122,7 +124,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                 <GoogleLogoutButton show={loggedIn} onClick={() => this.onLogout()} />
                 <GoogleLogin
                         style={{display: loggedIn ? "none" : "" }}
-                        clientId="692270598994-p92ku4bbjkvcddouh578eb1a07s8mghc.apps.googleusercontent.com"
+                        clientId={LOGIN_CLIENT_ID}
                         onSuccess={(resp) => this.onSuccess(resp)}
                         onFailure={this.onFailure}
                         prompt="select_account" // always prompts user to select a specific account

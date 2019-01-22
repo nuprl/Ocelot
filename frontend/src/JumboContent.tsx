@@ -108,9 +108,9 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
   }
 
   render() {
-    const { currentProgram, uiActive, mode } = this.state;
-    const mayRun = uiActive && currentProgram.kind === 'program' && mode === 'stopped';
-    const mayStop = uiActive && (mode === 'running' || mode === 'testing');
+    const { currentProgram, mode } = this.state;
+    const mayRun = currentProgram.kind === 'program' && mode === 'stopped';
+    const mayStop = (mode === 'running' || mode === 'testing');
     return [
       <Button key="run-button" color="secondary"
         onClick={() => this.onRunOrTestClicked('running')}
