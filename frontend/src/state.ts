@@ -72,8 +72,12 @@ export type Program =
      | { kind: 'loading' }
      | LoadedProgram;
 
-export const currentProgram = new Rx.BehaviorSubject<Program>({ kind: 'nothing' });
-export const files = new Rx.BehaviorSubject<string[]>([]);
+export const currentProgram = new Rx.BehaviorSubject<Program>({ 
+    kind: 'program',
+    ...emptyFile
+});
+
+export const files = new Rx.BehaviorSubject<string[]>([emptyFile.name]);
 
 // This state is set in several places: (1) the editor sets it to dirty,
 // (2) the autosaver sets it to saving and saved.
@@ -86,9 +90,6 @@ export const loggedIn = new Rx.BehaviorSubject<LoggedIn>({ kind: 'logged-out' })
 export const uiActive = new Rx.BehaviorSubject<boolean>(false);
 
 function isUiActive(loggedIn: LoggedIn): boolean {
-    if (window.location.search === '?anonymous') {
-        return true;
-    }
     return loggedIn.kind === 'logged-in';
 }
 

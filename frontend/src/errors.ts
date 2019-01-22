@@ -1,4 +1,5 @@
 import * as state from './state';
+import { CLD_FN_BASE_URL } from './secrets';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 
@@ -22,11 +23,11 @@ function traceError(message: string) {
     }
     const version = `Ocelot ${OCELOTVERSION}, EJS ${EJSVERSION}`;
     const userAgent = window.navigator.userAgent;
-    const err = { 
-        username: getEmail(), 
-        version, 
-        userAgent, 
-        message, 
+    const err = {
+        username: getEmail(),
+        version,
+        userAgent,
+        message,
         userProgram: state.currentProgram.getValue(),
     };
     let body: string;
@@ -38,7 +39,7 @@ function traceError(message: string) {
         body = JSON.stringify(err);
     }
 
-    fetch('https://us-central1-arjunguha-research-group.cloudfunctions.net/paws/error', {
+    fetch(`${CLD_FN_BASE_URL}error`, {
         method: 'POST',
         body: body,
         headers: { 'Content-Type': 'application/json' }
