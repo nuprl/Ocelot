@@ -101,14 +101,17 @@ module.exports = (val: any, opts: any, pad: any) => {
 
 			seen.push(val);
 
-			const ret = '[' + tokens.newLine + val.map((el, i) => {
+			let stringArray : string[] = []
+			for (let i = 0; i < val.length; i++) {
 				const eol = val.length - 1 === i ? tokens.newLine : ',' + tokens.newLineOrSpace;
-				let value = stringify(el, opts, pad + opts.indent);
+				let value = stringify(val[i], opts, pad + opts.indent);
 				if (opts.transform) {
 					value = opts.transform(val, i, value);
 				}
-				return tokens.indent + value + eol;
-			}).join('') + tokens.pad + ']';
+				stringArray.push(tokens.indent + value + eol);
+			}
+
+			const ret = '[' + tokens.newLine + stringArray.join('') + tokens.pad + ']';
 
 			seen.pop();
 
