@@ -131,7 +131,19 @@ class OutputPanel extends React.Component<Props, State> {
             if (typeof(message[i]) === 'object') {
                 const stringRep = stringifyObject(message[i], {
                     indent: '  ',
-                    singleQuotes: false
+                    singleQuotes: false,
+                    inlineCharacterLimit: 12,
+                    transform: (obj: any, prop: any, originalResult: string) : string => {
+                        let isArray = originalResult.charAt(0) === '[' && originalResult.charAt(originalResult.length - 1) === ']';
+                        let splitArray = isArray ? originalResult.split('\n') : []
+                        if (isArray && splitArray.length > 30) {
+                            let indent = (splitArray[splitArray.length - 1].match(/\S/) as RegExpMatchArray).index as number;
+                            return splitArray.slice(0, 4).concat(
+                                [ ' '.repeat(indent) + `${splitArray.length - 2 - 3} more...`, splitArray[splitArray.length - 1] ]
+                            ).join('\n');
+                        }
+                        return originalResult
+                    }
                 });
                 message[i] = stringRep;
             }
