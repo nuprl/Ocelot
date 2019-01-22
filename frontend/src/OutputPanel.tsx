@@ -134,10 +134,9 @@ class OutputPanel extends React.Component<Props, State> {
                     singleQuotes: false,
                     inlineCharacterLimit: 12,
                     transform: (obj: any, prop: any, originalResult: string) : string => {
-                        let isArray = originalResult.charAt(0) === '[' && originalResult.charAt(originalResult.length - 1) === ']';
-                        let splitArray = isArray ? originalResult.split('\n') : []
-                        if (isArray && splitArray.length > 30) {
-                            let indent = (splitArray[splitArray.length - 1].match(/\S/) as RegExpMatchArray).index as number;
+                        if (Array.isArray(obj[prop]) && obj[prop].length > 30) {
+                            let splitArray = originalResult.split('\n');
+                            let indent = ((splitArray[splitArray.length - 1].match(/\S/) as RegExpMatchArray).index as number);                           
                             return splitArray.slice(0, 4).concat(
                                 [ ' '.repeat(indent) + `${splitArray.length - 2 - 3} more...`, splitArray[splitArray.length - 1] ]
                             ).join('\n');
