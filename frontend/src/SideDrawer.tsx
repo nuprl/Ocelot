@@ -177,7 +177,7 @@ const NewFileField = ListItemStyles(class extends React.Component<NewFileFieldPr
                             aria-label="delete"
                             color="inherit"
                             className={`${classes.listItemColor}`}
-                            onClick={deleteFileField}
+                            onClick={() => { deleteFileField(); this.setState({ newFileErrorMsg: '' }); }}
                             classes={{ root: classes.noButtonBackground }}
                         >
                             <DeleteIcon color="inherit" />
