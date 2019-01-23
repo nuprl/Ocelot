@@ -20,7 +20,7 @@ div .SplitPane {
 }
 
 
-@media screen and (min-width: 1160px) { /* display inline when >= 520 px in width */
+@media screen and (min-width: 1160px) { /* display inline when >= 1160 px in width */
     #userEmail {
         display: inline;
     }
