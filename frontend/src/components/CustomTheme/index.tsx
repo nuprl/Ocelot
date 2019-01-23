@@ -28,7 +28,8 @@ const theme = createMuiTheme({
     MuiButton : {
       root: {
         paddingLeft: '8px',
-        paddingRight: '8px'
+        paddingRight: '8px',
+        minWidth: '0px',
       }
     }
   }
