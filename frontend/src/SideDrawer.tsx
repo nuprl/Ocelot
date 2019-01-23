@@ -198,16 +198,14 @@ type FileItemProps = {
     disabled: boolean
 };
 
-const FileItem = ListItemStyles(class extends React.Component<Props & FileItemProps, {selectedFilename: string | false, dirty: state.Dirty}> {
+const FileItem = ListItemStyles(class extends React.Component<Props & FileItemProps, {selectedFilename: string | false}> {
 
     constructor(props: Props & FileItemProps) {
         super(props);
         this.state = {
             selectedFilename: props.selectedFilename.getValue(),
-            dirty: state.dirty.getValue()
         };
         connect(this, 'selectedFilename', props.selectedFilename);
-        connect(this, 'dirty', state.dirty);
     }
 
 
@@ -235,8 +233,18 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
 
     render() {
         const { classes, name, disabled } = this.props
-        const isDisabled = disabled || this.state.dirty !== 'saved';
+        const isDisabled = disabled
         const isSelected = name === this.state.selectedFilename;
+
+        let preventActionWhenSaving = (onClickAction: () => void) => { 
+            return () => {
+                if (state.dirty.getValue() === 'dirty') {
+                    state.notify('File still saving, please wait...');
+                    return;
+                }
+                onClickAction();
+            }
+        };
         return (
             <ListItem
                 button
@@ -246,7 +254,7 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
                     root: `${isSelected && classes.selectedHighlight}`,
                     dense: classes.tinyPadding,
                 }}
-                onClick={() =>this.props.selectedFilename.next(name)}
+                onClick={preventActionWhenSaving(() => {this.props.selectedFilename.next(name)})}
                 dense
                 disabled={isDisabled}
             >
@@ -275,7 +283,7 @@ const FileItem = ListItemStyles(class extends React.Component<Props & FileItemPr
                             <IconButton
                                 aria-label="Delete"
                                 color="inherit"
-                                onClick={() => this.onDelete()}
+                                onClick={preventActionWhenSaving(() => this.onDelete())}
                                 classes={{
                                     root: classes.noButtonBackground
                                 }}
