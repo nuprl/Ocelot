@@ -31,6 +31,7 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
+    mouseWheelZoom: false,
     selectOnLineNumbers: true,
     fontSize: 14,
     fontFamily: 'Fira Mono',
