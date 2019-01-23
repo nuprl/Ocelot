@@ -57,6 +57,14 @@ const redTheme = createMuiTheme({
   palette: {
     type: 'dark',
     primary: red,
+  },
+  overrides: {
+    MuiButton : {
+      root: {
+        paddingLeft: '8px',
+        paddingRight: '8px'
+      }
+    }
   }
 });
 
