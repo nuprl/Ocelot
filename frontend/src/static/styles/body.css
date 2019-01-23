@@ -19,9 +19,19 @@ div .SplitPane {
     display: none;
 }
 
+#toolbar-buttons-text {
+    display: none;
+}
+
 
 @media screen and (min-width: 1160px) { /* display inline when >= 1160 px in width */
     #userEmail {
+        display: inline;
+    }
+}
+
+@media screen and (min-width: 860px) {
+    #toolbar-buttons-text {
         display: inline;
     }
 }
