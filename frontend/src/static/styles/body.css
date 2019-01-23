@@ -14,3 +14,14 @@ div .SplitPane {
     off if overflow is set to hidden for splitpane
      */
 }
+
+#userEmail {
+    display: none;
+}
+
+
+@media screen and (min-width: 1160px) { /* display inline when >= 520 px in width */
+    #userEmail {
+        display: inline;
+    }
+}
