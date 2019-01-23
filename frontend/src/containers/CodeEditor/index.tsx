@@ -40,7 +40,8 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     minimap: {
         enabled: false,
     },
-    renderIndentGuides: true
+    renderIndentGuides: true,
+    contextmenu: false
     // scrollBeyondLastLine: false,
 };
 
@@ -117,6 +118,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
             // students can accidentally press ctrl/cmd + s, this prevents default action
         }, '');
+        editor.addCommand(monaco.KeyCode.F1, () => {}, '');
         let codeEditor = this;
         let saveCode = function() {
             const program = state.currentProgram.getValue();
