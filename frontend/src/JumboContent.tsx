@@ -15,6 +15,7 @@ import * as types from './types';
 import { saveHistory } from './utils/api/saveHistory'
 import { isFailureResponse } from './utils/api/apiHelpers';
 import SideDrawer from './SideDrawer';
+import { OfflineIndicator } from './offlineIndicator';
 import Notification from './containers/Notification';
 import * as sandbox from './sandbox';
 import UserLogin from './loginButton';
@@ -107,6 +108,13 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
     if (this.state.uiActive && program.kind === 'program') {
       saveHistory(program.name, program.content).then((res) => {
         if (isFailureResponse(res)) {
+          // Suppress the notification if the browser is offline. Note that
+          // we still try to save, even when the UA thinks we are offline.
+          // I am not certain that online/offline detection is particularly
+          // reliable, so it is not worth disabling saving when offline.
+          if (navigator.onLine === false) {
+            return;
+          }
           state.notify('Failed to save history');
           return;
         }
@@ -337,6 +345,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             <HistoryButton />
             <div style={classes.flex} />
             <div style={{ display: 'inline-block', width: '0.5em' }} />
+            <OfflineIndicator />
             <UserLogin/>
           </Toolbar>
         </AppBar>

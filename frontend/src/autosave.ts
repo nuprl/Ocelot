@@ -44,6 +44,13 @@ dirty.pipe(
             dirty.next('saved');
         }
         else {
+            // Suppress the notification if the browser is offline. Note that
+            // we still try to save, even when the UA thinks we are offline.
+            // I am not certain that online/offline detection is particularly
+            // reliable, so it is not worth disabling saving when offline.
+            if (navigator.onLine === false) {
+                return;
+            }
             notification.next({ message: `Failed to save file`, position: 'top' });
         }
     });
