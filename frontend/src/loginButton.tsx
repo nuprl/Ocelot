@@ -120,11 +120,11 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
         const email = this.state.loggedIn.kind !== 'logged-out' ? this.state.loggedIn.email : '';
         return (
             [
-                <Typography id={loggedIn ? "userEmail" : "" } variant="subheading" color="inherit">
+                <Typography key="email" id={loggedIn ? "userEmail" : "" } variant="subheading" color="inherit">
                     {email}
                 </Typography>,
-                <GoogleLogoutButton show={loggedIn} onClick={() => this.onLogout()} />,
-                <GoogleLogin
+                <GoogleLogoutButton key="logout" show={loggedIn} onClick={() => this.onLogout()} />,
+                <GoogleLogin key="login"
                         style={{display: loggedIn ? "none" : "" }}
                         clientId={LOGIN_CLIENT_ID}
                         onSuccess={(resp) => this.onSuccess(resp)}
