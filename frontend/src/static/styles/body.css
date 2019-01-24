@@ -30,7 +30,7 @@ div .SplitPane {
     }
 }
 
-@media screen and (min-width: 860px) {
+@media screen and (min-width: 885px) {
     #toolbar-buttons-text {
         display: inline;
     }

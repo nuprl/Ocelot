@@ -344,8 +344,8 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             </Button>
             <HistoryButton />
             <div style={classes.flex} />
-            <div style={{ display: 'inline-block', width: '0.5em' }} />
             <OfflineIndicator />
+            <div style={{ display: 'inline-block', width: '0.5em' }} />
             <UserLogin/>
           </Toolbar>
         </AppBar>
