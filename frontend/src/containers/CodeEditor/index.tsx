@@ -31,8 +31,8 @@ const styles: StyleRulesCallback = theme => ({
 });
 
 const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
+    mouseWheelZoom: false,
     selectOnLineNumbers: true,
-    mouseWheelZoom: true,
     fontSize: 14,
     fontFamily: 'Fira Mono',
     autoIndent: true,
@@ -40,7 +40,8 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     minimap: {
         enabled: false,
     },
-    renderIndentGuides: true
+    renderIndentGuides: true,
+    contextmenu: false
     // scrollBeyondLastLine: false,
 };
 
@@ -56,6 +57,7 @@ type CodeEditorState = {
 
 class CodeEditor extends React.Component<Props, CodeEditorState> {
     editor: monacoEditor.editor.IStandaloneCodeEditor | undefined;
+    fontSize: number = 14;
 
     constructor(props: Props) {
         super(props);
@@ -117,6 +119,18 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, function() {
             // students can accidentally press ctrl/cmd + s, this prevents default action
         }, '');
+        editor.addCommand(monaco.KeyCode.F1, () => {}, '');
+
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.UpArrow, () => {
+            this.fontSize = Math.min(this.fontSize + 1, 40);
+            editor.updateOptions({ fontSize: this.fontSize})
+        }, '');
+
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.DownArrow, () => {
+            this.fontSize = Math.max(this.fontSize - 1, 1);
+            editor.updateOptions({ fontSize: this.fontSize})
+        }, '');
+
         let codeEditor = this;
         let saveCode = function() {
             const program = state.currentProgram.getValue();

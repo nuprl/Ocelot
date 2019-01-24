@@ -57,6 +57,15 @@ const redTheme = createMuiTheme({
   palette: {
     type: 'dark',
     primary: red,
+  },
+  overrides: {
+    MuiButton : {
+      root: {
+        paddingLeft: '8px',
+        paddingRight: '8px',
+        minWidth: '0px',
+      }
+    }
   }
 });
 
@@ -116,13 +125,17 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
         onClick={() => this.onRunOrTestClicked('running')}
         disabled={!mayRun}>
         <PlayIcon color="inherit" />
-        Run
+        <span id="toolbar-buttons-text">
+          Run
+        </span>
       </Button>,
       <Button key="test-button" color="secondary"
         onClick={() => this.onRunOrTestClicked('testing')}
         disabled={!mayRun}>
         <ExploreIcon color="inherit" />
-        Test
+        <span id="toolbar-buttons-text">
+          Test
+        </span>
       </Button>,
       <MuiThemeProvider key="stop-button" theme={redTheme}>
         <Button
@@ -130,7 +143,9 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
           onClick={() => this.props.sandbox.onStopClicked()}
           disabled={!mayStop}>
           <StopIcon color="inherit" />
-          Stop
+          <span id="toolbar-buttons-text">
+            Stop
+          </span>
       </Button>
       </MuiThemeProvider>
     ];
@@ -189,7 +204,7 @@ class DownloadButton extends React.Component<{}, { currentProgram: state.Program
       disabled={this.state.currentProgram.kind !== 'program'}
       onClick={() => this.onDownload()}>
       <DownloadIcon />
-      Download
+      <span id="toolbar-buttons-text">Download</span>
     </Button>;
   }
 }
@@ -296,7 +311,9 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               color="secondary"
               onClick={() => this.togglePanel('sideDrawer', 'width', 250, 0)}>
               <FileIcon />
-              Files
+              <span id="toolbar-buttons-text">
+                Files
+              </span>
             </Button>
             <ExecutionButtons 
               sandbox={this.sandbox} />
@@ -305,13 +322,17 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               color="secondary"
               onClick={() => this.togglePanel('outputPanel', 'height', '25%', 0)}>
               <ConsoleIcon />
-              Console
+              <span id="toolbar-buttons-text">
+                Console
+              </span>
             </Button>
             <Button
               color="secondary"
               onClick={() => this.togglePanel('codeEditor', 'width', '50%', '100%')}>
               <CanvasIcon />
-              Canvas
+              <span id="toolbar-buttons-text">
+                Canvas
+              </span>
             </Button>
             <HistoryButton />
             <div style={classes.flex} />

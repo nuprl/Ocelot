@@ -14,6 +14,8 @@ import Button from '@material-ui/core/Button';
 import { GoogleLogout } from 'react-google-login';
 import { connect } from './reactrx';
 
+import './static/styles/body.css';
+
 const alternateLogoutButton = (onClickProp?: { onClick: () => void }) => {
     if (typeof onClickProp === 'undefined') {
         return (<Button color="inherit">Logout</Button>);
@@ -119,7 +121,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
         const email = this.state.loggedIn.kind !== 'logged-out' ? this.state.loggedIn.email : '';
         return (
             <div>
-                <Typography style={{display: loggedIn ? "inline" : "none" }} variant="subheading" color="inherit">
+                <Typography id={loggedIn ? "userEmail" : "" } variant="subheading" color="inherit">
                     {email}
                 </Typography>
                 <GoogleLogoutButton show={loggedIn} onClick={() => this.onLogout()} />
