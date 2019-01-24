@@ -242,7 +242,7 @@ class HistoryButton extends React.Component<Props, State> {
                         color="secondary"
                         onClick={this.onClick}>
                     <HistoryIcon />
-                    History
+                    <span id="toolbar-buttons-text">History</span>
                 </Button>
                 <Popper
                     open={open}

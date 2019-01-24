@@ -23,6 +23,15 @@ const theme = createMuiTheme({
   zIndex: { // lets monaco editor hover/context info cover over appbar and drawer
     drawer: 1,
     appBar: 2,
+  },
+  overrides: {
+    MuiButton : {
+      root: {
+        paddingLeft: '8px',
+        paddingRight: '8px',
+        minWidth: '0px',
+      }
+    }
   }
 });
 
