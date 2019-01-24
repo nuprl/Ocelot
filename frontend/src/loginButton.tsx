@@ -93,7 +93,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                 const email = state.email();
                 if (email === false) { // This case is hit if user immediately logs out after logging in.
                     this.onLogout();
-                    throw new Error('Race condition--immediate logout');
+                    return;
                 }
                 state.loggedIn.next({ kind: 'logged-in', email  });
                 state.loadProgram.next({ kind: "nothing"});
