@@ -119,11 +119,11 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
         const loggedIn = this.state.loggedIn.kind !== 'logged-out';
         const email = this.state.loggedIn.kind !== 'logged-out' ? this.state.loggedIn.email : '';
         return (
-            <div>
+            [
                 <Typography id={loggedIn ? "userEmail" : "" } variant="subheading" color="inherit">
                     {email}
-                </Typography>
-                <GoogleLogoutButton show={loggedIn} onClick={() => this.onLogout()} />
+                </Typography>,
+                <GoogleLogoutButton show={loggedIn} onClick={() => this.onLogout()} />,
                 <GoogleLogin
                         style={{display: loggedIn ? "none" : "" }}
                         clientId={LOGIN_CLIENT_ID}
@@ -132,7 +132,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                         prompt="select_account" // always prompts user to select a specific account
                         isSignedIn
                     />
-            </div >
+            ]
         );
     }
 
