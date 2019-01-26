@@ -102,7 +102,7 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
 
   onRunOrTestClicked(mode: 'running' | 'testing') {
     const program = state.currentProgram.getValue();
-    if (state.loggedIn.getValue().kind === 'logged-in' && program.kind === 'program') {
+    if (state.uiActive.getValue() && program.kind === 'program') {
       saveHistory(program.name, program.content).then((res) => {
         if (isFailureResponse(res)) {
           // Suppress the notification if the browser is offline. Note that

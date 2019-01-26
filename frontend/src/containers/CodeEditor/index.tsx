@@ -130,7 +130,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
 
         let codeEditor = this;
         let saveCode = function() {
-            if (state.loggedIn.getValue().kind === 'logged-out') {
+            if (!state.uiActive.getValue()) {
                 return;
             }
             const program = state.currentProgram.getValue();
