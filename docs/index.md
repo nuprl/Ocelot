@@ -39,7 +39,7 @@ egregious features. For example:
    ElementaryJS produces an error:
    <pre style="color:red; background-color:#484848; font-weight: bold; font-family:'Fira Mono', monospace">
    function F expected 1 argument but received 2 arguments at Line 1: in F
-   ... Line 5
+   ... Line 2
    </pre>
 2. In ElementaryJS, you cannot reference non-existent fields. For example:
    ```javascript
@@ -50,7 +50,7 @@ egregious features. For example:
    JavaScript would return the value `undefined`, but
    ElementaryJS produces an error:
    <pre style="color:red; background-color:#484848; font-weight: bold; font-family:'Fira Mono', monospace">
-   object does not have member 'y' at Line 2
+   object does not have member 'y' at Line 3
    </pre>
 3. In ElementaryJS, you cannot dynamically add or remove fields from an object. For example:
    ```javascript
@@ -69,7 +69,7 @@ egregious features. For example:
    JavaScript would produce the empty string `""` without any errors, while
    ElementaryJS produces an error:
    <pre style="color:red; background-color:#484848; font-weight: bold; font-family:'Fira Mono', monospace">
-   arguments of operator '+' must both be numbers or strings
+   arguments of operator '+' must both be numbers or strings at Line 1
    </pre>
 4. ElementaryJS requires block scoping and disallows the `var` keyword.
 5. ElementaryJS disallows the `==` operator and forces programmers to use
