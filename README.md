@@ -1,6 +1,10 @@
 # Ocelot
 
-An online IDE that integrates [Stopify](https://github.com/plasma-umass/Stopify), a compiler that enables users to stop long-running programs with arbitrarily deep recursion and infinite loops. It also integrates an academic sublanguage of JavaScript, _ElementaryJS_.
+A web-based IDE for JavaScript, without the "bad parts".
+
+See [umass-compsci220.github.io/Ocelot/](https://umass-compsci220.github.io/Ocelot/) for an overview.
+
+This is a README to get started hacking on Ocelot.
 
 ## Dependencies
 
