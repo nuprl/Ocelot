@@ -106,7 +106,7 @@ define in JavaScript without locking up the browser. However, Ocelot ensures
 that the browser remains responsive and you can stop the program at any time by
 clicking the Stop button.
 
-We also provide easy access to drawing on a canvas, which, 
+We also provide easy access to drawing on a canvas, which 
 can be used to create animations without timer events or
 `requestAnimationFrame`:
 ```javascript
