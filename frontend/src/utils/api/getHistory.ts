@@ -63,7 +63,7 @@ export const getFileHistory = async (fileName: string): Promise<FileHistoryRespo
         const history: FileHistory[] = jsonResponse.data.history;
         history.map((elem) => {
             const dateTime = new Date(
-                elem.dateCreated + " " + elem.timeCreated + " UTC");
+                elem.dateCreated + ' ' + elem.timeCreated + ' UTC');
             elem.dateCreated = dateTime.toLocaleDateString('en-US');
             elem.timeCreated = dateTime.toLocaleTimeString('en-US');
         });
