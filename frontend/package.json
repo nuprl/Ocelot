@@ -50,11 +50,11 @@
     "tslint-react": "^3.6.0"
   },
   "scripts": {
-    "build": "echo \"let OCELOTVERSION = '$(git rev-parse --short HEAD)';\nexport { OCELOTVERSION };\" > src/version.ts && webpack --progress",
-    "start": "echo \"let OCELOTVERSION = '$(git rev-parse --short HEAD)';\nexport { OCELOTVERSION };\" > src/version.ts && webpack-dev-server",
+    "gen-version": "echo \"let OCELOTVERSION = '$(git rev-parse --short HEAD)';\nexport { OCELOTVERSION };\" > src/version.ts",
+    "build": "yarn run gen-version && webpack --progress",
+    "start": "yarn run gen-version && webpack-dev-server",
     "serve-local": "http-server build",
-    "deploy": "rsync -azdOL build/ ocelot@ocelot-ide.org:/var/www/ocelot-ide.org/",
-    "test": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts test --env=jsdom"
+    "deploy": "rsync -azdOL build/ ocelot@ocelot-ide.org:/var/www/ocelot-ide.org/"
   },
   "homepage": "https://storage.googleapis.com/paws/"
 }
