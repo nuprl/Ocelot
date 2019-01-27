@@ -84,7 +84,7 @@ decision that we made is that *programs that run in ElementaryJS will run
 without any changes in ordinary JavaScript*. Therefore, students learn
 comprehensible portion of JavaScript that works in the real world.
 
-#  Web Programming without Callbacks
+#  Web Programming Without Callbacks
 
 To write interesting web programs with images, animations, and interactivity,
 it is necessary for the programmer to understand callbacks and the event loop.
