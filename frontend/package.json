@@ -56,5 +56,4 @@
     "serve-local": "http-server build",
     "deploy": "rsync -azdOL build/ ocelot@ocelot-ide.org:/var/www/ocelot-ide.org/"
   },
-  "homepage": "https://storage.googleapis.com/paws/"
 }
