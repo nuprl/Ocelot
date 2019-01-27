@@ -21,7 +21,7 @@ work.
 
 The **most significant feature** of Ocelot is that it shields students from the
 "bad parts" of JavaScript[^2], by restricting the language to a subset
-of JavaScript that we call *ElementaryJS*[^3].
+of JavaScript that we call *ElementaryJS*.[^3]
 JavaScript is a powerful, but complicated language with several poorly-designed
 features that can confuse even expert programmers.[^4] This makes JavaScript a
 poor choice for teaching beginners how to code.  ElementaryJS uses a
