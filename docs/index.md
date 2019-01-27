@@ -147,12 +147,12 @@ with the authors of Pyret.
 
 ### Lead Developer
 
-[Sam Lee]
+- [Sam Lee]
 
 ### Contributors
 
-[Joydeep Biswas]
-[Arjun Guha]
+- [Joydeep Biswas]
+- [Arjun Guha]
 
 [^1]: The course is [COMPSCI 220 Programming Methodology].
 
