@@ -19,11 +19,9 @@ work.
 
 # JavaScript Without the "Bad Parts"
 
-The **most significant feature** of Ocelot is that shields students from the
-"bad parts" of JavaScript.[^2] Therefore, it makes JavaScript a reasonable
-programming language to teach to relatively new programmers.  Ocelot supports a
-restricted subset of JavaScript that we call *ElementaryJS*[^3].
-
+The **most significant feature** of Ocelot is that it shields students from the
+"bad parts" of JavaScript[^2], by restricting the language to a subset
+of JavaScript that we call *ElementaryJS*[^3].
 JavaScript is a powerful, but complicated language with several poorly-designed
 features that can confuse even expert programmers.[^4] This makes JavaScript a
 poor choice for teaching beginners how to code.  ElementaryJS uses a
@@ -57,7 +55,7 @@ egregious features. For example:
    let obj = { x: 100 };
    obj.y = 10;
    ```
-   JavaScript would dynamically create a new field named `y`, while ElementaryJS
+   JavaScript would dynamically create a new field named `y`, but ElementaryJS
    produces an error:
    <pre style="color:red; background-color:#484848; font-weight: bold; font-family:'Fira Mono', monospace">
    object does not have member 'y' at Line 2
@@ -66,7 +64,7 @@ egregious features. For example:
    ```javascript
    [] + []
    ```
-   JavaScript would produce the empty string `""` without any errors, while
+   JavaScript would produce the empty string `""` without any errors, but
    ElementaryJS produces an error:
    <pre style="color:red; background-color:#484848; font-weight: bold; font-family:'Fira Mono', monospace">
    arguments of operator '+' must both be numbers or strings at Line 1
@@ -77,11 +75,11 @@ egregious features. For example:
 6. ElementaryJS simplifies JavaScript's standard library in several ways.
    For example, JavaScript's `Array.prototype.map` method passes several
    extra arguments to the mapper function (the index, the array, etc).
-   The `map` method in ElementaryJS is simply the normal definition of map.
+   The `map` method in ElementaryJS is simply the usual definition of map.
 
 ElementaryJS has several other restrictions. However, an important design
 decision that we made is that *programs that run in ElementaryJS will run
-without any changes in ordinary JavaScript*. Therefore, students learn
+without any changes in ordinary JavaScript*. Therefore, students learn a
 comprehensible portion of JavaScript that works in the real world.
 
 #  Web Programming Without Callbacks
@@ -92,6 +90,7 @@ However, these concepts are hard for new programmers to understand. In Ocelot,
 we simulate blocking I/O in JavaScript,[^5] thus students can start writing
 interesting programs immediately.  For example, the following program prints
 `Hello` every second and runs forever:
+
 ```javascript
 let i = 0;
 while (true) {
@@ -103,12 +102,12 @@ while (true) {
 
 The program uses a *sleep* function that we provide, which is quite hard to
 define in JavaScript without locking up the browser. However, Ocelot ensures
-that the browser remains responsive and you can stop the program at any time by
-clicking the Stop button.
+that the browser remains responsive, and the user can stop the program at any time
+by clicking the Stop button in the IDE.
 
-We also provide easy access to drawing on a canvas, which 
-can be used to create animations without timer events or
-`requestAnimationFrame`:
+We also provide easy access to drawing on a canvas, which we use to
+create animations without timer events or `requestAnimationFrame`:
+
 ```javascript
 let c = lib220.newCanvas(400, 400);
 let theta = 0;
@@ -123,7 +122,7 @@ while (true) {
 }
 ```
 
-For some more examples, check out this [Animated Robot Path Planner (RRT)] (based on a
+For more examples, check out this [Animated Robot Path Planner (RRT)] (based on a
 programming assignment from our class) and this [bouncing ball animation] in Ocelot.
 
 # Getting the Code
@@ -146,8 +145,14 @@ with the authors of Pyret.
 
 ## Authors
 
-The primary developer of Ocelot and ElementaryJS is [Sam Lee] (junior at UMass Amherst).
-[Joydeep Biswas] and [Arjun Guha] have also contributed.
+### Lead Developer
+
+[Sam Lee]
+
+### Contributors
+
+[Joydeep Biswas]
+[Arjun Guha]
 
 [^1]: The course is [COMPSCI 220 Programming Methodology].
 
