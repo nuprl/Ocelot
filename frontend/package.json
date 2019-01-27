@@ -52,8 +52,8 @@
   "scripts": {
     "gen-version": "echo \"let OCELOTVERSION = '$(git rev-parse --short HEAD)';\nexport { OCELOTVERSION };\" > src/version.ts",
     "build": "yarn run gen-version && webpack --progress",
-    "start": "yarn run gen-version && webpack-dev-server",
+    "start": "yarn run gen-version && webpack-dev-server --open",
     "serve-local": "http-server build",
     "deploy": "rsync -azdOL build/ ocelot@ocelot-ide.org:/var/www/ocelot-ide.org/"
-  },
+  }
 }
