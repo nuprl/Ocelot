@@ -14,7 +14,7 @@
             "check-space"
         ],
         "curly": true,
-        "eofline": false,
+        "eofline": true,
         "forin": true,
         "indent": [ true, "spaces" ],
         "interface-name": [true, "never-prefix"],

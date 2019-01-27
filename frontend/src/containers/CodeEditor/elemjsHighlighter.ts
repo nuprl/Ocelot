@@ -1,4 +1,4 @@
-const crap = (): any => ({
+const highlight = (): any => ({
     tokenPostfix: '.js',
 
     keywords: [
@@ -130,4 +130,4 @@ const crap = (): any => ({
     },
 });
 
-export default crap;
+export default highlight;
