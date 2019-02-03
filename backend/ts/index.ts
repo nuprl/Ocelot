@@ -1,4 +1,3 @@
-
 import * as Storage from '@google-cloud/storage'; // Google cloud storage
 import * as Datastore from '@google-cloud/datastore';
 import { OAuth2Client } from 'google-auth-library'; // for authenticating google login
@@ -160,10 +159,7 @@ async function checkValidUser(userEmail: string): Promise<boolean> {
     .createQuery(datastoreKind)
     .filter('__key__', '=', datastore.key([datastoreKind, userEmail]));
   const [results] = await datastore.runQuery(query);
-  if (results.length === 1) {
-    return true;
-  }
-  return false;
+  return results.length === 1;
 }
 
 async function updateSessionId(userEmail: string, sessionId: string): Promise<void> {
@@ -490,10 +486,10 @@ async function getUrl(req: Request, res: Response) {
     try {
       res.status(200).send(await downloadUrl(url as string));
     } catch(e) {
-      res.status(500).send(e);
+      res.status(500).send('Invalid URL');
     }
   } catch(e) {
-    res.status(500).send("Exception: " + e.toString);
+    res.status(500).send('Exception: ' + e.toString());
   }
 }
 
@@ -583,14 +579,10 @@ paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
 paws.get('/geturl', getUrl);
 
-function str(x: any) {
-  if (typeof x === 'string') {
-    return x;
-  }
+function str(x: any): string {
   try {
-    return JSON.stringify(x);
-  }
-  catch (exn) {
+    return (typeof x === 'string') ? x : JSON.stringify(x);
+  } catch (e) {
     return 'could not stringify';
   }
 }
