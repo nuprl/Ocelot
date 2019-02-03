@@ -459,8 +459,11 @@ async function login(req: Request) {
 }
 
 async function downloadUrl(url: string) {
-  return (url.startsWith('http://') || url.startsWith('https://')) ?
-    await rpn.get(url, {encoding: null}) : 'URL not supported';
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return await rpn.get(url, { encoding: null });
+  } else {
+    throw 'URL not supported';
+  }
 }
 
 async function getUrl(req: Request, res: Response) {
@@ -486,7 +489,7 @@ async function getUrl(req: Request, res: Response) {
     try {
       res.status(200).send(await downloadUrl(url as string));
     } catch(e) {
-      res.status(500).send('Invalid URL');
+      res.status(500).send(typeof e === 'string' ? e : 'Invalid URL');
     }
   } catch(e) {
     res.status(500).send('Exception: ' + e.toString());
