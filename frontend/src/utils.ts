@@ -2,11 +2,19 @@ import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 import { getUrl } from './utils/api/apiHelpers';
 
-function respJsonHandler(resp: Response): Promise<any> {
+type RespType = 'json' | 'text';
+
+function respJsonHandler(resp: Response, respType?: RespType): Promise<any> {
   if (!resp.ok) {
     throw new Error(`Code ${resp.status} from ${resp.url}.`);
   }
-  return resp.json();
+
+  switch (respType) {
+    case 'text':
+      return resp.text();
+    default: // 'json'
+      return resp.json();
+  }
 }
 
 export async function postJson(path: string,
@@ -31,7 +39,9 @@ export async function postJson(path: string,
 }
 
 export async function getJson(path: string): Promise<any> {
-  return await respJsonHandler(await fetch(path, {
-    headers: { 'Content-Type': 'application/json' }
-  }));
+  return await respJsonHandler(await fetch(path));
+}
+
+export async function getText(path: string): Promise<any> {
+  return await respJsonHandler(await fetch(path), 'text');
 }
