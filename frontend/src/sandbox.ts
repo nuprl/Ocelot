@@ -2,8 +2,10 @@ import * as Rx from 'rxjs';
 import * as elementaryJS from '@stopify/elementary-js';
 import * as elementaryRTS from '@stopify/elementary-js/dist/runtime';
 import * as types from './types';
-import { console } from './errors';
 import * as state from './state';
+import { console } from './errors';
+import { getJson } from './utils';
+import { MODULE_WL_URL } from './secrets';
 import { OCELOTVERSION } from './version';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 
@@ -15,6 +17,27 @@ export function version() {
         ocelot: OCELOTVERSION
     };
 }
+
+// We need to know where/when to call this; seems the earlier the better.
+async function getWhitelist(): Promise<any> {
+    const wl: any = await getJson(MODULE_WL_URL);
+
+    /* We assume 'wl' is a map from module name to URL (string).
+       Alternatively, it could be a map from module name to code (string),
+           in which case we'd basically be done by now. */
+
+    Object.keys(wl).forEach(async module => {
+        wl[module] = await getJson(wl[module]);// I think we can get away with overwrites.
+        /* What does wl[module] hold at this point?
+           The result of JSON.parse on the contents returned,
+               so this is probably wrong; we can't use 'getJson'. */
+    });
+
+    return wl;
+}
+
+// Wrong, but just so I can commit for now:
+getWhitelist();
 
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
 // function to create an AsyncRun that does not run any user code.
@@ -150,7 +173,7 @@ export class Sandbox {
         this.repl.echo(userInputLine);
         this.mode.next('running');
         this.runner.eval(
-            userInputLine, 
+            userInputLine,
             (result: elementaryJS.Result) => {
               this.mode.next('stopped');
               this.onResult(result, true);
