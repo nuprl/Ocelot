@@ -18,7 +18,8 @@ export function version() {
     };
 }
 
-const _wl = (async function(): Promise<{ [key: string]: string }> {
+let whitelistCode: { [key: string]: string } = {};
+(async function(): Promise<{ [key: string]: string }> {
     const wl: { [key: string]: string } = await getJson(MODULE_WL_URL);
 
     /* We assume 'wl' is a map from module name to URL (string).
@@ -30,10 +31,11 @@ const _wl = (async function(): Promise<{ [key: string]: string }> {
     }
 
     return wl;
-}());
-
-// Wrong, but just so I can commit for now:
-_wl;
+}()).then(val => {
+    whitelistCode = val;
+}, err => {
+    console.error(`Could not load whitelist: ${JSON.stringify(err)}.`);
+});
 
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
 // function to create an AsyncRun that does not run any user code.
@@ -116,7 +118,7 @@ export class Sandbox {
     opts() {
         return {
             consoleLog: (message: string) => this.repl!.log(message),
-            version: version
+            version, whitelistCode
         };
     }
     onRunOrTestClicked(mode: 'testing' | 'running') {
