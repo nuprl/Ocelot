@@ -2,6 +2,7 @@ import * as React from 'react';
 import withStyles, { WithStyles, StyleRulesCallback, } from '@material-ui/core/styles/withStyles';
 import CustomTheme from './components/CustomTheme';
 import * as JumboContent from './JumboContent';
+import { loadLibraries } from './sandbox';
 import { detect } from 'detect-browser';
 import 'static/styles/JumboContent.css';
 import 'static/styles/body.css';
@@ -43,25 +44,67 @@ type WithStylesClasses =
   | 'toolbar'
   | 'jumboContainer';
 
-class Index extends React.Component<WithStyles<WithStylesClasses>> {
+type LibsLoad =
+  | 'ready'
+  | 'failed'
+  | 'waiting'
 
-      render() {
-        const browser = detect();
-        switch (browser && browser.name) {
-          case 'chrome':
-          case 'firefox':
-          case 'safari':
-          case 'ios':
-            const { classes } = this.props;
-            return (<JumboContent.JumboContentDefault classes={classes} />);
-          default:
+export class Index extends React.Component<WithStyles<WithStylesClasses>, {
+  allLibsLoaded: LibsLoad
+}> {
+
+  constructor(props: any) {
+    super(props);
+    this.state = {
+      allLibsLoaded: 'waiting'
+    };
+  }
+
+  componentDidMount() {
+    loadLibraries().then(() => {
+      this.setState({
+        allLibsLoaded: 'ready'
+      });
+    }, (err) => {
+      console.error(`Could not load whitelist: ${JSON.stringify(err)}.`);
+      this.setState({
+        allLibsLoaded: 'failed'
+      });
+    });
+  }
+
+  render() {
+    const browser = detect();
+    switch (browser && browser.name) {
+      case 'chrome':
+      case 'firefox':
+      case 'safari':
+      case 'ios':
+        switch (this.state.allLibsLoaded) {
+          case 'waiting':
             return (
               <Typography variant="display1" align="center">
-                Your browser is unsupported, please use chrome, firefox or safari.
-          </Typography>
+                Loading...
+              </Typography>
             );
+          case 'failed':
+            return (
+              <Typography variant="display1" align="center">
+                Failed; try to refesh the page.
+              </Typography>
+            );
+          default: //ready
+            const { classes } = this.props;
+            return (<JumboContent.JumboContentDefault classes={classes} />);
         }
-      }
+      default:
+        return (
+          <Typography variant="display1" align="center">
+            Your browser is unsupported; please use Chrome, Firefox, or Safari.
+          </Typography>
+        );
     }
+  }
+}
 
 export default CustomTheme(withStyles(styles)(Index));

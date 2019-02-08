@@ -19,19 +19,15 @@ export function version() {
 }
 
 let whitelistCode: { [key: string]: string } = {};
-(async function(): Promise<{ [key: string]: string }> {
+export async function loadLibraries() {
     const wl: { [key: string]: string } = await getJson(MODULE_WL_URL);
 
     for (const module in wl) {
         wl[module] = await getText(wl[module]);
     }
 
-    return wl;
-}()).then(val => {
-    whitelistCode = val;
-}, err => {
-    console.error(`Could not load whitelist: ${JSON.stringify(err)}.`);
-});
+    whitelistCode = wl;
+}
 
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
 // function to create an AsyncRun that does not run any user code.
