@@ -4,7 +4,7 @@ import { getUrl } from './utils/api/apiHelpers';
 
 type RespType = 'json' | 'text';
 
-function respJsonHandler(resp: Response, respType?: RespType): Promise<any> {
+function respHandler(resp: Response, respType?: RespType): Promise<any> {
   if (!resp.ok) {
     throw new Error(`Code ${resp.status} from ${resp.url}.`);
   }
@@ -31,7 +31,7 @@ export async function postJson(path: string,
     body[k] = fields[k];
   }
 
-  return await respJsonHandler(await fetch(getUrl(path), {
+  return await respHandler(await fetch(getUrl(path), {
     method: 'POST',
     body: JSON.stringify(body),
     headers: { 'Content-Type': 'application/json' }
@@ -39,9 +39,9 @@ export async function postJson(path: string,
 }
 
 export async function getJson(path: string): Promise<any> {
-  return await respJsonHandler(await fetch(path));
+  return await respHandler(await fetch(path));
 }
 
 export async function getText(path: string): Promise<any> {
-  return await respJsonHandler(await fetch(path), 'text');
+  return await respHandler(await fetch(path), 'text');
 }

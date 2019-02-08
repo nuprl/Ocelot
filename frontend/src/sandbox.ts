@@ -22,10 +22,6 @@ let whitelistCode: { [key: string]: string } = {};
 (async function(): Promise<{ [key: string]: string }> {
     const wl: { [key: string]: string } = await getJson(MODULE_WL_URL);
 
-    /* We assume 'wl' is a map from module name to URL (string).
-       Alternatively, it could be a map from module name to code (string),
-           in which case we'd basically be done by now. */
-
     for (const module in wl) {
         wl[module] = await getText(wl[module]);
     }
