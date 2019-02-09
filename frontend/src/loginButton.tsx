@@ -68,6 +68,12 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
     }
 
     onSuccess(response: GoogleLoginResponse | GoogleLoginResponseOffline) {
+        if (state.githubGist.getValue() !== 'no-gist' && localStorage.getItem('userEmail') !== null) { 
+            // if there is gist (or an attempt) and user is logged in before...
+            state.githubGist.next('no-gist');
+            return; // this prevents auto log in
+        }
+        
         validateUser(response as GoogleLoginResponse).then((response) => {
             if (isFailureResponse(response)) {
                 state.notify(response.data.message);

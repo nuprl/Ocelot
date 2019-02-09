@@ -72,6 +72,8 @@ export type Program =
      | { kind: 'loading' }
      | LoadedProgram;
 
+export type GithubGist = 'no-gist' | 'loading-gist' | 'loaded-gist' | 'failed-gist';
+
 export const currentProgram = new Rx.BehaviorSubject<Program>({ 
     kind: 'program',
     ...emptyFile
@@ -88,6 +90,8 @@ export const loggedIn = new Rx.BehaviorSubject<LoggedIn>({ kind: 'logged-out' })
 
 // Derived from loggedIn
 export const uiActive = new Rx.BehaviorSubject<boolean>(false);
+
+export const githubGist = new Rx.BehaviorSubject<GithubGist>('no-gist');
 
 function isUiActive(loggedIn: LoggedIn): boolean {
     return loggedIn.kind === 'logged-in';
