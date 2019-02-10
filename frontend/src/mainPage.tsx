@@ -53,7 +53,7 @@ export class Index extends React.Component<WithStyles<WithStylesClasses>, {
   allLibsLoaded: LibsLoad
 }> {
 
-  constructor(props: any) {
+  constructor(props: WithStyles<WithStylesClasses>) {
     super(props);
     this.state = {
       allLibsLoaded: 'waiting'
@@ -66,7 +66,7 @@ export class Index extends React.Component<WithStyles<WithStylesClasses>, {
         allLibsLoaded: 'ready'
       });
     }, (err) => {
-      console.error(`Could not load whitelist: ${JSON.stringify(err)}.`);
+      console.error(`Could not load libraries: ${JSON.stringify(err)}.`);
       this.setState({
         allLibsLoaded: 'failed'
       });
