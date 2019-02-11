@@ -85,7 +85,6 @@ type ExecutionProps = {
 
 type ExecutionButtonsState = {
   mode : sandbox.Mode,
-  uiActive: boolean,
   currentProgram: state.Program
 }
 
@@ -95,17 +94,15 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
     super(props);
     this.state = { 
       mode: this.props.sandbox.mode.getValue(),
-      uiActive: state.uiActive.getValue(),
       currentProgram: state.currentProgram.getValue()
     };
-    reactrx.connect(this, 'uiActive', state.uiActive);
     reactrx.connect(this, 'mode', this.props.sandbox.mode);
     reactrx.connect(this, 'currentProgram', state.currentProgram);
   }
 
   onRunOrTestClicked(mode: 'running' | 'testing') {
     const program = state.currentProgram.getValue();
-    if (this.state.uiActive && program.kind === 'program') {
+    if (state.uiActive.getValue() && program.kind === 'program') {
       saveHistory(program.name, program.content).then((res) => {
         if (isFailureResponse(res)) {
           // Suppress the notification if the browser is offline. Note that

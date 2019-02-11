@@ -2,8 +2,10 @@ import * as Rx from 'rxjs';
 import * as elementaryJS from '@stopify/elementary-js';
 import * as elementaryRTS from '@stopify/elementary-js/dist/runtime';
 import * as types from './types';
-import { console } from './errors';
 import * as state from './state';
+import { console } from './errors';
+import { getJson, getText } from './utils';
+import { MODULE_WL_URL } from './secrets';
 import { OCELOTVERSION } from './version';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 
@@ -14,6 +16,17 @@ export function version() {
         elementaryJS: EJSVERSION,
         ocelot: OCELOTVERSION
     };
+}
+
+let whitelistCode: { [key: string]: string } = {};
+export async function loadLibraries() {
+    const wl: { [key: string]: string } = await getJson(MODULE_WL_URL);
+
+    for (const module in wl) {
+        wl[module] = await getText(wl[module]);
+    }
+
+    whitelistCode = wl;
 }
 
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
@@ -95,7 +108,7 @@ export class Sandbox {
     opts() {
         return {
             consoleLog: (message: string) => this.repl!.log(message),
-            version: version
+            version, whitelistCode
         };
     }
     onRunOrTestClicked(mode: 'testing' | 'running') {
@@ -148,7 +161,7 @@ export class Sandbox {
         this.repl.echo(userInputLine);
         this.mode.next('running');
         this.runner.eval(
-            userInputLine, 
+            userInputLine,
             (result: elementaryJS.Result) => {
               this.mode.next('stopped');
               this.onResult(result, true);

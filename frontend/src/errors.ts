@@ -1,5 +1,5 @@
 import * as state from './state';
-import { CLD_FN_BASE_URL } from './secrets';
+import { getCloudFunctionBaseUrl } from './secrets';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 
@@ -37,7 +37,7 @@ function traceError(message: string) {
         body = JSON.stringify(err);
     }
 
-    fetch(`${CLD_FN_BASE_URL}error`, {
+    fetch(`${getCloudFunctionBaseUrl()}error`, {
         method: 'POST',
         body: body,
         headers: { 'Content-Type': 'application/json' }

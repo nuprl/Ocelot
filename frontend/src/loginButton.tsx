@@ -91,15 +91,16 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
             .then(files => {
                 state.files.next(files);
                 const email = state.email();
-                if (email === false) {
-                    throw new Error('Race condition--immediate logout');
+                if (email === false) { // This case is hit if user immediately logs out after logging in.
+                    this.onLogout();
+                    return;
                 }
                 state.loggedIn.next({ kind: 'logged-in', email  });
                 state.loadProgram.next({ kind: "nothing"});
             })
             .catch(reason =>
                 // TODO(arjun): Perhaps just retry?
-                state.notify(`Could not load files`));
+                    state.notify(`Could not load files`));
     }
 
     onFailure = (response: { error: string }) => {

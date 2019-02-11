@@ -51,7 +51,6 @@ type Props = {
 } & WithStyles<'emptyState' | 'pawIcon'>;
 
 type CodeEditorState = {
-    uiActive: boolean,
     loadProgram: state.Program
 };
 
@@ -63,11 +62,9 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         super(props);
         this.editor = undefined;
         this.state = {
-            uiActive: state.uiActive.getValue(),
             // On initialization, this will be nothing
             loadProgram: state.currentProgram.getValue()
         };
-        connect(this, 'uiActive', state.uiActive);
         connect(this, 'loadProgram', state.loadProgram);
     }
 
@@ -91,6 +88,11 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
                 increaseIndentPattern: /^.*\{[^}\"']*$/,
                 decreaseIndentPattern: /^(.*\*\/)?\s*\}[;\s]*$/
             },
+            brackets: [
+                ['{','}'],
+                ['(', ')']
+            ],
+            autoClosingPairs: [], // overrides autoclosing, disables autoclosing
         });
         monaco.languages.registerCompletionItemProvider('elementaryjs', {
             // A hacky way to get rid of autocomplete suggestions completely.
@@ -133,6 +135,9 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
 
         let codeEditor = this;
         let saveCode = function() {
+            if (!state.uiActive.getValue()) {
+                return;
+            }
             const program = state.currentProgram.getValue();
             if (program.kind !== 'program') return;
             saveHistory(program.name, program.content).then((res) => {
