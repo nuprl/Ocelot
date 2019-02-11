@@ -88,6 +88,11 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
                 increaseIndentPattern: /^.*\{[^}\"']*$/,
                 decreaseIndentPattern: /^(.*\*\/)?\s*\}[;\s]*$/
             },
+            brackets: [
+                ['{','}'],
+                ['(', ')']
+            ],
+            autoClosingPairs: [], // overrides autoclosing, disables autoclosing
         });
         monaco.languages.registerCompletionItemProvider('elementaryjs', {
             // A hacky way to get rid of autocomplete suggestions completely.
