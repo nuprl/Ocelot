@@ -48,17 +48,11 @@ type WithStylesClasses =
 
 class Index extends React.Component<WithStyles<WithStylesClasses>> {
 
-      componentWillMount() {
+      componentDidMount() {
         const gistParam = (new URLSearchParams(window.location.search)).get('gist');
         if (typeof gistParam === 'string') {
           state.githubGist.next('loading-gist');
-        }
-      }
-
-      componentDidMount() {
-        if (state.githubGist.getValue() === 'loading-gist') {
-          state.notify('Loading gist...');
-          const gistParam = (new URLSearchParams(window.location.search)).get('gist') as string;
+          state.notify('Loading Github gist...');
           getGithubGist(gistParam).then((res => {
             if (isFailureResponse(res)) {
               state.notify(res.data.message);

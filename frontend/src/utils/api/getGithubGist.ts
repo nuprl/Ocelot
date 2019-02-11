@@ -5,8 +5,6 @@ import {
   FailureResponse
 } from './apiHelpers';
 
-import { console as logError } from '../../errors';
-
 export type GithubGistResponse = SuccessResponse<{ code: string }> | FailureResponse;
 
 export const getGithubGist = async (gistID: string): Promise<GithubGistResponse> => {
@@ -15,7 +13,7 @@ export const getGithubGist = async (gistID: string): Promise<GithubGistResponse>
     const response = await fetch(`https://gist.githubusercontent.com/${gistID}/raw`);
 
     if (response.status !== 200) {
-      return failureResponse('Cannot fetch gist');
+      return failureResponse('Cannot load Github gist');
     }
 
     return successResponse({
@@ -23,7 +21,6 @@ export const getGithubGist = async (gistID: string): Promise<GithubGistResponse>
     });
 
   } catch (error) {
-    logError.log(error);
-    return failureResponse('Error fetching gist');
+    return failureResponse('Error loading Github gist');
   }
 };
