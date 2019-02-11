@@ -57,6 +57,5 @@
     "deploy": "rsync -azdOL build/ ocelot@ocelot-ide.org:/var/www/ocelot-ide.org/",
     "deploy-beta": "rsync -azdOL build/ beta/ && cd beta && git add -A . && git commit -m commit && git push",
     "test": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts test --env=jsdom"
-  },
-  "homepage": "https://storage.googleapis.com/paws/"
+  }
 }
