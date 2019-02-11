@@ -17,8 +17,10 @@ function respHandler(resp: Response, respType?: RespType): Promise<any> {
   }
 }
 
-export async function postJson(path: string,
-  fields: { [key: string]: any }): Promise<any> {
+export async function postJson(
+    path: string,
+    fields: { [key: string]: any }
+  ): Promise<any> {
 
   const body: any = {
     userEmail: localStorage.getItem('userEmail'),

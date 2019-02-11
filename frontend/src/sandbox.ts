@@ -78,8 +78,7 @@ export class Sandbox {
     setConsole(console: types.HasConsole) {
         this.repl = console;
     }
-
-
+    
     private onResult(result: elementaryJS.Result, showNormal: boolean) {
         if (result.type === 'exception') {
             let message = result.value instanceof Error ?
@@ -95,8 +94,7 @@ export class Sandbox {
             }
             this.repl.error(message + '\n... ' +
                 result.stack.slice(1).join('\n... '));
-        }
-        else if (result.type === 'normal' && showNormal) {
+        } else if (result.type === 'normal' && showNormal) {
             this.repl.log(result.value);
         }
     }
@@ -124,7 +122,7 @@ export class Sandbox {
             console.error(`Clicked Run/Test with currentProgram.kind === ${program.kind}`);
             return;
         }
-        this.repl.log(new Date().toLocaleString('en-us', {timeZoneName:'short'}));
+        this.repl.log(new Date().toLocaleString('en-us', { timeZoneName: 'short' }));
         this.repl.log('Compiling...');
         const runner = elementaryJS.compile(program.content, this.opts());
         if (runner.kind === 'error') {

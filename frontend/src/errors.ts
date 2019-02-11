@@ -8,8 +8,7 @@ function getEmail() {
 
     if (v.kind !== 'logged-out') {
         return v.email;
-    }
-    else {
+    } else {
         return '';
     }
 }
@@ -33,8 +32,7 @@ function traceError(message: string) {
     let body: string;
     try {
         body = JSON.stringify(err);
-    }
-    catch (exn) {
+    } catch (exn) {
         err.message = String(err.message);
         body = JSON.stringify(err);
     }
@@ -64,6 +62,6 @@ const tracingConsole = {
         traceError(message);
     }
 
-}
+};
 
 export { tracingConsole as console };
