@@ -533,6 +533,7 @@ paws.use(morgan(
 paws.use(cors({
 origin: [
   'https://www.ocelot-ide.org',
+  'https://umass-compsci220.github.io',
   'http://localhost:8080',
   'http://localhost:8081',
 ]}));
