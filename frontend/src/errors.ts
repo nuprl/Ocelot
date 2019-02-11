@@ -1,5 +1,5 @@
 import * as state from './state';
-import { CLD_FN_BASE_URL } from './secrets';
+import { getCloudFunctionBaseUrl } from './secrets';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 import { OCELOTVERSION } from './version';
 
@@ -8,8 +8,7 @@ function getEmail() {
 
     if (v.kind !== 'logged-out') {
         return v.email;
-    }
-    else {
+    } else {
         return '';
     }
 }
@@ -33,13 +32,12 @@ function traceError(message: string) {
     let body: string;
     try {
         body = JSON.stringify(err);
-    }
-    catch (exn) {
+    } catch (exn) {
         err.message = String(err.message);
         body = JSON.stringify(err);
     }
 
-    fetch(`${CLD_FN_BASE_URL}error`, {
+    fetch(`${getCloudFunctionBaseUrl()}error`, {
         method: 'POST',
         body: body,
         headers: { 'Content-Type': 'application/json' }
@@ -64,6 +62,6 @@ const tracingConsole = {
         traceError(message);
     }
 
-}
+};
 
 export { tracingConsole as console };

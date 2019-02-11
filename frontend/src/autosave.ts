@@ -6,8 +6,7 @@ import { currentProgram, dirty, notification } from './state';
 window.addEventListener('beforeunload', (event) => {
     if (dirty.getValue() === 'saved') {
         return null;
-    }
-    else {
+    } else {
         // NOTE(arjun): It does not appear to actually show this message.
         event.returnValue = `You may lose changes if you close the page.`;
         return true;
@@ -42,8 +41,7 @@ dirty.pipe(
             // may not be saved. However, the next save request, which fires
             // almost immediately, does isBufferSaved.next(false).
             dirty.next('saved');
-        }
-        else {
+        } else {
             // Suppress the notification if the browser is offline. Note that
             // we still try to save, even when the UA thinks we are offline.
             // I am not certain that online/offline detection is particularly

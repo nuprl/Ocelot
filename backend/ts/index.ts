@@ -1,4 +1,3 @@
-
 import * as Storage from '@google-cloud/storage'; // Google cloud storage
 import * as Datastore from '@google-cloud/datastore';
 import { OAuth2Client } from 'google-auth-library'; // for authenticating google login
@@ -10,8 +9,7 @@ import * as cors from 'cors'; // allows sending http requests to different domai
 import * as uid from 'uid-safe';
 import * as morgan from 'morgan'; // for logging in all http traffic on console.
 import { ErrorReporting } from '@google-cloud/error-reporting';
-import * as https from "https"
-import * as http from "http"
+import * as rpn from 'request-promise-native';
 import { URLSearchParams } from 'url';
 
 const errorReporting = new ErrorReporting();
@@ -161,10 +159,7 @@ async function checkValidUser(userEmail: string): Promise<boolean> {
     .createQuery(datastoreKind)
     .filter('__key__', '=', datastore.key([datastoreKind, userEmail]));
   const [results] = await datastore.runQuery(query);
-  if (results.length === 1) {
-    return true;
-  }
-  return false;
+  return results.length === 1;
 }
 
 async function updateSessionId(userEmail: string, sessionId: string): Promise<void> {
@@ -241,7 +236,7 @@ async function changeFile(req: Request) {
   }
 
   const currentFileChange: FileChange = req.body.fileChanges;
-  if (!isSimpleValidFileName(currentFileChange.fileName)) { 
+  if (!isSimpleValidFileName(currentFileChange.fileName)) {
     // if it's not a 'simple' valid filename
     return failureResponse(`Could not make changes to file: ${currentFileChange.fileName}, name not valid`);
   }
@@ -251,8 +246,8 @@ async function changeFile(req: Request) {
     // Non-null assertion of changes can be saved
     await currentFile.save(currentFileChange.changes!, { resumable: false });
     // Taken from: https://cloud.google.com/nodejs/docs/reference/storage/1.7.x/File.html#save
-    /* There is some overhead when using a resumable upload that can cause noticeable performance 
-    degradation while uploading a series of small files. When uploading files less than 10MB, 
+    /* There is some overhead when using a resumable upload that can cause noticeable performance
+    degradation while uploading a series of small files. When uploading files less than 10MB,
     it is recommended that the resumable feature is disabled. */
     await currentFile.setMetadata({ contentType: 'text/javascript' });
   }
@@ -282,7 +277,7 @@ async function changeFile(req: Request) {
  *  generation?: number // if there's a generation number, it's a restore
  *  // operation
  * }
- * 
+ *
  * It will save the given code to its respective
  * directory in the history bucket.
  *
@@ -407,8 +402,8 @@ async function getFileHistory(req: Request) {
 /**
  * Verifies the given token in request
  * and check if user is allowed to be sign in.
- * 
- * @param {Request} req 
+ *
+ * @param {Request} req
  * @returns statusCode and contents in body
  */
 async function login(req: Request) {
@@ -463,46 +458,12 @@ async function login(req: Request) {
   };
 }
 
-function isHTTP(url: string) {
-  return (url.slice(0,7) === "http://");
-}
-
-function isHTTPS(url: string) {
-  return (url.slice(0,8) === "https://");
-}
-
-function downloadUrl(url: string): 
-    Promise<{errcode:string, data:string | Buffer}> {
-  let payload: Buffer[] = [];
-  return new Promise<{errcode:string, data:string | Buffer}> ( resolve => {
-    try {
-      let responseCallback = (res: http.IncomingMessage) => {
-        if (res.statusCode !== undefined && res.statusCode !== 200) {
-          resolve({errcode: "error", data: "URL got redirected"})
-        }
-        res.on('data', function (chunk : Buffer) {
-          payload.push(chunk);
-        });
-        res.on('end', function () {
-          const data = Buffer.concat(payload);
-          resolve({errcode: "ok", data: data});
-        })
-      }
-      if (isHTTP(url)) {
-        http.get(url, responseCallback).on('error', (e) => {
-          resolve({errcode: "error", data: "Invalid URL"});
-        });
-      } else if (isHTTPS(url)) {
-        https.get(url, responseCallback).on('error', (e) => {
-          resolve({errcode: "error", data: "Invalid URL"});
-        });
-      } else {
-        resolve({errcode: "error", data: "URL not supported"});
-      }
-    } catch(e) {
-      resolve({errcode: "exception", data: e.toString()});
-    }
-  });
+async function downloadUrl(url: string) {
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return await rpn.get(url, { encoding: null });
+  } else {
+    throw 'URL not supported';
+  }
 }
 
 async function getUrl(req: Request, res: Response) {
@@ -525,14 +486,13 @@ async function getUrl(req: Request, res: Response) {
       res.status(500).send("Invalid user");
       return;
     }
-    const result = await downloadUrl(url as string);
-    if (result.errcode !== "ok") {
-      res.status(500).send(result.data);
-      return;
+    try {
+      res.status(200).send(await downloadUrl(url as string));
+    } catch(e) {
+      res.status(500).send(typeof e === 'string' ? e : 'Invalid URL');
     }
-    res.status(200).send(result.data);
   } catch(e) {
-    res.status(500).send("Exception: " + e.toString);
+    res.status(500).send('Exception: ' + e.toString());
   }
 }
 
@@ -563,7 +523,7 @@ morgan.token('ejsversion', (req, res) => {
 });
 
 paws.use(morgan(
-  ':method :url :status :username ocelot-:ocelotversion ejs-:ejsversion :res[content-length] - :response-time ms', 
+  ':method :url :status :username ocelot-:ocelotversion ejs-:ejsversion :res[content-length] - :response-time ms',
   {
     stream: {
       write: (str: string) => console.log(str)
@@ -572,7 +532,8 @@ paws.use(morgan(
 
 paws.use(cors({
 origin: [
-  'https://www.ocelot-ide.org', 
+  'https://www.ocelot-ide.org',
+  'https://umass-compsci220.github.io',
   'http://localhost:8080',
   'http://localhost:8081',
 ]}));
@@ -622,14 +583,10 @@ paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
 paws.get('/geturl', getUrl);
 
-function str(x: any) {
-  if (typeof x === 'string') {
-    return x;
-  }
+function str(x: any): string {
   try {
-    return JSON.stringify(x);
-  }
-  catch (exn) {
+    return (typeof x === 'string') ? x : JSON.stringify(x);
+  } catch (e) {
     return 'could not stringify';
   }
 }
@@ -654,7 +611,7 @@ paws.post('/error', wrapHandler(async req => {
 paws.post('/exception', wrapHandler(async req => {
   const contentType = req.headers['content-type'];
   if (contentType !== 'application/json') {
-    errorReporting.report('BadRequest:', req, 
+    errorReporting.report('BadRequest:', req,
     `Content-type: ${contentType}`);
     return { statusCode: 400, body: { status: 'failure' } };
   }

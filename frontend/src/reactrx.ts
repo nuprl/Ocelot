@@ -11,14 +11,14 @@ import * as React from 'react';
  * connect(this, 'x', observableX);
  *
  */
-export function connect<P, S extends { [key in K]: T }  , T, K extends keyof S>(
+export function connect<P, S extends { [Key in K]: T }  , T, K extends keyof S>(
     component: React.Component<P, S>,
     key: K,
     observable: Rx.Observable<T>) {
 
     const didMount = component.componentDidMount;
     const willUnmount = component.componentWillUnmount;
-    let subscription : Rx.Subscription | undefined;
+    let subscription: Rx.Subscription | undefined;
 
     component.componentDidMount = () => {
         if (didMount) {

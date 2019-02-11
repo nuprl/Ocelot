@@ -1,4 +1,4 @@
-import { CLD_FN_BASE_URL } from '../../secrets';
+import { getCloudFunctionBaseUrl } from '../../secrets';
 
 export interface SuccessResponse<T> {
     status: 'SUCCESS';
@@ -42,5 +42,5 @@ export const validEmailSession = (): boolean => {
 };
 
 export const getUrl = (path: string): string => {
-    return `${CLD_FN_BASE_URL}${path}`;
+    return `${getCloudFunctionBaseUrl()}${path}`;
 };
