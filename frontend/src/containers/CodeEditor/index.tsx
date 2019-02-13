@@ -36,7 +36,7 @@ const monacoOptions: monacoEditor.editor.IEditorConstructionOptions = {
     fontSize: 14,
     fontFamily: 'Fira Mono',
     autoIndent: true,
-    folding: false,
+    folding: true,
     minimap: {
         enabled: false,
     },
