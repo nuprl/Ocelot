@@ -1,4 +1,4 @@
-import { getCloudFunctionBaseUrl } from '../../secrets';
+import { CLD_FN_BASE_URL } from '../../secrets';
 
 export interface SuccessResponse<T> {
     status: 'SUCCESS';
@@ -31,16 +31,10 @@ export const successResponse = <T>(data: T): SuccessResponse<T> => ({
 });
 
 export const validEmailSession = (): boolean => {
-    const userEmail = localStorage.getItem('userEmail');
-    const sessionId = localStorage.getItem('sessionId');
-
-    if (userEmail === null || sessionId === null) {
-        return false;
-    }
-
-    return true;
+    return localStorage.getItem('userEmail') !== null &&
+            localStorage.getItem('sessionId') !== null;
 };
 
 export const getUrl = (path: string): string => {
-    return `${getCloudFunctionBaseUrl()}${path}`;
+    return `${CLD_FN_BASE_URL}${path}`;
 };
