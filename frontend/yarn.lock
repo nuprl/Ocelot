@@ -109,17 +109,17 @@
     "@babel/runtime" "^7.0.0-beta.42"
     recompose "^0.27.0"
 
-"@stopify/elementary-js@1.0.22":
-  version "1.0.22"
-  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.22.tgz#8c987a55e64948ed41202c152fe5022517e7482a"
-  integrity sha512-vy4qSsuFPsZpl6HgvE/SsjXl3gLWNgw4UgxPSZP7vgvR9z4mCyBLU2ulLCXYymVV7wAVDL8DfFv2F+876Rp5hQ==
+"@stopify/elementary-js@1.0.23":
+  version "1.0.23"
+  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.23.tgz#a396ca24257c9f44d61ac702ada277d5e32d402b"
+  integrity sha512-9CR7NuzF+h54oAOYSMBOCG5LHTzSzLRYSNiJKMK30H6crsWlVNOcmxpcJcXqVSM+UEdZqu6cuMLocBZ2ge0c2g==
   dependencies:
     "@stopify/project-interpreter" "1.1.4"
     "@types/babel-types" "^6.7.16"
     babel-core "^6.26.3"
     babel-plugin-transform-es2015-classes "^6.24.1"
     babel-types "^6.26.0"
-    stopify "0.5.3-elementaryJS"
+    stopify "0.5.4-elementaryJS"
 
 "@stopify/project-interpreter@1.1.4":
   version "1.1.4"
@@ -4873,9 +4873,10 @@ stopify-estimators@^0.5.0:
   dependencies:
     detect-browser "^1.12.0"
 
-stopify@0.5.3-elementaryJS:
-  version "0.5.3-elementaryJS"
-  resolved "https://registry.yarnpkg.com/stopify/-/stopify-0.5.3-elementaryJS.tgz#e462c1d655656ca4c46edb689964867450929c7c"
+stopify@0.5.4-elementaryJS:
+  version "0.5.4-elementaryJS"
+  resolved "https://registry.yarnpkg.com/stopify/-/stopify-0.5.4-elementaryJS.tgz#7ec3dbcad87d5691a671cab6311b4a304c715f6f"
+  integrity sha512-9Yrz6mYW7wLZPu7NGAF/vwc1dOPPjk+NtnczEf6OU12HaEmT59LReujPJkcCVFCx/XYH/UTEYPuVwjtZW00gKw==
   dependencies:
     babel-core "^6.26.3"
     babel-loader "^7.1.2"
