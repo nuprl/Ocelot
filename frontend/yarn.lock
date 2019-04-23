@@ -109,10 +109,10 @@
     "@babel/runtime" "^7.0.0-beta.42"
     recompose "^0.27.0"
 
-"@stopify/elementary-js@1.0.23":
-  version "1.0.23"
-  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.23.tgz#a396ca24257c9f44d61ac702ada277d5e32d402b"
-  integrity sha512-9CR7NuzF+h54oAOYSMBOCG5LHTzSzLRYSNiJKMK30H6crsWlVNOcmxpcJcXqVSM+UEdZqu6cuMLocBZ2ge0c2g==
+"@stopify/elementary-js@1.0.24":
+  version "1.0.24"
+  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.0.24.tgz#f3a5e4a7e31bdc1f77c786e9177e8c948f674677"
+  integrity sha512-2OAX7iXM+ADZh3iEoozzRWn6Wx06UvtNhE9Lv/MN5pn+lgdTTt108IZ57Y+ER6KLMuCQ1gciT58LCt/9ItQYXQ==
   dependencies:
     "@stopify/project-interpreter" "1.1.4"
     "@types/babel-types" "^6.7.16"
