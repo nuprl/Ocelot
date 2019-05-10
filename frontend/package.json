@@ -11,7 +11,7 @@
     "@types/react": "^16.4.7",
     "@types/react-dom": "^16.0.6",
     "babel-traverse": "^6.26.0",
-    "console-feed": "^2.8.3",
+    "console-feed": "2.8.3",
     "detect-browser": "^3.0.0",
     "get-own-enumerable-property-symbols": "^3.0.0",
     "is-obj": "^1.0.1",
