@@ -18,13 +18,16 @@ export function version() {
     };
 }
 
-let whitelistCode: { [key: string]: string } = {};
+let ws: WebSocket | undefined,
+    whitelistCode: { [key: string]: string } = {};
 export async function loadLibraries() {
     const wl: { [key: string]: string } = await getJson(MODULE_WL_URL);
 
     for (const module in wl) {
         wl[module] = await getText(wl[module]);
     }
+
+    ws = wl.robotLibrary ? new WebSocket('ws://localhost:8000') : undefined;
 
     whitelistCode = wl;
 }
@@ -73,12 +76,18 @@ export class Sandbox {
     constructor() {
         this.runner = emptyStopifyRunner(this.opts());
         this.mode = new Rx.BehaviorSubject<Mode>('stopped');
+
+        if (ws) {
+            ws.onopen = (e) => { this.repl.log('Connected.'); };
+            ws.onclose = (e) => { this.repl.error('Disconnected.'); };
+            ws.onerror = (e) => { this.repl.error('Network error.'); };
+        }
     }
 
     setConsole(console: types.HasConsole) {
         this.repl = console;
     }
-    
+
     private onResult(result: elementaryJS.Result, showNormal: boolean) {
         if (result.type === 'exception') {
             let message = result.value instanceof Error ?
@@ -108,7 +117,7 @@ export class Sandbox {
     opts() {
         return {
             consoleLog: (message: string) => this.repl!.log(message),
-            version, whitelistCode
+            version, whitelistCode, ws
         };
     }
     onRunOrTestClicked(mode: 'testing' | 'running') {
