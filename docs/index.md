@@ -172,6 +172,6 @@ with the authors of Pyret.
 [Joydeep Biswas]: https://www.joydeepb.com
 [JavaScript: The Good Parts]: http://shop.oreilly.com/product/9780596517748.do
 [Stopify]: http://www.stopify.org
-[Animated Robot Path Planner (RRT)]: https://gist.github.com/joydeep-b/1f40f8584709404c07f1da24d025a194
-[bouncing ball animation]: https://gist.github.com/joydeep-b/8956ab7ab21e36a0f4c12fa289f952a4
+[Animated Robot Path Planner (RRT)]: https://www.ocelot-ide.org/?gist=joydeep-b/1f40f8584709404c07f1da24d025a194
+[bouncing ball animation]: https://www.ocelot-ide.org/?gist=joydeep-b/8956ab7ab21e36a0f4c12fa289f952a4
 [Ocelot]: https://www.ocelot-ide.org/
