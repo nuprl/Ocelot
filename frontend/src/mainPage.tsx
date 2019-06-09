@@ -41,6 +41,26 @@ const styles: StyleRulesCallback = theme => {
   };
 };
 
+const checkAndLoadGist = () => {
+  const gistParam = (new URLSearchParams(window.location.search)).get('gist');
+    if (typeof gistParam === 'string') {
+      state.githubGist.next('loading-gist');
+      state.notify('Loading Github gist...');
+      getGithubGist(gistParam).then((res => {
+        if (isFailureResponse(res)) {
+          state.notify(res.data.message);
+          state.githubGist.next('failed-gist');
+          return;
+        }
+        const gistFileObj = { name: 'gist.js', content: res.data.code };
+        state.files.next([ gistFileObj.name]);
+        state.loadProgram.next({ kind: "program", ...gistFileObj });
+        state.githubGist.next('loaded-gist');
+        state.notify('Gist loaded');
+      }));
+    }
+}
+
 type WithStylesClasses =
   | 'root'
   | 'jumboContent'
@@ -68,30 +88,13 @@ export class Index extends React.Component<WithStyles<WithStylesClasses>, {
       this.setState({
         allLibsLoaded: 'ready'
       });
+      checkAndLoadGist();
     }, (err) => {
       console.error(`Could not load libraries: ${JSON.stringify(err)}.`);
       this.setState({
         allLibsLoaded: 'failed'
       });
     });
-    
-    const gistParam = (new URLSearchParams(window.location.search)).get('gist');
-    if (typeof gistParam === 'string') {
-      state.githubGist.next('loading-gist');
-      state.notify('Loading Github gist...');
-      getGithubGist(gistParam).then((res => {
-        if (isFailureResponse(res)) {
-          state.notify(res.data.message);
-          state.githubGist.next('failed-gist');
-          return;
-        }
-        const gistFileObj = { name: 'gist.js', content: res.data.code };
-        state.files.next([ gistFileObj.name]);
-        state.loadProgram.next({ kind: "program", ...gistFileObj });
-        state.githubGist.next('loaded-gist');
-        state.notify('Gist loaded');
-      }));
-    }
   }
 
   render() {
