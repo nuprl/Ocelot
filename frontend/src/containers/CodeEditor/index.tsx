@@ -151,12 +151,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, function() {
             // Ctrl + Enter: Run code
             saveCode();
-            codeEditor.props.sandbox.onRunOrTestClicked('running');
-        }, '');
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter, function() {
-            // Ctrl + Shift + Enter: Run tests
-            saveCode();
-            codeEditor.props.sandbox.onRunOrTestClicked('testing');
+            codeEditor.props.sandbox.onRunClicked();
         }, '');
         this.editor = editor;
     }
@@ -175,7 +170,7 @@ class CodeEditor extends React.Component<Props, CodeEditorState> {
         }
         this.editor.layout();
     }
-    
+
     onChange(code: string)  {
         if (this.state.loadProgram.kind !== 'program') {
             console.error('editor received onChange without a loaded program');

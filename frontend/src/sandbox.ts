@@ -9,7 +9,7 @@ import { MODULE_WL_URL } from './secrets';
 import { OCELOTVERSION } from './version';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 
-export type Mode = 'running' | 'testing' | 'stopped' | 'stopping';
+export type Mode = 'running' | 'stopped' | 'stopping';
 
 export function version() {
     return {
@@ -63,7 +63,7 @@ function emptyStopifyRunner(opts: elementaryJS.CompilerOpts) {
  * When the user's program changes, call setCode. Note that this does *not*
  * recompile the program.
  *
- * Finally, use onRunOrTestClick, onConsoleInput, and onStopClicked to actually
+ * Finally, use onRunClick, onConsoleInput, and onStopClicked to actually
  * control program execution.
  *
  */
@@ -120,15 +120,10 @@ export class Sandbox {
             version, whitelistCode, ws
         };
     }
-    onRunOrTestClicked(mode: 'testing' | 'running') {
-        const currentMode = this.mode.getValue();
-        if (currentMode === 'testing' || currentMode === 'running') {
-            console.error(`Clicked Run while in mode ${this.mode}`);
-            return;
-        }
+    onRunClicked() {
         const program = state.currentProgram.getValue();
         if (program.kind !== 'program') {
-            console.error(`Clicked Run/Test with currentProgram.kind === ${program.kind}`);
+            console.error(`Clicked Run with currentProgram.kind === ${program.kind}`);
             return;
         }
         this.repl.log(new Date().toLocaleString('en-us', { timeZoneName: 'short' }));
@@ -139,22 +134,13 @@ export class Sandbox {
             return;
         }
         this.repl.log('Compilation succesful.');
-        if (mode === 'running') {
-            this.repl.log('Starting program...');
-        } else if (mode === 'testing') {
-            this.repl.log('Running tests...');
-        }
+        this.repl.log('Starting program...');
         this.runner = runner;
-        elementaryRTS.enableTests(mode === 'testing');
-        this.mode.next(mode);
+        elementaryRTS.enableTests(false);
+        this.mode.next('running');
         runner.run(result => {
-            const currentMode = this.mode.getValue();
             this.onResult(result, false);
-            if (currentMode === 'testing' && result.type !== 'exception') {
-              const summary = elementaryRTS.summary(true);
-              this.repl.log(summary.output, ...summary.style);
-            }
-            if (currentMode !== 'testing' && result.type === 'normal') {
+            if (result.type === 'normal') {
                 this.repl.log('Program terminated normally.');
             }
             this.mode.next('stopped');

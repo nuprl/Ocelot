@@ -1,13 +1,11 @@
 import * as React from 'react';
 import SplitPane from 'react-split-pane';
-import CanvasOutput from './components/CanvasOutput';
 import OutputPanel from './OutputPanel';
 import './static/styles/SplitPane.css';
 import red from '@material-ui/core/colors/red';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import PlayIcon from '@material-ui/icons/PlayArrow';
 import CodeEditor from './containers/CodeEditor';
-import ExploreIcon from '@material-ui/icons/Spellcheck';
 import Button from '@material-ui/core/Button';
 import StopIcon from '@material-ui/icons/Stop';
 import DownloadIcon from '@material-ui/icons/ArrowDownward';
@@ -29,7 +27,6 @@ import { console } from './errors';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import FileIcon from '@material-ui/icons/FileCopy';
-import CanvasIcon from '@material-ui/icons/Wallpaper';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -92,7 +89,7 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
 
   constructor(props: ExecutionProps) {
     super(props);
-    this.state = { 
+    this.state = {
       mode: this.props.sandbox.mode.getValue(),
       currentProgram: state.currentProgram.getValue()
     };
@@ -100,7 +97,7 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
     reactrx.connect(this, 'currentProgram', state.currentProgram);
   }
 
-  onRunOrTestClicked(mode: 'running' | 'testing') {
+  onRunClicked() {
     const program = state.currentProgram.getValue();
     if (state.uiActive.getValue() && program.kind === 'program') {
       saveHistory(program.name, program.content).then((res) => {
@@ -118,28 +115,20 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
       })
       .catch(err => console.log(err));
     }
-    this.props.sandbox.onRunOrTestClicked(mode);
+    this.props.sandbox.onRunClicked();
   }
 
   render() {
     const { currentProgram, mode } = this.state;
     const mayRun = currentProgram.kind === 'program' && mode === 'stopped';
-    const mayStop = (mode === 'running' || mode === 'testing');
+    const mayStop = (mode === 'running');
     return [
       <Button key="run-button" color="secondary"
-        onClick={() => this.onRunOrTestClicked('running')}
+        onClick={() => this.onRunClicked()}
         disabled={!mayRun}>
         <PlayIcon color="inherit" />
         <span id="toolbar-buttons-text">
           Run
-        </span>
-      </Button>,
-      <Button key="test-button" color="secondary"
-        onClick={() => this.onRunOrTestClicked('testing')}
-        disabled={!mayRun}>
-        <ExploreIcon color="inherit" />
-        <span id="toolbar-buttons-text">
-          Test
         </span>
       </Button>,
       <MuiThemeProvider key="stop-button" theme={redTheme}>
@@ -157,7 +146,7 @@ class ExecutionButtons extends React.Component<ExecutionProps, ExecutionButtonsS
   }
 }
 
-const MustLoginDialog: React.StatelessComponent<{open: boolean, onClose: () => void }> = 
+const MustLoginDialog: React.StatelessComponent<{open: boolean, onClose: () => void }> =
   ({ open, onClose }) => (
     <Dialog
           open={open}
@@ -229,9 +218,9 @@ class JumboContent extends React.Component<Props, JumboContentState> {
       mustLoginDialogOpen: false,
     }
   }
- 
-  togglePanel = (elementId: string, 
-    styleProperty: 'width' | 'height', 
+
+  togglePanel = (elementId: string,
+    styleProperty: 'width' | 'height',
     defaultSize: number | string, // if default size is number, it'll be in pixel
     closedSize: number | string ) => {
     let element = document.getElementById(elementId);
@@ -282,7 +271,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     if (isTiny && matches.length > 1) {
       // remove latest width/height
       let currIndex = -1;
-      parent.setAttribute('style', 
+      parent.setAttribute('style',
         currentStyle.replace(stylePropRegx, (match, groupOne) => {
             if (typeof groupOne === 'undefined') { // if matched
               currIndex += 1;
@@ -306,8 +295,8 @@ class JumboContent extends React.Component<Props, JumboContentState> {
     return (
       <div className={this.props.classes.root}>
         <Notification />
-        <MustLoginDialog 
-          open={mustLoginDialogOpen} 
+        <MustLoginDialog
+          open={mustLoginDialogOpen}
           onClose={() => this.setState({ mustLoginDialogOpen: false})}
         />
         <AppBar position="absolute">
@@ -320,7 +309,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
                 Files
               </span>
             </Button>
-            <ExecutionButtons 
+            <ExecutionButtons
               sandbox={this.sandbox} />
             <DownloadButton />
             <Button
@@ -329,14 +318,6 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               <ConsoleIcon />
               <span id="toolbar-buttons-text">
                 Console
-              </span>
-            </Button>
-            <Button
-              color="secondary"
-              onClick={() => this.togglePanel('codeEditor', 'width', '50%', '100%')}>
-              <CanvasIcon />
-              <span id="toolbar-buttons-text">
-                Canvas
               </span>
             </Button>
             <HistoryButton />
@@ -359,23 +340,15 @@ class JumboContent extends React.Component<Props, JumboContentState> {
                 primary="second"
                 pane2Style={{ maxHeight: '100%' }}
               >
-                <SplitPane
-                  split="vertical"
-                  defaultSize="50%"
-                  minSize={0}
-                  maxSize="100%"
-                  pane1Style={{ maxWidth: '100%' }}>
-                  <div style={{ width: '100%', height: '100%', minWidth: '286px' }} id="codeEditor">
-                    <CodeEditor 
-                      openMustLogin={() => this.setState({mustLoginDialogOpen: true})}
-                      sandbox={this.sandbox}
-                    />
-                  </div>
-                  <CanvasOutput />
-                </SplitPane>
-                <OutputPanel 
-                  sandbox={this.sandbox} 
-                  aref={x => this.console = x} 
+                <div style={{ width: '100%', height: '100%', minWidth: '286px' }} id="codeEditor">
+                  <CodeEditor
+                    openMustLogin={() => this.setState({mustLoginDialogOpen: true})}
+                    sandbox={this.sandbox}
+                  />
+                </div>
+                <OutputPanel
+                  sandbox={this.sandbox}
+                  aref={x => this.console = x}
                   openMustLogin={() => this.setState({mustLoginDialogOpen: true})}
                 />
               </SplitPane>
