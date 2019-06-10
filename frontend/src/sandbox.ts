@@ -9,6 +9,10 @@ import { MODULE_WL_URL } from './secrets';
 import { OCELOTVERSION } from './version';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 
+const simMap: { [key: string]: number } = {
+    'ocelot-1@cs.umass.edu': 8001
+}
+
 export type Mode = 'running' | 'stopped' | 'stopping';
 
 export function version() {
@@ -18,16 +22,13 @@ export function version() {
     };
 }
 
-let ws: WebSocket | undefined,
-    whitelistCode: { [key: string]: string } = {};
+let whitelistCode: { [key: string]: string } = {};
 export async function loadLibraries() {
     const wl: { [key: string]: string } = await getJson(MODULE_WL_URL);
 
     for (const module in wl) {
         wl[module] = await getText(wl[module]);
     }
-
-    ws = wl.robotLibrary ? new WebSocket('ws://localhost:8000') : undefined;
 
     whitelistCode = wl;
 }
@@ -68,7 +69,7 @@ function emptyStopifyRunner(opts: elementaryJS.CompilerOpts) {
  *
  */
 export class Sandbox {
-
+    private ws: WebSocket | undefined;
     private runner: elementaryJS.CompileOK;
     private repl!: types.HasConsole; // bang is 'definite assignment'
     public mode: Rx.BehaviorSubject<Mode>;
@@ -76,16 +77,26 @@ export class Sandbox {
     constructor() {
         this.runner = emptyStopifyRunner(this.opts());
         this.mode = new Rx.BehaviorSubject<Mode>('stopped');
-
-        if (ws) {
-            ws.onopen = (e) => { this.repl.log('Connected.'); };
-            ws.onclose = (e) => { this.repl.error('Disconnected.'); };
-            ws.onerror = (e) => { this.repl.error('Network error.'); };
-        }
     }
 
     setConsole(console: types.HasConsole) {
         this.repl = console;
+    }
+
+    setWS() {
+        const email: string | null = localStorage.getItem('userEmail');
+
+        if (email) {
+            this.ws = new WebSocket(
+                `ws://localhost:${simMap[email] || 8000}`
+            );
+            this.ws.onopen = e => this.repl.log('Connected.');
+            this.ws.onclose = e => this.repl.error('Disconnected.');
+            this.ws.onerror = e => this.repl.error('Network error.');
+        } else {
+            this.ws && this.ws.close();
+            delete this.ws;
+        }
     }
 
     private onResult(result: elementaryJS.Result, showNormal: boolean) {
@@ -117,7 +128,8 @@ export class Sandbox {
     opts() {
         return {
             consoleLog: (message: string) => this.repl!.log(message),
-            version, whitelistCode, ws
+            ws: this.ws,
+            version, whitelistCode
         };
     }
     onRunClicked() {

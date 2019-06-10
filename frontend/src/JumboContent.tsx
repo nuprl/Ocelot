@@ -324,7 +324,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             <div style={classes.flex} />
             <OfflineIndicator />
             <div style={{ display: 'inline-block', width: '0.5em' }} />
-            <UserLogin/>
+            <UserLogin sandbox={this.sandbox}/>
           </Toolbar>
         </AppBar>
         <SplitPane split="vertical" style={{height:'100%'}} defaultSize={250} minSize={0}>

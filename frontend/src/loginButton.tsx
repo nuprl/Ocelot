@@ -5,10 +5,11 @@ import { validateUser } from './utils/api/validateUser';
 import { isFailureResponse } from './utils/api/apiHelpers';
 import * as state from './state';
 import * as utils from './utils';
+import { Sandbox } from './sandbox';
 import { LOGIN_CLIENT_ID } from './secrets';
 
 import Fade from '@material-ui/core/Fade';
-import { GoogleLogin, } from 'react-google-login';
+import { GoogleLogin } from 'react-google-login';
 import Button from '@material-ui/core/Button';
 
 import { GoogleLogout } from 'react-google-login';
@@ -54,14 +55,18 @@ function GoogleLogoutButton(props: GoogleLogoutButtonProps): JSX.Element {
     );
 }
 
+type SandboxProps = {
+    sandbox: Sandbox
+}
+
 type LoginLogoutState = {
     loggedIn: state.LoggedIn,
     loading: boolean,
 }
 
-class LoginLogout extends React.Component<{}, LoginLogoutState> {
+class LoginLogout extends React.Component<SandboxProps, LoginLogoutState> {
 
-    constructor(props: {}) {
+    constructor(props: SandboxProps) {
         super(props);
         this.state = {
             loggedIn: state.loggedIn.getValue(),
@@ -71,12 +76,12 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
     }
 
     onSuccess(response: GoogleLoginResponse | GoogleLoginResponseOffline) {
-        if (state.githubGist.getValue() !== 'no-gist' && localStorage.getItem('userEmail') !== null) { 
+        if (state.githubGist.getValue() !== 'no-gist' && localStorage.getItem('userEmail') !== null) {
             // if there is gist (or an attempt) and user is logged in before...
             state.githubGist.next('no-gist');
             return; // this prevents auto log in
         }
-        
+
         validateUser(response as GoogleLoginResponse).then((response) => {
             if (isFailureResponse(response)) {
                 state.notify(response.data.message);
@@ -96,7 +101,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
     }
 
     loadFiles = () => {
-        utils.postJson('listfiles', { })
+        utils.postJson('listfiles', {})
             .then(files => {
                 state.files.next(files);
                 const email = state.email();
@@ -104,7 +109,8 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                     this.onLogout();
                     return;
                 }
-                state.loggedIn.next({ kind: 'logged-in', email  });
+                this.props.sandbox.setWS();
+                state.loggedIn.next({ kind: 'logged-in', email });
                 state.loadProgram.next({ kind: "nothing"});
             })
             .catch(reason =>
@@ -123,6 +129,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
         state.loadProgram.next({ kind: "program", ...state.emptyFile });
         localStorage.removeItem('userEmail');
         localStorage.removeItem('sessionId');
+        this.props.sandbox.setWS();
     }
 
     render() {
