@@ -28,6 +28,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import FileIcon from '@material-ui/icons/FileCopy';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
+import SimIcon from '@material-ui/icons/VideoLabel';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -321,6 +322,20 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               </span>
             </Button>
             <HistoryButton />
+            <Button
+              color="secondary"
+              onClick={() => {
+                const simURL: string = this.sandbox.getWS().slice(5);
+
+                if (simURL) {
+                  window.open(`http://${simURL}`);
+                }
+              }}>
+              <SimIcon />
+              <span id="toolbar-buttons-text">
+                &nbsp;Simulator
+              </span>
+            </Button>
             <div style={classes.flex} />
             <OfflineIndicator />
             <div style={{ display: 'inline-block', width: '0.5em' }} />

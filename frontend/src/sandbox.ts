@@ -11,6 +11,25 @@ import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 
 const simMap: { [key: string]: number } = {
     'ocelot-1@cs.umass.edu': 8001
+};
+
+// NOTE(arjun): I consider this to be hacky. Stopify should have a
+// function to create an AsyncRun that does not run any user code.
+function emptyStopifyRunner(opts: elementaryJS.CompilerOpts) {
+    const runner = elementaryJS.compile('', opts);
+    if (runner.kind === 'error') {
+        // Panic situation!
+        throw new Error('Could not create empty ElementaryJS.AsyncRun');
+    }
+    // In theory, this is a race condition. In practice, Stopify is not going
+    // to yield control, so the callback will run before the function returns.
+    runner.run((result) => {
+        if (result.type === 'exception') {
+            // Panic situation!
+            throw new Error('Could not evaluate empty program with ElementaryJS');
+        }
+    });
+    return runner;
 }
 
 export type Mode = 'running' | 'stopped' | 'stopping';
@@ -31,25 +50,6 @@ export async function loadLibraries() {
     }
 
     whitelistCode = wl;
-}
-
-// NOTE(arjun): I consider this to be hacky. Stopify should have a
-// function to create an AsyncRun that does not run any user code.
-function emptyStopifyRunner(opts: elementaryJS.CompilerOpts) {
-    const runner = elementaryJS.compile('', opts);
-    if (runner.kind === 'error') {
-        // Panic situation!
-        throw new Error('Could not create empty ElementaryJS.AsyncRun');
-    }
-    // In theory, this is a race condition. In practice, Stopify is not going
-    // to yield control, so the callback will run before the function returns.
-    runner.run((result) => {
-        if (result.type === 'exception') {
-            // Panic situation!
-            throw new Error('Could not evaluate empty program with ElementaryJS');
-        }
-    });
-    return runner;
 }
 
 /**
@@ -79,26 +79,6 @@ export class Sandbox {
         this.mode = new Rx.BehaviorSubject<Mode>('stopped');
     }
 
-    setConsole(console: types.HasConsole) {
-        this.repl = console;
-    }
-
-    setWS() {
-        const email: string | null = localStorage.getItem('userEmail');
-
-        if (email) {
-            this.ws = new WebSocket(
-                `ws://localhost:${simMap[email] || 8000}`
-            );
-            this.ws.onopen = e => this.repl.log('Connected.');
-            this.ws.onclose = e => this.repl.error('Disconnected.');
-            this.ws.onerror = e => this.repl.error('Network error.');
-        } else {
-            this.ws && this.ws.close();
-            delete this.ws;
-        }
-    }
-
     private onResult(result: elementaryJS.Result, showNormal: boolean) {
         if (result.type === 'exception') {
             let message = result.value instanceof Error ?
@@ -125,14 +105,39 @@ export class Sandbox {
         }
     }
 
-    opts() {
+    public setConsole(console: types.HasConsole) {
+        this.repl = console;
+    }
+
+    public setWS() {
+        const email: string | null = localStorage.getItem('userEmail');
+
+        if (email) {
+            this.ws = new WebSocket(
+                `ws://localhost:${simMap[email] || 8000}`
+            );
+            this.ws.onopen = e => this.repl.log('Connected.');
+            this.ws.onclose = e => this.repl.error('Disconnected.');
+            this.ws.onerror = e => this.repl.error('Network error.');
+        } else {
+            this.ws && this.ws.close(); // tslint:disable-line:no-unused-expression
+            delete this.ws;
+        }
+    }
+
+    public getWS() {
+        return this.ws ? this.ws.url : '';
+    }
+
+    public opts() {
         return {
             consoleLog: (message: string) => this.repl!.log(message),
             ws: this.ws,
             version, whitelistCode
         };
     }
-    onRunClicked() {
+
+    public onRunClicked() {
         const program = state.currentProgram.getValue();
         if (program.kind !== 'program') {
             console.error(`Clicked Run with currentProgram.kind === ${program.kind}`);
@@ -159,7 +164,7 @@ export class Sandbox {
         });
     }
 
-    onConsoleInput(userInputLine: string) {
+    public onConsoleInput(userInputLine: string) {
         const currentMode = this.mode.getValue();
         if (currentMode !== 'stopped') {
             console.error(`ERROR: called onConsoleInput with mode = ${currentMode}`);
@@ -175,7 +180,7 @@ export class Sandbox {
         });
     }
 
-    onStopClicked() {
+    public onStopClicked() {
         const currentMode = this.mode.getValue();
         if (currentMode === 'stopped') {
             console.error(`Clicked Stop while in mode ${this.mode}`);
@@ -194,5 +199,4 @@ export class Sandbox {
           this.mode.next('stopped');
         });
     }
-
 }
