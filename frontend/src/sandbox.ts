@@ -126,7 +126,7 @@ export class Sandbox {
     }
 
     public getWS() {
-        return this.ws ? this.ws.url : '';
+        return this.ws ? this.ws.url.slice(5) : '';
     }
 
     public opts() {

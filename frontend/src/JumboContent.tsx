@@ -29,6 +29,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import FileIcon from '@material-ui/icons/FileCopy';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
 import SimIcon from '@material-ui/icons/VideoLabel';
+import DocIcon from '@material-ui/icons/Subject';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -306,35 +307,35 @@ class JumboContent extends React.Component<Props, JumboContentState> {
               color="secondary"
               onClick={() => this.togglePanel('sideDrawer', 'width', 250, 0)}>
               <FileIcon />
-              <span id="toolbar-buttons-text">
-                Files
-              </span>
+              <span id="toolbar-buttons-text">Files</span>
             </Button>
-            <ExecutionButtons
-              sandbox={this.sandbox} />
-            <DownloadButton />
             <Button
               color="secondary"
               onClick={() => this.togglePanel('outputPanel', 'height', '25%', 0)}>
               <ConsoleIcon />
-              <span id="toolbar-buttons-text">
-                Console
-              </span>
+              <span id="toolbar-buttons-text">Console</span>
             </Button>
+            <ExecutionButtons
+              sandbox={this.sandbox} />
+            <DownloadButton />
             <HistoryButton />
             <Button
               color="secondary"
               onClick={() => {
-                const simURL: string = this.sandbox.getWS().slice(5);
-
-                if (simURL) {
-                  window.open(`http://${simURL}`);
-                }
+                const simURL: string = this.sandbox.getWS();
+                simURL && window.open(`http://${simURL}`);
               }}>
               <SimIcon />
-              <span id="toolbar-buttons-text">
-                &nbsp;Simulator
-              </span>
+              <span id="toolbar-buttons-text">&nbsp;Simulator</span>
+            </Button>
+            <Button
+              color="secondary"
+              onClick={() => {
+                const simURL: string = this.sandbox.getWS();
+                simURL && window.open(`http://${simURL}docs.html`);
+              }}>
+              <DocIcon />
+              <span id="toolbar-buttons-text">Documentation</span>
             </Button>
             <div style={classes.flex} />
             <OfflineIndicator />
