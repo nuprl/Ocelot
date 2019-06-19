@@ -536,6 +536,7 @@ origin: [
   'https://umass-compsci220.github.io',
   'http://localhost:8080',
   'http://localhost:8081',
+  /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:80\d\d$/
 ]}));
 
 paws.use(bodyParser.json()); // parse all incoming json data
