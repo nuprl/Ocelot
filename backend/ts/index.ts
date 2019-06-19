@@ -174,8 +174,8 @@ async function updateSessionId(userEmail: string, sessionId: string): Promise<vo
 
 }
 
-function isSimpleValidEmail(email: string) { // incomplete but will do for now
-  return /^\w[.\w]*@\w+\.[a-zA-Z]+$/.test(email);
+function isSimpleValidEmail(email: string) {
+  return /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/.test(email);
 }
 
 function isSimpleValidFileName(fileName: any): fileName is string {
