@@ -13,6 +13,7 @@ const config = {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
   },
   module: {
+    exprContextCritical: false,
     rules: [
       {
         test: /\.ts$/,
