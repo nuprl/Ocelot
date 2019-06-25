@@ -10,21 +10,21 @@ import { OCELOTVERSION } from './version';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 
 const simMap: { [key: string]: string } = {
-    'ocelot-1@cs.umass.edu': '192.168.0.1:8001',
-    'ocelot-2@cs.umass.edu': '192.168.0.2:8002',
-    'ocelot-3@cs.umass.edu': '192.168.0.1:8003',
-    'ocelot-4@cs.umass.edu': '192.168.0.2:8004',
-    'ocelot-5@cs.umass.edu': '192.168.0.1:8005',
-    'ocelot-6@cs.umass.edu': '192.168.0.2:8006',
-    'ocelot-7@cs.umass.edu': '192.168.0.1:8007',
-    'ocelot-8@cs.umass.edu': '192.168.0.2:8008',
-    'ocelot-9@cs.umass.edu': '192.168.0.1:8009',
-    'ocelot-10@cs.umass.edu': '192.168.0.2:8010',
-    'ocelot-11@cs.umass.edu': '192.168.0.1:8011',
-    'ocelot-12@cs.umass.edu': '192.168.0.2:8012',
-    'ocelot-13@cs.umass.edu': '192.168.0.1:8013',
-    'ocelot-14@cs.umass.edu': '192.168.0.2:8014',
-    'ocelot-15@cs.umass.edu': '192.168.0.1:8015'
+    'ocelot-1@cs.umass.edu': '10.0.0.106:8001',
+    'ocelot-2@cs.umass.edu': '10.0.0.107:8002',
+    'ocelot-3@cs.umass.edu': '10.0.0.106:8003',
+    'ocelot-4@cs.umass.edu': '10.0.0.107:8004',
+    'ocelot-5@cs.umass.edu': '10.0.0.106:8005',
+    'ocelot-6@cs.umass.edu': '10.0.0.107:8006',
+    'ocelot-7@cs.umass.edu': '10.0.0.106:8007',
+    'ocelot-8@cs.umass.edu': '10.0.0.107:8008',
+    'ocelot-9@cs.umass.edu': '10.0.0.106:8009',
+    'ocelot-10@cs.umass.edu': '10.0.0.107:8010',
+    'ocelot-11@cs.umass.edu': '10.0.0.106:8011',
+    'ocelot-12@cs.umass.edu': '10.0.0.107:8012',
+    'ocelot-13@cs.umass.edu': '10.0.0.106:8013',
+    'ocelot-14@cs.umass.edu': '10.0.0.107:8014',
+    'ocelot-15@cs.umass.edu': '10.0.0.106:8015'
 };
 
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
@@ -130,7 +130,7 @@ export class Sandbox {
             this.ws = new WebSocket(
                 window.location.hostname === 'localhost' ?
                    'ws://localhost:8000' :
-                   `ws://${simMap[email] || '192.168.0.2:8000'}`
+                   `ws://${simMap[email] || '10.0.0.107:8000'}`
             );
             this.ws.onopen = e => this.repl.log('Connected.');
             this.ws.onclose = e => this.repl.error('Disconnected.');

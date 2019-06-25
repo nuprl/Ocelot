@@ -535,9 +535,8 @@ origin: [
   'https://www.ocelot-ide.org',
   'https://umass-compsci220.github.io',
   'http://localhost:8080',
-  'http://soccer-sim-1:8080',
-  'http://soccer-sim-2:8080',
-  'http://joseph-desktop:8080'
+  'http://robots1.local:8080',
+  'http://robots2.local:8080'
 ]}));
 
 paws.use(bodyParser.json()); // parse all incoming json data
