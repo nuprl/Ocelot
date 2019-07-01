@@ -160,13 +160,11 @@ export class Sandbox {
             return;
         }
         this.repl.log(new Date().toLocaleString('en-us', { timeZoneName: 'short' }));
-        this.repl.log('Compiling...');
         const runner = elementaryJS.compile(program.content, this.opts());
         if (runner.kind === 'error') {
             this.reportElementaryError(runner);
             return;
         }
-        this.repl.log('Compilation succesful.');
         this.repl.log('Starting program...');
         this.runner = runner;
         elementaryRTS.enableTests(false);
