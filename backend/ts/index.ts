@@ -536,7 +536,8 @@ origin: [
   'https://umass-compsci220.github.io',
   'http://localhost:8080',
   'http://robots1.local:8080',
-  'http://robots2.local:8080'
+  'http://robots2.local:8080',
+  'http://robots3.local:8081'
 ]}));
 
 paws.use(bodyParser.json()); // parse all incoming json data
