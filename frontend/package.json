@@ -6,10 +6,7 @@
   "dependencies": {
     "@material-ui/core": "^1.4.2",
     "@material-ui/icons": "^2.0.0",
-    "@stopify/elementary-js": "1.0.24",
-    "@types/babel-core": "^6.25.5",
-    "@types/react": "^16.4.7",
-    "@types/react-dom": "^16.0.6",
+    "@stopify/elementary-js": "1.1.0",
     "babel-traverse": "^6.26.0",
     "console-feed": "2.8.3",
     "detect-browser": "^3.0.0",
@@ -26,6 +23,9 @@
     "react-split-pane": "^0.1.82"
   },
   "devDependencies": {
+    "@types/babel-core": "^6.25.5",
+    "@types/react": "^16.4.7",
+    "@types/react-dom": "^16.0.6",
     "@types/babel-traverse": "^6.25.4",
     "@types/detect-browser": "^2.0.1",
     "@types/inline-style-prefixer": "^3.0.1",
@@ -38,7 +38,6 @@
     "copy-webpack-plugin": "^4.5.2",
     "css-loader": "^1.0.0",
     "http-server": "^0.11.1",
-    "stopify": "^0.5.0",
     "style-loader": "^0.21.0",
     "ts-loader": "^4.4.2",
     "typescript": "^3.0.1",
