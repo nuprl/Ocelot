@@ -94,7 +94,7 @@ interesting programs immediately.  For example, the following program prints
 ```javascript
 let i = 0;
 while (true) {
-  lib220.sleep(1000);
+  ocelot.sleep(1000);
   console.log("Hello " +  i.toString());
   i = i + 1;
 }
@@ -109,7 +109,7 @@ We also provide easy access to drawing on a canvas, which we use to
 create animations without timer events or `requestAnimationFrame`:
 
 ```javascript
-let c = lib220.newCanvas(400, 400);
+let c = ocelot.newCanvas(400, 400);
 let theta = 0;
 while (true) {
   c.clear();
@@ -118,7 +118,7 @@ while (true) {
   c.drawLine(200, 200, x, y, [0, 0.2, 0.8]);
   c.drawCircle(200, 200, 100, [1, 0.5, 0]);
   theta += Math.PI / 100;
-  lib220.sleep(16);
+  ocelot.sleep(16);
 }
 ```
 
