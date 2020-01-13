@@ -16,7 +16,7 @@ import SideDrawer from './SideDrawer';
 import { OfflineIndicator } from './offlineIndicator';
 import Notification from './containers/Notification';
 import * as sandbox from './sandbox';
-import UserLogin from './loginButton';
+// import UserLogin from './loginButton';
 import HistoryButton from './containers/HistoryButton';
 import * as state from './state';
 import * as reactrx from './reactrx';
@@ -26,7 +26,7 @@ import { console } from './errors';
 // import { withStyles, WithStyles, StyleRulesCallback } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import FileIcon from '@material-ui/icons/FileCopy';
+// import FileIcon from '@material-ui/icons/FileCopy';
 import ConsoleIcon from '@material-ui/icons/NavigateNext';
 import SimIcon from '@material-ui/icons/VideoLabel';
 import DocIcon from '@material-ui/icons/Subject';
@@ -303,12 +303,12 @@ class JumboContent extends React.Component<Props, JumboContentState> {
         />
         <AppBar position="absolute">
           <Toolbar variant="dense">
-            <Button
+            {/*<Button
               color="secondary"
               onClick={() => this.togglePanel('sideDrawer', 'width', 250, 0)}>
               <FileIcon />
               <span id="toolbar-buttons-text">Files</span>
-            </Button>
+            </Button>*/}
             <Button
               color="secondary"
               onClick={() => this.togglePanel('outputPanel', 'height', '25%', 0)}>
@@ -340,10 +340,15 @@ class JumboContent extends React.Component<Props, JumboContentState> {
             <div style={classes.flex} />
             <OfflineIndicator />
             <div style={{ display: 'inline-block', width: '0.5em' }} />
-            <UserLogin sandbox={this.sandbox}/>
+            {/*<UserLogin sandbox={this.sandbox}/>*/}
           </Toolbar>
         </AppBar>
-        <SplitPane split="vertical" style={{height:'100%'}} defaultSize={250} minSize={0}>
+        <SplitPane
+          split="vertical"
+          style={{ height: '100%' }}
+          defaultSize={250}
+          minSize={0}
+          pane1Style={{ maxWidth: 0 }}>
           <SideDrawer />
           <div className={this.props.classes.jumboContainer}>
             <div className={this.props.classes.toolbar} style={{ minHeight: '48px' }} />
@@ -356,7 +361,7 @@ class JumboContent extends React.Component<Props, JumboContentState> {
                 primary="second"
                 pane2Style={{ maxHeight: '100%' }}
               >
-                <div style={{ width: '100%', height: '100%', minWidth: '286px' }} id="codeEditor">
+                <div style={{ width: '100%', height: '99%', minWidth: '286px' }} id="codeEditor">
                   <CodeEditor
                     openMustLogin={() => this.setState({mustLoginDialogOpen: true})}
                     sandbox={this.sandbox}

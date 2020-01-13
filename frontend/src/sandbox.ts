@@ -9,23 +9,7 @@ import { MODULE_WL_URL } from './secrets';
 import { OCELOTVERSION } from './version';
 import { EJSVERSION } from '@stopify/elementary-js/dist/version';
 
-const simMap: { [key: string]: string } = {
-    'ocelot-1@cs.umass.edu': '192.168.10.2:8001',
-    'ocelot-2@cs.umass.edu': '192.168.10.3:8002',
-    'ocelot-3@cs.umass.edu': '192.168.10.2:8003',
-    'ocelot-4@cs.umass.edu': '192.168.10.3:8004',
-    'ocelot-5@cs.umass.edu': '192.168.10.2:8005',
-    'ocelot-6@cs.umass.edu': '192.168.10.3:8006',
-    'ocelot-7@cs.umass.edu': '192.168.10.2:8007',
-    'ocelot-8@cs.umass.edu': '192.168.10.3:8008',
-    'ocelot-9@cs.umass.edu': '192.168.10.2:8009',
-    'ocelot-10@cs.umass.edu': '192.168.10.3:8010',
-    'ocelot-11@cs.umass.edu': '192.168.10.2:8011',
-    'ocelot-12@cs.umass.edu': '192.168.10.3:8012',
-    'ocelot-13@cs.umass.edu': '192.168.10.2:8013',
-    'ocelot-14@cs.umass.edu': '192.168.10.3:8014',
-    'ocelot-15@cs.umass.edu': '192.168.10.2:8015'
-};
+// const simMap: { [key: string]: string } = {};
 
 // NOTE(arjun): I consider this to be hacky. Stopify should have a
 // function to create an AsyncRun that does not run any user code.
@@ -83,7 +67,7 @@ export async function loadLibraries() {
  *
  */
 export class Sandbox {
-    private ws: WebSocket | undefined;
+    private ws: WebSocket; // | undefined;
     private runner: elementaryJS.CompileOK;
     private repl!: types.HasConsole; // bang is 'definite assignment'
     public mode: Rx.BehaviorSubject<Mode>;
@@ -91,6 +75,11 @@ export class Sandbox {
     constructor() {
         this.runner = emptyStopifyRunner(this.opts());
         this.mode = new Rx.BehaviorSubject<Mode>('stopped');
+        // Hack for demo; set WS here.
+        this.ws = new WebSocket('ws://localhost:8000');
+        this.ws.onopen = e => this.repl.log('Connected.');
+        this.ws.onclose = e => this.repl.error('Disconnected.');
+        this.ws.onerror = e => this.repl.error('Network error.');
     }
 
     private onResult(result: elementaryJS.Result, showNormal: boolean) {
@@ -124,17 +113,18 @@ export class Sandbox {
     }
 
     public setWS() {
+        return; // Hack for demo; set in constructor.
         const email: string | null = localStorage.getItem('userEmail');
 
         if (email) {
-            this.ws = new WebSocket(
-                window.location.hostname === 'localhost' ?
-                   'ws://localhost:8000' :
-                   `ws://${simMap[email] || '192.168.10.3:8000'}`
-            );
-            this.ws.onopen = e => this.repl.log('Connected.');
-            this.ws.onclose = e => this.repl.error('Disconnected.');
-            this.ws.onerror = e => this.repl.error('Network error.');
+            // this.ws = new WebSocket(
+            //     window.location.hostname === 'localhost' ?
+            //        'ws://localhost:8000' :
+            //        `ws://${simMap[email] || '192.168.10.3:8000'}`
+            // );
+            // this.ws.onopen = e => this.repl.log('Connected.');
+            // this.ws.onclose = e => this.repl.error('Disconnected.');
+            // this.ws.onerror = e => this.repl.error('Network error.');
         } else {
             this.ws && this.ws.close(); // tslint:disable-line:no-unused-expression
             delete this.ws;
