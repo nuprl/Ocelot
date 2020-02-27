@@ -145,14 +145,10 @@ with the authors of Pyret.
 
 ## Authors
 
-### Lead Developer
-
-- [Sam Lee]
-
-### Contributors
-
 - [Joydeep Biswas]
 - [Arjun Guha]
+- [Sam Lee]
+- [Joseph Spitzer]
 
 [^1]: The course is [COMPSCI 220 Programming Methodology].
 
@@ -170,6 +166,7 @@ with the authors of Pyret.
 [Sam Lee]: https://lchsam.github.io/
 [Arjun Guha]: https://people.cs.umass.edu/~arjun/main/home/
 [Joydeep Biswas]: https://www.joydeepb.com
+[Joseph Spitzer]: https://sp1tz.github.io/
 [JavaScript: The Good Parts]: http://shop.oreilly.com/product/9780596517748.do
 [Stopify]: http://www.stopify.org
 [Animated Robot Path Planner (RRT)]: https://www.ocelot-ide.org/?gist=joydeep-b/1f40f8584709404c07f1da24d025a194
