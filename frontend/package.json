@@ -6,7 +6,7 @@
   "dependencies": {
     "@material-ui/core": "^1.4.2",
     "@material-ui/icons": "^2.0.0",
-    "@stopify/elementary-js": "1.1.1",
+    "@stopify/elementary-js": "~1.2.0",
     "babel-traverse": "^6.26.0",
     "console-feed": "2.8.3",
     "detect-browser": "^3.0.0",

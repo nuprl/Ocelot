@@ -147,15 +147,14 @@
     source-map "^0.6.0"
     source-map-support "^0.5.6"
 
-"@stopify/elementary-js@1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.1.1.tgz#71c95e1d77ebe39aa2c522fde80a37395c72e5b5"
-  integrity sha512-JVB5pQAg4BogU8tGTcBTq38DtdXDf16YJcqyUKJVyUJ7SRIuCl9JToVXqupY5MK5Q2Ku1sfzTjBPf96a8p9/Mg==
+"@stopify/elementary-js@~1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.2.0.tgz#90d36b19b56b7385cf7a13aa1ac72dd027111e60"
+  integrity sha512-QOquDxHrfWcJaO3o4iuiEMD+B6uURpcdT/ET5XewOL9M/PIQibdmMFOiCqJDta27hof67pB6Xj5sUplxwncSFg==
   dependencies:
     "@stopify/higher-order-functions" "0.7.1"
     "@stopify/project-interpreter" "1.1.4"
-    "@stopify/stopify" "0.7.1"
-    "@types/babel-types" "^6.7.16"
+    "@stopify/stopify" "0.7.2"
     babel-core "^6.26.3"
     babel-plugin-transform-es2015-arrow-functions "^6.22.0"
     babel-plugin-transform-es2015-classes "^6.24.1"
@@ -217,10 +216,10 @@
     immutable "^4.0.0-rc.12"
     parsimmon "^1.12.0"
 
-"@stopify/stopify@0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@stopify/stopify/-/stopify-0.7.1.tgz#2a42907dd2b950a6ec030e9ed088ed88a23b36b0"
-  integrity sha512-sZHJGpnWfOAaeR9kn0C2LKl6PeDF1hhTpvAqITCVfwKsPPridji5wJltZfzvUP06e2Ck3kegH+7e+YoBaiK88Q==
+"@stopify/stopify@0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@stopify/stopify/-/stopify-0.7.2.tgz#a3438bf8a1937c4f6e38d5a7c1622262531fccff"
+  integrity sha512-tTpgUpz5fULKINiop1FUsjGWny1jxmOmc6SbwRs3i1Mk9Yck83qbV2FrYXqloRz/c4wp6ADLeBrXfWzXtmBHfA==
   dependencies:
     "@stopify/continuations" "0.7.1"
     "@stopify/continuations-runtime" "0.7.1"
@@ -292,10 +291,6 @@
 "@types/babel-types@*":
   version "7.0.4"
   resolved "https://registry.yarnpkg.com/@types/babel-types/-/babel-types-7.0.4.tgz#bfd5b0d0d1ba13e351dff65b6e52783b816826c8"
-
-"@types/babel-types@^6.7.16":
-  version "6.25.2"
-  resolved "https://registry.yarnpkg.com/@types/babel-types/-/babel-types-6.25.2.tgz#5c57f45973e4f13742dbc5273dd84cffe7373a9e"
 
 "@types/babylon@*":
   version "6.16.3"
