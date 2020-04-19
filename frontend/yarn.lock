@@ -147,10 +147,10 @@
     source-map "^0.6.0"
     source-map-support "^0.5.6"
 
-"@stopify/elementary-js@~1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.2.0.tgz#90d36b19b56b7385cf7a13aa1ac72dd027111e60"
-  integrity sha512-QOquDxHrfWcJaO3o4iuiEMD+B6uURpcdT/ET5XewOL9M/PIQibdmMFOiCqJDta27hof67pB6Xj5sUplxwncSFg==
+"@stopify/elementary-js@1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@stopify/elementary-js/-/elementary-js-1.2.1.tgz#9a0b15bf339cdd5bc6bef01bd969bd5cacb9d968"
+  integrity sha512-SIQGqlSUK2e9dUYMb44jU56ns/2w/v7qBv6KOQPMN97ieGumLL4FD9OAA8Wx3wC77FR6liKab0GA5o0ErzhuDw==
   dependencies:
     "@stopify/higher-order-functions" "0.7.1"
     "@stopify/project-interpreter" "1.1.4"
