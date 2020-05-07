@@ -1,5 +1,5 @@
 // stringify-objects forked from Yeoman Github repo, with modifications.
-// 
+//
 // Copyright (c) 2015, Yeoman team
 // All rights reserved.
 
@@ -24,9 +24,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 'use strict';
-const isRegexp = require('is-regexp');
-const isObj = require('is-obj');
-const getOwnEnumPropSymbols = require('get-own-enumerable-property-symbols').default;
+const _ = require('lodash'),
+      getOwnEnumPropSymbols = require('get-own-enumerable-property-symbols').default;
 
 module.exports = (val: any, opts: any, pad: any) => {
   const seen: any[] = [];
@@ -86,7 +85,7 @@ module.exports = (val: any, opts: any, pad: any) => {
       typeof val === 'number' ||
       typeof val === 'boolean' ||
       typeof val === 'symbol' ||
-      isRegexp(val)) {
+      _.isRegExp(val)) {
       return String(val);
     }
 
@@ -118,7 +117,7 @@ module.exports = (val: any, opts: any, pad: any) => {
       return expandWhiteSpace(ret);
     }
 
-    if (isObj(val)) {
+    if (_.isObject(val)) {
       let objKeys = Object.keys(val).concat(getOwnEnumPropSymbols(val));
 
       if (opts.filter) {
