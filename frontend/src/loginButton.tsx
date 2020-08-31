@@ -28,10 +28,7 @@ const alternateLogoutButton = (onClickProp?: { onClick: () => void }) => {
 };
 
 const alternateLoginButton = (onClickProp? : {onClick: () => void}) => {
-    if (typeof onClickProp === 'undefined') {
-        return (<Button color="inherit">Login</Button>);
-    }
-    return (
+    return !onClickProp ? (<Button color="inherit">Login</Button>) : (
         <Button color="inherit" onClick={onClickProp.onClick}>
             <Typography color="inherit" variant="button">Login with Google</Typography>
         </Button>
