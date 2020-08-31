@@ -27,6 +27,17 @@ const alternateLogoutButton = (onClickProp?: { onClick: () => void }) => {
     );
 };
 
+const alternateLoginButton = (onClickProp? : {onClick: () => void}) => {
+    if (typeof onClickProp === 'undefined') {
+        return (<Button color="inherit">Login</Button>);
+    }
+    return (
+        <Button color="inherit" onClick={onClickProp.onClick}>
+            <Typography color="inherit" variant="button">Login with Google</Typography>
+        </Button>
+    );
+}
+
 type GoogleLogoutButtonProps = {
     show: boolean, // whether to show it or not
     onClick: () => void, // when they press log out button
@@ -132,12 +143,13 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                 </Typography>,
                 <GoogleLogoutButton key="logout" show={loggedIn} onClick={() => this.onLogout()} />,
                 <GoogleLogin key="login"
-                        style={{display: loggedIn ? "none" : "" }}
+                        style={{display: loggedIn ? 'none' : ''}}
                         clientId={LOGIN_CLIENT_ID}
                         onSuccess={(resp) => this.onSuccess(resp)}
                         onFailure={this.onFailure}
                         prompt="select_account" // always prompts user to select a specific account
                         isSignedIn
+                        render={alternateLoginButton}
                     />
             ]
         );
