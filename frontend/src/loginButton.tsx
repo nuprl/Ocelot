@@ -17,12 +17,9 @@ import { connect } from './reactrx';
 import './static/styles/body.css';
 
 const alternateLogoutButton = (onClickProp?: { onClick: () => void }) => {
-    if (typeof onClickProp === 'undefined') {
-        return (<Button color="inherit">Logout</Button>);
-    }
-    return (
+    return !onClickProp ? (<Button color="inherit">Logout</Button>) : (
         <Button color="inherit" onClick={onClickProp.onClick}>
-            <Typography color="inherit" variant="button">Sign out</Typography>
+            <Typography color="inherit" variant="button">Sign Out</Typography>
         </Button>
     );
 };
