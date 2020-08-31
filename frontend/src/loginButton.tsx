@@ -22,15 +22,13 @@ const alternateLogoutButton = (onClickProp?: { onClick: () => void }) => {
             <Typography color="inherit" variant="button">Sign Out</Typography>
         </Button>
     );
-};
-
-const alternateLoginButton = (onClickProp? : {onClick: () => void}) => {
+}, alternateLoginButton = (onClickProp? : {onClick: () => void}) => {
     return !onClickProp ? (<Button color="inherit">Login</Button>) : (
         <Button color="inherit" onClick={onClickProp.onClick}>
             <Typography color="inherit" variant="button">Login with Google</Typography>
         </Button>
     );
-}
+};
 
 type GoogleLogoutButtonProps = {
     show: boolean, // whether to show it or not
