@@ -141,7 +141,7 @@ class LoginLogout extends React.Component<{}, LoginLogoutState> {
                         onFailure={this.onFailure}
                         prompt="select_account" // always prompts user to select a specific account
                         isSignedIn
-                        render={alternateLoginButton}
+                        render={!loggedIn ? alternateLoginButton : undefined}
                     />
             ]
         );
