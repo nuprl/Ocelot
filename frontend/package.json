@@ -8,7 +8,7 @@
     "@material-ui/icons": "^2.0.0",
     "@stopify/elementary-js": "1.2.1",
     "babel-traverse": "^6.26.0",
-    "console-feed": "2.8.10",
+    "console-feed": "2.8.3",
     "detect-browser": "^3.0.0",
     "get-own-enumerable-property-symbols": "^3.0.0",
     "lodash": "^4.17.19",
