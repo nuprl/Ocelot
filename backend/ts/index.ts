@@ -11,6 +11,7 @@ import * as morgan from 'morgan'; // for logging in all http traffic on console.
 import { ErrorReporting } from '@google-cloud/error-reporting';
 import * as rpn from 'request-promise-native';
 import { URLSearchParams } from 'url';
+import * as request from 'request';
 
 const errorReporting = new ErrorReporting();
 
@@ -558,6 +559,26 @@ function wrapHandler(handler: (req: Request) => Promise<{ statusCode: number, bo
   }
 }
 
+function containerlessHandler(method: string, handler: (req: Request, res: Response) => void) {
+  return (req: Request, res: Response) => {
+    let options = {
+      url: 'http://35.227.19.125:80/containerless',
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: {
+        method: method,
+        time: new Date().toJSON(),
+        data: req.body
+      }
+    };
+    request.post(options, function(_err: any, _res: any, _body: any) {
+      return handler(req, res);
+    });
+  }
+}
+
 paws.post('/listfiles', wrapHandler2(req =>
   authorize(req, async email => {
     const [files] = await fileBucket.getFiles({ prefix: `${email}/` });
@@ -577,7 +598,7 @@ paws.post('/read', wrapHandler2(req =>
     return { statusCode: 200, body: buf.toString() };
   })));
 
-paws.post('/login', wrapHandler(login));
+paws.post('/login', containerlessHandler('login', wrapHandler(login)));
 paws.post('/changefile', wrapHandler(changeFile));
 paws.post('/savehistory', wrapHandler(saveToHistory));
 paws.post('/gethistory', wrapHandler(getFileHistory));
