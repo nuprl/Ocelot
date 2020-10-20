@@ -598,10 +598,9 @@ function containerlessHandler(handler: (req: Request, res: Response) => void) {
     };
 
     let promise1 = request.post(options, function(_err: any, _res: any, _body: any) {
-      
+      // check to see if successful? Probably not necessary  
     });
-    let promise2 = handler(req, res);
-    Promise.all([promise1, promise2]);
+    handler(req, res);
   }
 }
 
