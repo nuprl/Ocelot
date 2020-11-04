@@ -522,6 +522,8 @@ morgan.token('ejsversion', (req, res) => {
   return 'notprovided'
 });
 
+paws.use(bodyParser.json()); // parse all incoming json data
+
 paws.use(morgan(
   ':method :url :status :username ocelot-:ocelotversion ejs-:ejsversion :res[content-length] - :response-time ms',
   {
@@ -537,8 +539,6 @@ origin: [
   'http://localhost:8080',
   'http://localhost:8081',
 ]}));
-
-paws.use(bodyParser.json()); // parse all incoming json data
 
 
 type Body = {
