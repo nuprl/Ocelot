@@ -78,7 +78,7 @@ export class Sandbox {
     setConsole(console: types.HasConsole) {
         this.repl = console;
     }
-    
+
     private onResult(result: elementaryJS.Result, showNormal: boolean) {
         if (result.type === 'exception') {
             let message = result.value instanceof Error ?
@@ -129,7 +129,7 @@ export class Sandbox {
             this.reportElementaryError(runner);
             return;
         }
-        this.repl.log('Compilation succesful.');
+        this.repl.log('Compilation successful.');
         if (mode === 'running') {
             this.repl.log('Starting program...');
         } else if (mode === 'testing') {
