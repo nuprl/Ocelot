@@ -100,7 +100,9 @@ npm run-script deploy
 
 ## Building and Deploying the Ocelot frontend
 
-The following command builds the Ocelot frontend to :
+Edit the file `frontend/src/secrets.ts`.
+
+Run the following commands:
 
 ```
 cd frontend
