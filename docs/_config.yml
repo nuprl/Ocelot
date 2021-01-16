@@ -1,3 +1,5 @@
 title: Ocelot and ElementaryJS
 description: An IDE for JavaScript, without the "bad parts".
 theme: jekyll-theme-cayman
+github:
+  repository_url: https://github.com/ut-amrl/Ocelot
