@@ -17,6 +17,7 @@ Therefore, Ocelot works with a flaky Internet connection, works on any
 device that has a web browser, and limits the risk of students losing their
 work.
 
+
 # JavaScript Without the "Bad Parts"
 
 The **most significant feature** of Ocelot is that it shields students from the
