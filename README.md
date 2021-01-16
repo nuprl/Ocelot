@@ -1,16 +1,14 @@
 # Ocelot
 
-A web-based IDE for JavaScript, without the "bad parts".
-
-See [umass-compsci220.github.io/Ocelot/](https://umass-compsci220.github.io/Ocelot/) for an overview.
+A web-based IDE for JavaScript, without the "bad parts".  See
+[https://www.ocelot-ide.org](www.ocelot-ide.org) for more information.
 
 This is a README to get started hacking on Ocelot.
 
 ## Dependencies
 
 1. You'll need the following:
-    - [Node](https://nodejs.org/en/)
-    - [Yarn](https://www.yarnpkg.com)
+    - [Node](https://nodejs.org/en/) (we use Node 14 LTS)
     - [Google Cloud SDK](https://cloud.google.com/sdk/)
 
 1. Be sure you're authenticated on Google Cloud and on your computer:
@@ -124,3 +122,7 @@ yarn install
   ```
   yarn link stopify && yarn link elementary-js && yarn link stopify-continuations
   ```
+
+Copyright 2018--2020 University of Massachusetts Amherst
+Copyright 2019--2021 University of Texas at Austin
+Copyright 2020--2021 Northeastern University
