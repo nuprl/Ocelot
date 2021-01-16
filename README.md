@@ -1,7 +1,7 @@
 # Ocelot
 
 A web-based IDE for JavaScript, without the "bad parts".  See
-[https://www.ocelot-ide.org](www.ocelot-ide.org) for more information.
+[https://www.ocelot-ide.org](https://www.ocelot-ide.org) for more information.
 
 This is a README to get started hacking on Ocelot.
 
