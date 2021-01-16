@@ -1,7 +1,0 @@
-steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['pull', 'gcr.io/arjunguha-research-group/ocelot:latest']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/arjunguha-research-group/ocelot:latest', '--cache-from', 'gcr.io/arjunguha-research-group/ocelot:latest', '.']
-  timeout: 600s
-images: ['gcr.io/arjunguha-research-group/ocelot:latest']
