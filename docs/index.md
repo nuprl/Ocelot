@@ -22,6 +22,6 @@ A key feature of Ocelot is that it is a **pedagogical IDE** -- the
 site.baseurl }}{% link rationale.md %}) page describes the specific language-level features
 that Ocelot supports towards this goal, and the rationale behind them.
 
-For some sample demos of the features of Ocelot, you could run a demo [Animated
-Robot Path Planner (RRT)](https://code.ocelot-ide.org/?gist=joydeep-b/1f40f8584709404c07f1da24d025a194)
-or a [bouncing ball animation](https://www.ocelot-ide.org/?gist=joydeep-b/8956ab7ab21e36a0f4c12fa289f952a4)
+For some sample demos of the features of Ocelot, you could run a demo [animated
+robot path planner (RRT)](https://code.ocelot-ide.org/?gist=joydeep-b/1f40f8584709404c07f1da24d025a194)
+or a [bouncing ball animation](https://code.ocelot-ide.org/?gist=joydeep-b/8956ab7ab21e36a0f4c12fa289f952a4).
