@@ -5,41 +5,124 @@ A web-based IDE for JavaScript, without the "bad parts".  See
 
 This is a README to get started hacking on Ocelot.
 
-## Dependencies
+## Dependencies and Cloud Configuration
 
-1. You'll need the following:
-    - [Node](https://nodejs.org/en/) (we use Node 14 LTS)
-    - [Google Cloud SDK](https://cloud.google.com/sdk/)
+1. Install [Node](https://nodejs.org/en/) and the
+   [Google Cloud SDK](https://cloud.google.com/sdk/) on your development
+   machine. We use Node 14.
 
-1. Be sure you're authenticated on Google Cloud and on your computer:
+1. Create a project on Google Cloud Platform to host Ocelot. You can
+   reuse an existing project, as long as you don't mind setting Cloud Datastore
+   to Datastore mode permanently for that project. *If you are already using
+   Cloud Datastore in Native mode, you will need to create a new project.*
+
+1. A domain to host Ocelot. For example, you can use a subdomain of
+   `github.io`, if you do not want to pay for a domain name,
+    
+
+1. Ensure your development machine is logged in to the Google Cloud Platform
     ```bash
     gcloud auth login
     gcloud auth application-default login
     ```
-    If this is the only GCloud project you are working on, set the project to PLASMA:
+
+
+1. Create a project on Google Cloud Platform and note down its Project ID.
+   If this is the only Google Cloud project that you are using, you can set it
+   as the default project on your machine:
+
     ```bash
-    gcloud config set project arjunguha-research-group
-    ```
-    Else, you will have to manually specify the project ID when deploying the backend:
-    ```bash
-    yarn deploy --project arjunguha-research-group
+    gcloud config set project PROJECT_ID
     ```
 
-## Build & Run Instructions
-Follow these instructions to use the deployed versions of Stopify, and ElementaryJS with Ocelot.
+    Otherwise, you will have to add the `--project PROJECT_ID` flag to all
+    subsequent commands that manipulate Google Cloud resources. The remaining
+    instructions assume that you set the default project.
 
-To setup Ocelot frontend:
+1. Create a bucket for Ocelot to store files. For example, the following
+   command creates a bucket called `ocelot-ide-org-files`, and sets the storage
+   class to regional, which is a cheaper storage option than the default, which
+   replicates data across multiple data centers. The `-b on` flag disables
+   per-file ACLs and isn't strictly necessary.
 
-```bash
-cd Ocelot/frontend && yarn install && yarn run build
+   ```bash
+   gsutil mb -b on -c Regional -l us-central1 gs://ocelot-ide-org-files
+   ```
+
+1. Create a bucket for Ocelot to store revision history. For example:
+
+   ```bash
+   gsutil mb -b on -c Regional -l us-central1 gs://ocelot-ide-org-history
+   ```
+
+1. Enable object versioning on the former bucket. Ocelot relies on object
+   versioning to implement its history feature:
+
+
+   ```bash
+   gsutil versioning set on gs://ocelot-ide-org-history
+   ```
+
+1. Using your web browser, go to the 
+   [Google Cloud Datastore](https://console.cloud.google.com/datastore) 
+   console and create a database in **Datastore Mode**. (**Do not use
+   Native Mode.**) You will need to chose the datastore location. We recommend
+   choosing the same region that you used for the two buckets that you created
+   above.
+
+1. Using your web browser, configure the 
+   [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent)
+   for the Google Cloud project. It is straightforward to setup the application
+   for testing, which limits you to 100 users over the lifetime of the testing
+   period.
+
+1. Using your web browser, go to the
+   [Credentials](https://console.cloud.google.com/apis/credentials) page for
+   the Google Cloud project. Click the *Create Credentials* button and then
+   click *OAuth client ID*. On the next page, select *Web application* as
+   the application type and enter the domain name at which you plan to
+   host Ocelot.
+
+1. Using your web browser,
+  [Enable the Google Cloud Build API](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com)
+
+1. Copy the file `/env.yaml` to `/backend/env.yaml` and edit it as directed
+   in the file.
+
+## Building and Deploying the Ocelot backend
+
+```
+cd backend
+npm install
+npm run-script build
+npm run-script deploy
 ```
 
-To run Ocelot locally:
+## Building and Deploying the Ocelot frontend
 
-```bash
-cd Ocelot/frontend
-yarn run serve-local
+The following command builds the Ocelot frontend to :
+
 ```
+cd frontend
+npm install
+npm run-script build
+```
+
+At this point, you need to deploy the contents of `frontend/build` to a
+static web hosting provider. For example, if you plan to use GitHub Pages, you
+can create a repository with the contents of `frontend/build`, push that
+repository to a new GitHub pages, and serve it.
+
+## Copyright
+
+Copyright 2018--2020 University of Massachusetts Amherst
+
+Copyright 2019--2021 University of Texas at Austin
+
+Copyright 2020--2021 Northeastern University
+
+
+## Old Instructions Below
 
 To setup and run backend locally
 
@@ -122,7 +205,3 @@ yarn install
   ```
   yarn link stopify && yarn link elementary-js && yarn link stopify-continuations
   ```
-
-Copyright 2018--2020 University of Massachusetts Amherst
-Copyright 2019--2021 University of Texas at Austin
-Copyright 2020--2021 Northeastern University

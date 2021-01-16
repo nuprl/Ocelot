@@ -7,8 +7,7 @@
     "build": "tsc",
     "start": "tsc -w",
     "serve": "node dist/testServer",
-    "deploy": "gcloud functions deploy --trigger-http ocelot --runtime nodejs14 --entry-point paws --allow-unauthenticated",
-    "deploy-beta": "gcloud functions deploy --trigger-http ocelot-beta --runtime nodejs8 --project arjunguha-research-group --entry-point paws"
+    "deploy": "gcloud functions deploy --trigger-http ocelot --runtime nodejs14 --entry-point paws --allow-unauthenticated --env-vars-file env.yaml"
   },
   "dependencies": {
     "@google-cloud/datastore": "~6",

@@ -12,22 +12,35 @@ import { ErrorReporting } from '@google-cloud/error-reporting';
 import * as rpn from 'request-promise-native';
 import { URLSearchParams } from 'url';
 
+function expectEnv(name: string): string {
+  let value = process.env[name];
+  if (typeof value !== 'string') {
+    throw new Error(`environment variable ${name} was not set`);
+  }
+  return value;
+}
+
+function expectEnvInt(name: string): number {
+  let value = Number(expectEnv(name));
+  if ((value | 0) !== value) {
+    throw new Error(`environment variable ${name} must be an integer, received ${value}`);
+  }
+  return value;
+}
+
 const errorReporting = new ErrorReporting();
 
 const storage = new Storage();
-const fileBucket = storage.bucket('ocelot-student-files');
-const settingsBucket = storage.bucket('plasma-settings');
-const historyBucket = storage.bucket('ocelot-student-history');
+const fileBucket = storage.bucket(expectEnv('fileBucket'));
+const historyBucket = storage.bucket(expectEnv('historyBucket'));
 
 const datastore = new Datastore();
 const datastoreKind = 'CS220AllowedAccounts';
 
-let client: OAuth2Client | undefined = undefined;
-let CLIENT_ID: string | undefined = undefined;
+const CLIENT_ID: string = expectEnv('CLIENT_ID');
+const client = new OAuth2Client(CLIENT_ID);
 
-let sessionDuration: number | undefined = undefined; // hours
-type Settings = { clientID: string, sessionDuration: number };
-let settings: Settings | undefined = undefined;
+const sessionDuration: number = expectEnvInt('sessionDuration');
 
 function reportError(req: Request, message: string) {
   const evt = errorReporting.event();
@@ -37,39 +50,6 @@ function reportError(req: Request, message: string) {
   evt.setMessage(message.replace(/[^A-Za-z]/g,'_') + ': ' + message);
   errorReporting.report(evt);
   console.error(message);
-}
-
-async function getSettings() {
-  if (settings !== undefined) {
-    return settings;
-  }
-  const settingsFile = await settingsBucket.file('ocelot-settings.json').download();
-  return JSON.parse(settingsFile.toString());
-}
-
-async function getClientID() {
-  if (CLIENT_ID !== undefined) {
-    return CLIENT_ID;
-  }
-  CLIENT_ID = ((await getSettings()) as Settings).clientID;
-  return CLIENT_ID;
-}
-
-async function getOAuthClient() {
-  if (client !== undefined) {
-    return client;
-  }
-  const clientID = (await getClientID());
-  client = new OAuth2Client(clientID);
-  return client;
-}
-
-async function getSessionDuration() {
-  if (sessionDuration !== undefined) {
-    return sessionDuration;
-  }
-  sessionDuration = ((await getSettings()) as Settings).sessionDuration;
-  return sessionDuration;
 }
 
 function undefinedOrNull(...properties: (any | undefined | null)[]) {
@@ -97,8 +77,8 @@ function failureResponse(message: string) {
   }
 }
 
-async function isWithinSessionTime(sessionTime: number) {
-  const sessionDurationMili: number = (await getSessionDuration()) * 3600000;
+function isWithinSessionTime(sessionTime: number) {
+  const sessionDurationMili: number = sessionDuration * 3600000;
   if (Math.abs(sessionTime - Date.now()) > sessionDurationMili) {
     return false;
   }
@@ -408,9 +388,9 @@ async function getFileHistory(req: Request) {
  */
 async function login(req: Request) {
   // check if user has active session, if so, just return session
-  const ticket = await (await getOAuthClient()).verifyIdToken({
+  const ticket = await client.verifyIdToken({
     idToken: req.body.token,
-    audience: (await getClientID())
+    audience: CLIENT_ID
   });
 
   if (ticket == null) {
@@ -533,14 +513,7 @@ paws.use(morgan(
     }
   })); // logging all http traffic
 
-paws.use(cors({
-origin: [
-  'https://www.ocelot-ide.org',
-  'https://umass-compsci220.github.io',
-  'http://localhost:8080',
-  'http://localhost:8081',
-]}));
-
+paws.use(cors({ origin: expectEnv("ALLOWED_ORIGINS").split(",") }));
 
 type Body = {
   status: string,
