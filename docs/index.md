@@ -1,5 +1,5 @@
 ---
-title: The Ocelot JavaScript Programming Environment
+title: The Ocelot IDE for JavaScript
 ---
 
 ![Image of Ocelot](./ocelot-robot-screenshot.jpg)
