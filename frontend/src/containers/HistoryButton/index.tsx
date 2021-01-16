@@ -195,7 +195,7 @@ class HistoryButton extends React.Component<Props, State> {
                         />
                     </ListItem>
                     <Collapse in={codeOpenIndex === index} timeout="auto" unmountOnExit>
-                        <List component="div" dense>
+                        <List  dense>
                             <ListItem>
                                 <div style={{ height: '100%', width: '100%' }}>
                                     <MonacoDiffEditor

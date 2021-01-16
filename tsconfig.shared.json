@@ -4,6 +4,6 @@
       "strict": true,
       "noImplicitReturns": true,
       "inlineSourceMap": true,
-      "noUnusedLocals": true
+      "noUnusedLocals": false
   }
 }

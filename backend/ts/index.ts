@@ -1,25 +1,25 @@
-import * as Storage from '@google-cloud/storage'; // Google cloud storage
-import * as Datastore from '@google-cloud/datastore';
+import {  Storage } from '@google-cloud/storage'; // Google cloud storage
+import { Datastore } from '@google-cloud/datastore';
 import { OAuth2Client } from 'google-auth-library'; // for authenticating google login
 import { Request, Response } from 'express'; // For response and request object autocomplete
 import * as express from 'express'; // for routing different links
 import * as bodyParser from 'body-parser'; // for parsing JSON data
 import * as path from 'path'; // for manipulating paths
-import * as cors from 'cors'; // allows sending http requests to different domains
+import { default as cors } from 'cors'; // allows sending http requests to different domains
 import * as uid from 'uid-safe';
-import * as morgan from 'morgan'; // for logging in all http traffic on console.
+import { default as morgan } from 'morgan'; // for logging in all http traffic on console.
 import { ErrorReporting } from '@google-cloud/error-reporting';
 import * as rpn from 'request-promise-native';
 import { URLSearchParams } from 'url';
 
 const errorReporting = new ErrorReporting();
 
-const storage = Storage();
+const storage = new Storage();
 const fileBucket = storage.bucket('ocelot-student-files');
 const settingsBucket = storage.bucket('plasma-settings');
 const historyBucket = storage.bucket('ocelot-student-history');
 
-const datastore = new Datastore({});
+const datastore = new Datastore();
 const datastoreKind = 'CS220AllowedAccounts';
 
 let client: OAuth2Client | undefined = undefined;
@@ -496,8 +496,9 @@ async function getUrl(req: Request, res: Response) {
   }
 }
 
-export const paws = express();
-morgan.token('username', function(req, res) {
+export const paws = express.default();
+
+morgan.token('username', function(req: Request, res) {
   if (req.body.userEmail) {
     return req.body.userEmail;
   }
@@ -508,14 +509,14 @@ morgan.token('username', function(req, res) {
   return 'notprovided'
 });
 
-morgan.token('ocelotversion', (req, res) => {
+morgan.token('ocelotversion', (req: Request, res) => {
   if (req.body.ocelotVersion) {
     return req.body.ocelotVersion
   }
   return 'notprovided'
 });
 
-morgan.token('ejsversion', (req, res) => {
+morgan.token('ejsversion', (req: Request, res) => {
   if (req.body.ejsVersion) {
     return req.body.ejsVersion;
   }

@@ -392,7 +392,7 @@ const FilesFolder = ListItemStyles(class extends React.Component<Props, State> {
     render() {
         return (
             <div style={{height:'100%'}}>
-                <List style={{height:'100%'}} component="div" disablePadding dense >
+                <List style={{height:'100%'}}  disablePadding dense >
                     <SavedIndicator />
                     <div style={{color: 'white', paddingLeft: '15px' }}>
                         <Button
