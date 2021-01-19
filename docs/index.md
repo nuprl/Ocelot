@@ -30,6 +30,6 @@ animation](https://code.ocelot-ide.org/?gist=joydeep-b/8956ab7ab21e36a0f4c12fa28
 
 <div align="center">
   <a href="https://www.ocelot-ide.org/privacy.html">Privacy Policy</a>&nbsp;
-  <a href="https://www.ocelot-ide.org/privacy.html">Terms of Service</a>
+  <a href="https://www.ocelot-ide.org/terms.html">Terms of Service</a>
   
   </div>
