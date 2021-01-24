@@ -1,0 +1,24 @@
+{
+  "name": "ocelot-accounts",
+  "version": "1.0.0",
+  "description": "Onboarding script for Ocelot accounts",
+  "author": "Sam Lee",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc && chmod +x ./dist/index.js",
+    "build-bin": "yarn run build && mkdir -p bin; cp ./dist/index.js ./bin/oc",
+    "clean": "rm -rf ./dist ./bin"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.18",
+    "@types/ora": "^3.0.0",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {
+    "@google-cloud/datastore": "^4.2.0",
+    "chalk": "^2.4.2",
+    "commander": "^2.18.0",
+    "ora": "^3.0.0"
+  }
+}
