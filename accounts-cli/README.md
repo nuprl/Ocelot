@@ -28,25 +28,25 @@ npm run-script build-bin # to build the JavaScript file
 There will be a JavaScript file that resides in the `bin` directory.
  - Add email to Ocelot access
     ```bash
-    ./bin/oc add example@gmail.com
+    ./oc add example@gmail.com
     ```
  - Quickly add multiple emails
     ```bash
-    ./bin/oc add example@gmail.com example@aol.com
+    ./oc add example@gmail.com example@aol.com
     ```
  - Remove email from Ocelot access
     ```bash
-    ./bin/oc remove example@gmail.com 
+    ./oc remove example@gmail.com 
     ```
  - Add all emails in comma-separated file
     ```bash
-    ./bin/oc bulk ./path/to/file.csv
+    ./oc bulk ./path/to/file.csv
     ```
  - Remove all emails in comma-separated file
     ```bash
-    ./bin/oc bulk -m remove ./path/to/file.csv
+    ./oc bulk -m remove ./path/to/file.csv
     ```
  - And to display help
    ```bash
-   ./bin/oc --help
+   ./oc --help
    ```
