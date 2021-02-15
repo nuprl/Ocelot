@@ -18,14 +18,12 @@ This is a README to get started hacking on Ocelot.
 
 1. A domain to host Ocelot. For example, you can use a subdomain of
    `github.io`, if you do not want to pay for a domain name,
-    
 
 1. Ensure your development machine is logged in to the Google Cloud Platform
     ```bash
     gcloud auth login
     gcloud auth application-default login
     ```
-
 
 1. Create a project on Google Cloud Platform and note down its Project ID.
    If this is the only Google Cloud project that you are using, you can set it
@@ -84,7 +82,8 @@ This is a README to get started hacking on Ocelot.
    host Ocelot.
 
 1. Using your web browser,
-  [Enable the Google Cloud Build API](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com)
+  [Enable the Google Cloud Build API](https://console.developers.google.com/apis/library/cloudbuild.googleapis.com) and the
+  [Stackdriver Error Reporting API](https://console.cloud.google.com/apis/api/clouderrorreporting.googleapis.com/overview)
 
 1. Copy the file `/env.yaml` to `/backend/env.yaml` and edit it as directed
    in the file.
