@@ -16,6 +16,7 @@
     "get-own-enumerable-property-symbols": "^3.0.0",
     "lodash": "^4.17.19",
     "monaco-editor": "^0.13.1",
+    "nanoid": "^3.1.22",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-google-login": "^3.2.1",

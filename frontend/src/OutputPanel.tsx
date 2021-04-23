@@ -8,6 +8,7 @@ import * as monacoEditor from 'monaco-editor';
 import RightArrowIcon from '@material-ui/icons/KeyboardArrowRight';
 
 import { Console } from 'console-feed';
+import { nanoid } from 'nanoid';
 import { inspectorTheme } from './static/styles/consoleStyle';
 import 'static/styles/Scrollbar.css';
 import { Sandbox } from './sandbox';
@@ -153,7 +154,12 @@ class OutputPanel extends React.Component<Props, State> {
     /** Appends a message to the log. Bounds scrollback to 100 items. */
     appendLogMessage(message: Message | { method: 'command' | 'result' | 'error', data: any }) {
         this.setState((prevState) => {
-            let newLog = [...prevState.logs, message as Message];
+            const messageView = message as Message;
+            /** Get a unique ID for each message. Solve React rendering issue */
+            /** Ignore is needed due to the fact that the maintainer of console-feed ignore id in Message defintion */
+            // @ts-ignore
+            messageView.id = nanoid(7);
+            let newLog = [...prevState.logs, messageView];
             if (newLog.length > 100) {
                 newLog = newLog.slice(newLog.length - 100);
             }
