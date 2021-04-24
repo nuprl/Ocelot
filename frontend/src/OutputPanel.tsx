@@ -155,10 +155,9 @@ class OutputPanel extends React.Component<Props, State> {
     appendLogMessage(message: Message | { method: 'command' | 'result' | 'error', data: any }) {
         this.setState((prevState) => {
             const messageView = message as Message;
-            /** Get a unique ID for each message. Solve React rendering issue */
-            /** Ignore is needed due to the fact that the maintainer of console-feed ignore id in Message defintion */
-            // @ts-ignore
-            messageView.id = nanoid(7);
+            // See https://github.com/ocelot-ide/Ocelot/issues/146 for more information.
+            // Get a unique ID for each message. Solve React rendering issue
+            (messageView as any).id = nanoid(7);
             let newLog = [...prevState.logs, messageView];
             if (newLog.length > 100) {
                 newLog = newLog.slice(newLog.length - 100);
