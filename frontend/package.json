@@ -6,10 +6,10 @@
   "dependencies": {
     "@material-ui/core": "~3",
     "@material-ui/icons": "~3",
-    "@stopify/elementary-js": "1.3.0",
+    "@stopify/elementary-js": "^1.3.3",
     "@types/linkifyjs": "^2.1.3",
-    "@types/react-dom": "~16",
     "@types/react": "~16",
+    "@types/react-dom": "~16",
     "babel-traverse": "^6.26.0",
     "console-feed": "~3",
     "detect-browser": "^3.0.0",
@@ -49,7 +49,6 @@
     "build": "npm run-script gen-version && ./build.sh",
     "start": "yarn gen-version && webpack-dev-server --open",
     "serve-local": "http-server build",
-    "deploy": "rsync -azdOL build/ ocelot@ocelot-ide.org:/var/www/ocelot-ide.org/",
     "deploy-beta": "rsync -azdOL build/ beta/ && cd beta && git add -A . && git commit -m commit && git push",
     "test": "cp ../node_modules/stopify/dist/stopify-full.bundle.js public/ && react-scripts-ts test --env=jsdom"
   }
